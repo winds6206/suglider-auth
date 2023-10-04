@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"github.com/gin-gonic/gin"
 	mariadb "suglider-auth/internal/database/connect"
+	"suglider-auth/pkg/encrypt"
 
 )
 
@@ -31,8 +32,11 @@ func UserSignUp(c *gin.Context) {
 		return
 	}
 
+	// Encode user password
+	passwordEncode, _ := encrypt.SaltedPasswordHash(request.Password)
+
 	sqlStr := "INSERT INTO suglider.user_info(user_id, username, password, mail, address) VALUES (UNHEX(REPLACE(UUID(), '-', '')),?,?,?,?)"
-	_, err = mariadb.DataBase.Exec(sqlStr, request.Username, request.Password, request.Mail, request.Address)
+	_, err = mariadb.DataBase.Exec(sqlStr, request.Username, passwordEncode, request.Mail, request.Address)
 	if err != nil {
 		log.Println("Insert user_info table failed:", err)
 		c.JSON(http.StatusBadRequest, gin.H{"message": "User create failed"})
