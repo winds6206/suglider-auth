@@ -1,0 +1,83 @@
+{
+    "schemes": [
+        "http",
+        "https"
+    ],
+    "swagger": "2.0",
+    "info": {
+        "description": "API Doc for Suglider Auth",
+        "title": "Suglider-Auth API Doc",
+        "termsOfService": "http://swagger.io/terms/",
+        "contact": {
+            "name": "Above and Beyond",
+            "email": "geek@openmind.ng"
+        },
+        "license": {
+            "name": "MIT",
+            "url": "https://github.com/tony/suglider-auth/blob/master/LICENSE"
+        },
+        "version": "1.0"
+    },
+    "basePath": "/",
+    "paths": {
+        "/info": {
+            "get": {
+                "description": "show the fundamental informations of this server",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "general"
+                ],
+                "summary": "Show Information (Simple Health Check)",
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "404": {
+                        "description": "Not found",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "securityDefinitions": {
+        "ApiKeyAuth": {
+            "type": "apiKey",
+            "name": "X-API-KEY",
+            "in": "header"
+        },
+        "BearerAuth": {
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header"
+        }
+    }
+}

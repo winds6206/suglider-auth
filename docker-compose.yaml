@@ -1,0 +1,40 @@
+version: '3'
+services:
+  suglider-auth:
+    container_name: suglider-auth
+    image: suglider-auth
+    restart: unless-stopped
+    build:
+      context:    .
+      dockerfile: build/Dockerfile
+      args:
+        TZ:           "Asia/Taipei"
+        GO_VERSION:   "1.21"
+        BUILD_TAGS:   "doc"
+        VERSION:      "0.0.1"
+    tty: true
+    stdin_open: true
+    entrypoint:
+      - /usr/local/app/bin/suglider-auth
+      - -config=/tmp/config.toml
+      - -debug=true
+    environment:
+      ENV: dev
+      # DISABLE_SWAGGER: Y
+      GIN_MODE: release
+    volumes:
+      - ./test/config.toml:/tmp/config.toml:ro
+    networks:
+      - "suglider-auth"
+    ports:
+      - 9527:9527
+      - 1997:1997
+    ulimits:
+      nproc: 65535
+      nofile:
+        soft: 10240
+        hard: 65536
+networks:
+  suglider-auth:
+    name: suglider-auth
+    driver: bridge

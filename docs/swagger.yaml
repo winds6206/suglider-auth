@@ -1,0 +1,57 @@
+basePath: /
+info:
+  contact:
+    email: geek@openmind.ng
+    name: Above and Beyond
+  description: API Doc for Suglider Auth
+  license:
+    name: MIT
+    url: https://github.com/tony/suglider-auth/blob/master/LICENSE
+  termsOfService: http://swagger.io/terms/
+  title: Suglider-Auth API Doc
+  version: "1.0"
+paths:
+  /info:
+    get:
+      consumes:
+      - application/json
+      description: show the fundamental informations of this server
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            type: string
+        "400":
+          description: Bad request
+          schema:
+            type: string
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+        "403":
+          description: Forbidden
+          schema:
+            type: string
+        "404":
+          description: Not found
+          schema:
+            type: string
+      summary: Show Information (Simple Health Check)
+      tags:
+      - general
+schemes:
+- http
+- https
+securityDefinitions:
+  ApiKeyAuth:
+    in: header
+    name: X-API-KEY
+    type: apiKey
+  BearerAuth:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"

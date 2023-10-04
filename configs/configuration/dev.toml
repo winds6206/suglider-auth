@@ -1,0 +1,24 @@
+[database]
+  host     = "localhost"
+  port     = "3306"
+  name     = "suglider"
+  user     = ""
+  password = ""
+[server]
+  read_timeout     = 5
+  write_timeout    = 15
+  max_header_bytes = 2
+[log]
+  [log.filelog]
+    filename   = "/usr/local/app/logs/suglider-auth.log"
+    maxsize    = 10 # in megabytes
+    maxage     = 30 # in days
+    maxbackups = 3
+    localtime  = true
+    compress   = true
+  [log.syslog]
+    host       = ""
+    port       = 514
+    protocol   = "udp"
+[swagger]
+  theme = "redoc" # default or redoc

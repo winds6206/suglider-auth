@@ -1,0 +1,31 @@
+# generic files to ignore
+#.*
+
+# go dep vender path
+vendor/
+test/
+bin/
+tmp/
+oauth2-server/bin/
+oauth2-server/test/
+oauth2-server/vendor/
+oauth2-server/tmp/
+do-scheduler/bin/
+do-scheduler/test/
+do-scheduler/vendor/
+do-scheduler/tmp/
+
+# python temp paths
+__pycache__/
+*.py[cod]
+
+# editors
+*~
+*.swp
+*.swo
+*#
+
+# ms-windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
