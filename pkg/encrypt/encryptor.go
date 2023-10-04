@@ -12,13 +12,14 @@ import (
 	"crypto/sha256"
 	"crypto/sha512"
 	"fmt"
+	"golang.org/x/crypto/bcrypt"
 	"hash"
 	"io"
 )
 
-func HashWithSHA(data, length string) string {
+func HashWithSHA(data, alg string) string {
 	var hsh hash.Hash
-	switch length {
+	switch alg {
 	case "sha1", "sha128":
 		hsh = sha1.New()
 	case "sha256":
@@ -38,8 +39,36 @@ func HashWithMD5(data string) string {
 	return fmt.Sprintf("%x",sm)
 }
 
+func SaltedPasswordHash(pwd string, cost int) (string, error) {
+	switch {
+	case cost < 4:
+		cost = 4
+	case cost > 31:
+		cost = 31
+	}
+	salted, err := bcrypt.GenerateFromPassword([]byte(pwd), bcrypt.MinCost)
+	if err != nil {
+		return "", err
+	}
+	return string(salted), nil
+}
+
+func VerifySaltedPasswordHash(hashedPwd, pwd string) bool {
+	err := bcrypt.CompareHashAndPassword([]byte(hashedPwd), []byte(pwd))
+	if err != nil {
+		return false
+	}
+	return true
+}
+
 func AesEncrypt(key, data []byte, mode string) ([]byte, error) {
 	var result []byte
+	switch len(key) {
+	case 16, 24, 32:
+		break
+	default:
+		return nil, fmt.Errorf("The key length cloud be 16(AES-128), 24(AES-192) or 32(AES-256).\n")
+	}
 	blk, err := aes.NewCipher(key)
 	if err != nil {
 		return nil, err
@@ -116,16 +145,21 @@ func AesDecrypt(key, data []byte, mode string) ([]byte, error) {
 		encrypter := cipher.NewCBCDecrypter(blk, key[:size])
 		result = make([]byte, len(data))
 		encrypter.CryptBlocks(result, data)
+		if result, err = Pkcs5Unpad(result, size); err != nil {
+			return nil, err
+		}
 	}
 
 	return result, nil
 }
 
 func Pkcs5Pad(data []byte, blkSize int) []byte {
-	// eg. []byte{0x0A, 0x0B, 0x0C, 0x0D} to []byte{0x0A, 0x0B, 0x0C, 0x0D, 0x04, 0x04, 0x04, 0x04}
+	// padding such as:
+	//   []byte{0x0A, 0x0B, 0x0C, 0x0D} to []byte{0x0A, 0x0B, 0x0C, 0x0D, 0x04, 0x04, 0x04, 0x04}
 	length := blkSize - (len(data) % blkSize)
-	newKey := bytes.Repeat([]byte{byte(length)}, length)
-	return newKey
+	padding := bytes.Repeat([]byte{byte(length)}, length)
+	newData := append(data, padding...)
+	return newData
 }
 
 func Pkcs5Unpad(data []byte, blkSize int) ([]byte, error) {
@@ -212,7 +246,7 @@ func (re *RsaEncryptor) RsaDecrypt(data string) (string, error) {
 	default:
 		if decrypted, err = re.Privkey.Decrypt(
 			nil,
-			decrypted,
+			[]byte(data),
 			&rsa.OAEPOptions {
 				Hash: hsh,
 			},

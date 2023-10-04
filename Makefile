@@ -17,6 +17,7 @@ run:
 
 clean:
 	go clean
+	go clean -testcache
 	@if [ -f bin/${BINARY_NAME} ] ; then rm -f bin/${BINARY_NAME} ; fi
 
 docker:

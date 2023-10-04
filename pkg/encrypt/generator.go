@@ -7,10 +7,9 @@ import (
 	"crypto/x509"
 	"encoding/pem"
 	"fmt"
+	"github.com/google/uuid"
 	"math/rand"
 	"time"
-
-	"github.com/google/uuid"
 )
 
 func RandomString(length int, specials string) string {
@@ -154,4 +153,3 @@ func RsaPublicKeyFromPemFile(file string) (*rsa.PublicKey, error) {
 	}
 	return nil, fmt.Errorf("Error: %s\n", "")
 }
-
