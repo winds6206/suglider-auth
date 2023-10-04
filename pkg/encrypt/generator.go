@@ -7,9 +7,10 @@ import (
 	"crypto/x509"
 	"encoding/pem"
 	"fmt"
-	"github.com/google/uuid"
 	"math/rand"
+	"strings"
 	"time"
+	"github.com/google/uuid"
 )
 
 func RandomString(length int, specials string) string {
@@ -23,8 +24,11 @@ func RandomString(length int, specials string) string {
 }
 
 func GenertateUUID(noDash bool) string {
-	id := uuid.New()
-	return id.String()
+	id := uuid.New().String()
+	if noDash {
+		id = strings.Replace(id, "-", "", -1)
+	}
+	return id
 }
 
 func GenerateRSAKeyPair(length int) (*rsa.PrivateKey, *rsa.PublicKey, error) {
