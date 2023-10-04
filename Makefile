@@ -6,6 +6,7 @@ BUILD_FLAGS = "-X main.Version=${VERSION} -X main.Build=${BUILD_DATE}"
 TZ          = Asia/Taipei
 GO_VERSION  = 1.21
 
+.PHONY: build
 build:
 	GOARCH=amd64 CGO_ENABLED=0 \
 	go build -mod mod -buildvcs=false -tags ${BUILD_TAGS} -ldflags ${BUILD_FLAGS} \
@@ -20,6 +21,8 @@ clean:
 
 docker:
 	docker build \
+	-e GOPATH=/tmp/go \
+	-v ${PWD}:/tmp/go \
 	--build-arg "TZ=${TZ}" \
 	--build-arg "GO_VERSION=${GO_VERSION}" \
 	--build-arg "VERSION=${VERSION}" \
@@ -35,6 +38,7 @@ lint:
 benchmark:
 	go test -bench=.
 
+.PHONY: test
 test:
 	go test -race -v ./...
 
@@ -42,3 +46,6 @@ help:
 	@echo "make build VERSION=1.0.0 - compile the binary file with golang codes"
 	@echo "make docker VERSION=1.0.0 GO_VERSION=1.21 - compile the docker image from build/Dockerfile"
 	@echo "make clean - remove the binary file in the bin directory"
+	@echo "make lint - check golang syntax"
+	@echo "make benchmark - run benchmark"
+	@echo "make test - run test with -race parameter"

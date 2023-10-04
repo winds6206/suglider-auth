@@ -1,3 +1,7 @@
+CREATE DATABASE IF NOT EXISTS suglider;
+
+USE suglider;
+
 CREATE TABLE IF NOT EXISTS user_info (
     user_id BINARY(16) NOT NULL,
     username VARCHAR(256) NOT NULL,

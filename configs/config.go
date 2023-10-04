@@ -39,9 +39,10 @@ type (
 		Password       string             `toml:"password"`
 	}
 	serverSettings struct {
-		ReadTimeout    int           `toml:"read_timeout"`
-		WriteTimeout   int           `toml:"write_timeout"`
-		MaxHeaderBytes int           `toml:"max_header_bytes"`
+		GracefulTimeout int           `toml:"graceful_timeout",default:"5"`
+		ReadTimeout     int           `toml:"read_timeout"`
+		WriteTimeout    int           `toml:"write_timeout"`
+		MaxHeaderBytes  int           `toml:"max_header_bytes"`
 	}
 	logSettings struct {
 		Filelog        *lumberjack.Logger `toml:"filelog"`

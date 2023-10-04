@@ -7,7 +7,7 @@ import (
 	"suglider-auth/configs"
 )
 
-var SugliderDB *sqlx.DB
+var DataBase *sqlx.DB
 
 func init() {
 
@@ -15,35 +15,34 @@ func init() {
 
 	var DatabaseConfig = configs.ApplicationConfig.Database
 
-	// DB connection setting
+	// DB connection setting, no specify any Database
 	dbConfig := mysql.Config{
 		User:      DatabaseConfig.User,
 		Passwd:    DatabaseConfig.Password,
 		Net:       "tcp",
 		Addr:      DatabaseConfig.Host + ":" + DatabaseConfig.Port,
-		DBName:    DatabaseConfig.Name,
 		AllowNativePasswords: true,
 	}
 
 	// Generate MariaDB connection string
-	SugliderDBURL := dbConfig.FormatDSN()
+	DataBaseURL := dbConfig.FormatDSN()
 
 	// Connect to MariaDB
-	SugliderDB, dbErr = sqlx.Connect("mysql", SugliderDBURL)
+	DataBase, dbErr = sqlx.Connect("mysql", DataBaseURL)
 	if dbErr != nil {
 		log.Println("Can not connect to database:", dbErr)
 		panic(dbErr)
 	}
 
 	// Set DB max connection
-    SugliderDB.DB.SetMaxOpenConns(100)
+    DataBase.DB.SetMaxOpenConns(100)
 
-	log.Println("Connected to SugliderDB successfully！")
+	log.Println("Connected to DataBase successfully！")
 
 }
 
 // Close DB connection
 func Close() {
-	SugliderDB.Close()
+	DataBase.Close()
 	return
 }

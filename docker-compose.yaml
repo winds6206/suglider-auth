@@ -2,16 +2,8 @@ version: '3'
 services:
   suglider-auth:
     container_name: suglider-auth
-    image: suglider-auth
+    image: ghcr.io/winds6206/suglider-auth
     restart: unless-stopped
-    build:
-      context:    .
-      dockerfile: build/Dockerfile
-      args:
-        TZ:           "Asia/Taipei"
-        GO_VERSION:   "1.21"
-        BUILD_TAGS:   "doc"
-        VERSION:      "0.0.1"
     tty: true
     stdin_open: true
     entrypoint:
@@ -28,7 +20,28 @@ services:
       - "suglider-auth"
     ports:
       - 9527:9527
-      - 1997:1997
+    ulimits:
+      nproc: 65535
+      nofile:
+        soft: 10240
+        hard: 65536
+  suglider-auth-db:
+    container_name: suglider-auth-db
+    image: mariadb:11
+    restart: unless-stopped
+    volumes:
+      - ./db/data:/var/lib/mysql
+      - ./db/initdb.d:/docker-entrypoint-initdb.d
+    environment:
+      TZ: "Asia/Taipei"
+      MARIADB_ROOT_PASSWORD: "YOUR_PASSWORD"
+      MARIADB_DATABASE: "suglider"
+      MARIADB_USER: "suglider"
+      MARIADB_PASSWORD: "YOUR_PASSWORD"
+    networks:
+      - "suglider-auth"
+    ports:
+      - 3306:3306
     ulimits:
       nproc: 65535
       nofile:

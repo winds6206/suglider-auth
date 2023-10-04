@@ -5,6 +5,7 @@
   user     = ""
   password = ""
 [server]
+  graceful_timeout = 5
   read_timeout     = 5
   write_timeout    = 15
   max_header_bytes = 2

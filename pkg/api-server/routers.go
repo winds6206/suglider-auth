@@ -18,6 +18,7 @@ type AuthApiSettings struct {
 	Name            string
 	Version         string
 	SubpathPrefix   string
+	GracefulTimeout int
 	ReadTimeout     int
 	WriteTimeout    int
 	MaxHeaderBytes  int
@@ -52,17 +53,26 @@ func (aa * AuthApiSettings) StartServer(addr string, swag gin.HandlerFunc) {
 		WriteTimeout:   time.Duration(aa.WriteTimeout) * time.Second,
 		MaxHeaderBytes: aa.MaxHeaderBytes << 20, // default is max 2 MB
 	}
+
+	if aa.GracefulTimeout <= 0 { aa.GracefulTimeout = 5 }
+
 	go func() {
 		if err := srv.ListenAndServe(); err != nil {
 		    log.Printf("Server Listen Error: %s\n", err)
 		}
 	}()
+
 	quit := make(chan os.Signal, 1)
+	// run kill -2 <pid> (SIGINT) to stop gracefully (same as trigger by Ctrl-C)
+	// run kill -1 <pid> (SIGHUP) to restart gracefully
 	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
 	<-quit
 	log.Println("Shutting down server...")
 
-	ctx, cancel := context.WithTimeout(context.Background(), 10 * time.Second)
+	ctx, cancel := context.WithTimeout(
+		context.Background(),
+		time.Duration(aa.GracefulTimeout) * time.Second,
+	)
 	defer cancel()
 	if err := srv.Shutdown(ctx); err != nil {
 		log.Fatal("Server forced to shutdown: ", err)
@@ -70,8 +80,8 @@ func (aa * AuthApiSettings) StartServer(addr string, swag gin.HandlerFunc) {
 	}
 	select {
 		case <-ctx.Done():
-			log.Println("Graceful Shutdown start...")
+			log.Printf("timeout of %d seconds.\n", aa.GracefulTimeout)
 			close(quit)
 	}
-	log.Println("Graceful shutdown finished...")
+	log.Println("Server exiting")
 }

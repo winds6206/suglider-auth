@@ -31,7 +31,7 @@ func SugliderTableInit() {
 			continue
 		}
 
-		mariadb.SugliderDB.Exec(sqlStatement)
+		mariadb.DataBase.Exec(sqlStatement)
 	}
 
 	log.Println("SQL file excution complete!")
