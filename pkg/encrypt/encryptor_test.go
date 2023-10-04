@@ -6,10 +6,10 @@ import (
 )
 
 func TestEncrypt(t *testing.T) {
-	t.Run("Test password hash in Parallel", func(t *testing.T) {
+	t.Run("Test password hash in parallel", func(t *testing.T) {
 		t.Parallel()
 		pwd := RandomString(16, "!@#$%^&*()")
-		hashed, err := SaltedPasswordHash(pwd, 12)
+		hashed, err := SaltedPasswordHash(pwd)
 		if err != nil {
 			t.Errorf("Unit Test (Hash Slated Password) Fail: %v\n", err)
 		}
@@ -22,7 +22,7 @@ func TestEncrypt(t *testing.T) {
 			t.Errorf("Result: %v (%s)\n", matched, "The result of salted password verrification is not correct.")
 		}
 	})
-	t.Run("Test aes encryption/decryption in Parallel", func(t *testing.T) {
+	t.Run("Test aes encryption/decryption in parallel", func(t *testing.T) {
 		t.Parallel()
 		text := []byte("This is a test for aes encryption/decryption.")
 		secret := []byte(RandomString(32, "!@#$%^&*()"))
@@ -74,7 +74,7 @@ func TestEncrypt(t *testing.T) {
 			)
 		}
 	})
-	t.Run("Test rsa encryption/decryption in Parallel", func(t *testing.T) {
+	t.Run("Test rsa encryption/decryption in parallel", func(t *testing.T) {
 		t.Parallel()
 		msg := "This is a test for rsa encryption/decryption."
 		privkey, pubkey, err := GenerateRSAKeyPair(4096)

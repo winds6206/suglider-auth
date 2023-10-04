@@ -39,14 +39,8 @@ func HashWithMD5(data string) string {
 	return fmt.Sprintf("%x",sm)
 }
 
-func SaltedPasswordHash(pwd string, cost int) (string, error) {
-	switch {
-	case cost < 4:
-		cost = 4
-	case cost > 31:
-		cost = 31
-	}
-	salted, err := bcrypt.GenerateFromPassword([]byte(pwd), bcrypt.MinCost)
+func SaltedPasswordHash(pwd string) (string, error) {
+	salted, err := bcrypt.GenerateFromPassword([]byte(pwd), bcrypt.DefaultCost)
 	if err != nil {
 		return "", err
 	}
