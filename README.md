@@ -30,6 +30,7 @@ make clean
 ### make docker
 
 Command `make docker` can build docker images
+
 ```bash
 make docker VERSION=1.0.0
 ```
@@ -40,4 +41,20 @@ Compile and run the program through main.go
 
 ```bash
 ENV=dev go run main.go -c ~/tmp/dev.toml
+```
+
+## Test
+
+### Unit Test
+
+Run the following command to start unit test for entire project:
+
+```bash
+make test
+```
+
+You could clean test cache by the following command:
+
+```bash
+make clean
 ```
