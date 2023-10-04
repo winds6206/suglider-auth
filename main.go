@@ -70,13 +70,12 @@ func init() {
 
 func main() {
 	apiServer := &authApiSettings {
-		Name:            ServiceName,
-		Version:         Version,
-		GracefulTimeout: configs.ApplicationConfig.Server.GracefulTimeout,
-		ReadTimeout:     configs.ApplicationConfig.Server.ReadTimeout,
-		WriteTimeout:    configs.ApplicationConfig.Server.WriteTimeout,
-		MaxHeaderBytes:  configs.ApplicationConfig.Server.MaxHeaderBytes,
-		EnablePprof:     configs.Args.Debug,
+		Name:           ServiceName,
+		Version:        Version,
+		ReadTimeout:    configs.ApplicationConfig.Server.ReadTimeout,
+		WriteTimeout:   configs.ApplicationConfig.Server.WriteTimeout,
+		MaxHeaderBytes: configs.ApplicationConfig.Server.MaxHeaderBytes,
+		EnablePprof:    configs.Args.Debug,
 	}
 
 	if configs.Args.Subpath != "" {

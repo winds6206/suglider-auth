@@ -10,6 +10,7 @@ import (
 	"log"
 	"github.com/gin-gonic/gin"
 	"github.com/gin-contrib/pprof"
+	v1_routers "suglider-auth/pkg/api-server/api_v1/routers"
 
 	docs "suglider-auth/docs"
 )
@@ -18,7 +19,6 @@ type AuthApiSettings struct {
 	Name            string
 	Version         string
 	SubpathPrefix   string
-	GracefulTimeout int
 	ReadTimeout     int
 	WriteTimeout    int
 	MaxHeaderBytes  int
@@ -41,6 +41,11 @@ func (aa * AuthApiSettings) SetupRouter(swag gin.HandlerFunc) *gin.Engine {
 	}
 	router.GET(aa.SubpathPrefix + "/healthz", aa.healthzHandler)
 
+	apiv1Router := router.Group("/api/v1")
+	{
+		v1_routers.Apiv1Handler(apiv1Router)
+	}
+
 	return router
 }
 
@@ -53,26 +58,17 @@ func (aa * AuthApiSettings) StartServer(addr string, swag gin.HandlerFunc) {
 		WriteTimeout:   time.Duration(aa.WriteTimeout) * time.Second,
 		MaxHeaderBytes: aa.MaxHeaderBytes << 20, // default is max 2 MB
 	}
-
-	if aa.GracefulTimeout <= 0 { aa.GracefulTimeout = 5 }
-
 	go func() {
 		if err := srv.ListenAndServe(); err != nil {
 		    log.Printf("Server Listen Error: %s\n", err)
 		}
 	}()
-
 	quit := make(chan os.Signal, 1)
-	// run kill -2 <pid> (SIGINT) to stop gracefully (same as trigger by Ctrl-C)
-	// run kill -1 <pid> (SIGHUP) to restart gracefully
 	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
 	<-quit
 	log.Println("Shutting down server...")
 
-	ctx, cancel := context.WithTimeout(
-		context.Background(),
-		time.Duration(aa.GracefulTimeout) * time.Second,
-	)
+	ctx, cancel := context.WithTimeout(context.Background(), 10 * time.Second)
 	defer cancel()
 	if err := srv.Shutdown(ctx); err != nil {
 		log.Fatal("Server forced to shutdown: ", err)
@@ -80,8 +76,8 @@ func (aa * AuthApiSettings) StartServer(addr string, swag gin.HandlerFunc) {
 	}
 	select {
 		case <-ctx.Done():
-			log.Printf("timeout of %d seconds.\n", aa.GracefulTimeout)
+			log.Println("Graceful Shutdown start...")
 			close(quit)
 	}
-	log.Println("Server exiting")
+	log.Println("Graceful shutdown finished...")
 }
