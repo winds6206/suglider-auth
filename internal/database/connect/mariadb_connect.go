@@ -35,7 +35,7 @@ func init() {
 	}
 
 	// Set DB max connection
-    DataBase.DB.SetMaxOpenConns(100)
+    DataBase.SetMaxOpenConns(100)
 
 	log.Println("Connected to DataBase successfully！")
 
