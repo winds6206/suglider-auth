@@ -6,6 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 	mariadb "suglider-auth/internal/database/connect"
 	"suglider-auth/pkg/encrypt"
+	"database/sql"
 
 )
 
@@ -20,6 +21,16 @@ type userDelete struct {
 	User_id  string `json:"user_id"`
 	Username string `json:"username" binding:"required"`
 	Mail     string `json:"mail" binding:"required"`
+}
+
+type userLogin struct {
+	Username string `json:"username" binding:"required"`
+	Password string `json:"password" binding:"required"`
+}
+
+type userDBInfo struct {
+	Username string `json:"username"`
+	Password string `json:"password"`
 }
 
 func UserSignUp(c *gin.Context) {
@@ -61,6 +72,7 @@ func UserDelete(c *gin.Context) {
 		if err != nil {
 			log.Println("Delete user_info data failed:", err)
 			c.JSON(http.StatusBadRequest, gin.H{"message": "User delete failed"})
+			return
 		} else {
 			c.JSON(http.StatusOK, gin.H{"message": "User deleted successfully"})
 		}
@@ -72,9 +84,50 @@ func UserDelete(c *gin.Context) {
 		if err != nil {
 			log.Println("Delete user_info data failed:", err)
 			c.JSON(http.StatusBadRequest, gin.H{"message": "User delete failed"})
+			return
 		} else {
 			c.JSON(http.StatusOK, gin.H{"message": "User deleted successfully"})
 		}	
 	}
 }
 
+func UserLogin(c *gin.Context) {
+
+	var request userLogin
+	var userDBInfo userDBInfo
+	var usernameExist int
+
+	// Check the parameter trasnfer from POST
+	err := c.ShouldBindJSON(&request)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	// Check whether username exist or not
+	err = mariadb.DataBase.Get(&userDBInfo, "SELECT username, password FROM suglider.user_info WHERE username=?", request.Username)
+
+	if err == nil {
+		usernameExist = 1
+	} else if err == sql.ErrNoRows {
+		log.Println("User Login failed:", err)
+		c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
+		return
+	} else if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
+		return
+	}
+
+	pwdVerify := encrypt.VerifySaltedPasswordHash(userDBInfo.Password, request.Password)
+
+	// Check password true or false
+	if usernameExist == 1 && pwdVerify {
+		c.JSON(http.StatusOK, gin.H{"message": "User Logined successfully"})
+	} else if !pwdVerify {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid password"})
+		return
+	} else {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
+		return
+	}
+}
