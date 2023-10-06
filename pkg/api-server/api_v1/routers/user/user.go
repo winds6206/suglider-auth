@@ -10,4 +10,8 @@ func UserHandler(router *gin.RouterGroup) {
 	router.POST("/sign-up", handlers.UserSignUp)
 	router.POST("/delete", handlers.UserDelete)
 	router.POST("/login", handlers.UserLogin)
+
+	// Test 
+	router.GET("/test", handlers.Test)
+	router.GET("/test-v2", handlers.Testv2)
 }
