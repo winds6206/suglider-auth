@@ -13,6 +13,7 @@ build:
 	-o bin/${BINARY_NAME}
 
 run:
+	go mod tidy
 	go run -race
 
 clean:
@@ -22,8 +23,6 @@ clean:
 
 docker:
 	docker build \
-	-e GOPATH=/tmp/go \
-	-v ${PWD}:/tmp/go \
 	--build-arg "TZ=${TZ}" \
 	--build-arg "GO_VERSION=${GO_VERSION}" \
 	--build-arg "VERSION=${VERSION}" \
@@ -37,10 +36,12 @@ lint:
 	golangci-lint run --verbose
 
 benchmark:
+	go mod tidy
 	go test -bench=.
 
 .PHONY: test
 test:
+	go mod tidy
 	go test -race -v ./...
 
 help:

@@ -8,17 +8,23 @@ import (
 	"context"
 	"net/http"
 	"log"
+	"log/slog"
 	"github.com/gin-gonic/gin"
 	"github.com/gin-contrib/pprof"
-	v1_routers "suglider-auth/pkg/api-server/api_v1/routers"
+	"github.com/casbin/casbin/v2"
+	"github.com/memwey/casbin-sqlx-adapter"
 
+	v1_routers "suglider-auth/pkg/api-server/api_v1/routers"
 	docs "suglider-auth/docs"
+	mariadb "suglider-auth/internal/database/connect"
 )
 
 type AuthApiSettings struct {
 	Name            string
 	Version         string
 	SubpathPrefix   string
+	CasbinConfig    string
+	CasbinTable     string
 	ReadTimeout     int
 	WriteTimeout    int
 	MaxHeaderBytes  int
@@ -29,7 +35,7 @@ func (aa * AuthApiSettings) SetupRouter(swag gin.HandlerFunc) *gin.Engine {
 	router := gin.New()
 	router.Use(gin.Logger())
 	if aa.EnablePprof {
-		pprof.Register(router, "debug/pprof")
+		pprof.Register(router, aa.SubpathPrefix + "debug/pprof")
 	}
 	if swag != nil {
 		if aa.SubpathPrefix != "" {
@@ -41,9 +47,57 @@ func (aa * AuthApiSettings) SetupRouter(swag gin.HandlerFunc) *gin.Engine {
 	}
 	router.GET(aa.SubpathPrefix + "/healthz", aa.healthzHandler)
 
-	apiv1Router := router.Group("/api/v1")
+	// RBAC model
+	csbnAdapterOpts := &sqlxadapter.AdapterOptions {
+		DB:        mariadb.DataBase,
+		TableName: aa.CasbinTable,
+		// DriverName:     "mysql",
+		// DataSourceName: "root:1234@tcp(127.0.0.1:3306)/suglider",
+	}
+	csbnAdapter := sqlxadapter.NewAdapterFromOptions(csbnAdapterOpts)
+	csbnEnforcer, err := casbin.NewEnforcer(aa.CasbinConfig, csbnAdapter)
+	if err != nil {
+		slog.Error(err.Error())
+	}
+	if ok, err := csbnEnforcer.AddPolicy("admin", "/*", "*"); !ok {
+		if err != nil {
+			slog.Error(err.Error())
+		}
+		slog.Info("This policy already exists.")
+	}
+	if ok, err := csbnEnforcer.AddPolicy("anonymous", "/login", "POST"); !ok {
+		if err != nil {
+			slog.Error(err.Error())
+		}
+		slog.Info("This policy already exists.")
+	}
+	if ok, err := csbnEnforcer.AddPolicy("anonymous", "/logout", "POST"); !ok {
+		if err != nil {
+			slog.Error(err.Error())
+		}
+		slog.Info("This policy already exists.")
+	}
+	if err = csbnEnforcer.LoadPolicy(); err != nil {
+		slog.Error(err.Error())
+		panic(err)
+	}
+	csbnEnforcer.EnableAutoSave(true)
+
+	apiv1Router := router.Group(aa.SubpathPrefix + "/api/v1")
 	{
 		v1_routers.Apiv1Handler(apiv1Router)
+		router.Group("/rbac")
+		{
+			router.GET("/roles", aa.CasbinListRoles)
+			router.GET("/members", aa.CasbinListMembers)
+			router.GET("/role/:name", aa.CasbinGetRole)
+			router.GET("/member/:name", aa.CasbinGetMember)
+			router.POST("/rbac/role/add", aa.CasbinAddRole)
+			router.POST("/rbac/member/add", aa.CasbinAttachRoleToMember)
+			router.POST("/rbac/role/:name/delete", aa.CasbinDeleteRole)
+			router.POST("/rbac/member/:name/delete", aa.CasbinDeleteMember)
+			router.POST("/rbac/object/delete", aa.CasbinDeleteObject)
+		}
 	}
 
 	return router

@@ -2,16 +2,8 @@ version: '3'
 services:
   suglider-auth:
     container_name: suglider-auth
-    image: suglider-auth
+    image: ghcr.io/winds6206/suglider-auth
     restart: unless-stopped
-    build:
-      context:    .
-      dockerfile: build/Dockerfile
-      args:
-        TZ:           "Asia/Taipei"
-        GO_VERSION:   "1.21"
-        BUILD_TAGS:   "doc"
-        VERSION:      "0.0.1"
     tty: true
     stdin_open: true
     entrypoint:

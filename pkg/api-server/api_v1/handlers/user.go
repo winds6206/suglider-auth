@@ -33,6 +33,21 @@ type userDBInfo struct {
 	Password string `json:"password"`
 }
 
+// @Summary Sign Up User
+// @Description registry new user
+// @Tags users
+// @Accept multipart/form-data
+// @Produce application/json
+// @Param username formData string false "User Name"
+// @Param password formData string false "Password"
+// @Param mail formData string false "e-Mail"
+// @Param address formData string false "Address"
+// @Success 200 {string} string "Success"
+// @Failure 400 {string} string "Bad request"
+// @Failure 401 {string} string "Unauthorized"
+// @Failure 403 {string} string "Forbidden"
+// @Failure 404 {string} string "Not found"
+// @Router /api/v1/user/sign-up [post]
 func UserSignUp(c *gin.Context) {
 	var request userSignUp
 
@@ -56,6 +71,19 @@ func UserSignUp(c *gin.Context) {
 	}
 }
 
+// @Summary Delete User
+// @Description delete an existing user
+// @Tags users
+// @Accept multipart/form-data
+// @Produce application/json
+// @Param username formData string false "User Name"
+// @Param mail formData string false "e-Mail"
+// @Success 200 {string} string "Success"
+// @Failure 400 {string} string "Bad request"
+// @Failure 401 {string} string "Unauthorized"
+// @Failure 403 {string} string "Forbidden"
+// @Failure 404 {string} string "Not found"
+// @Router /api/v1/user/delete [post]
 func UserDelete(c *gin.Context) {
 	var request userDelete
 
@@ -91,6 +119,19 @@ func UserDelete(c *gin.Context) {
 	}
 }
 
+// @Summary User Login
+// @Description user login
+// @Tags users
+// @Accept multipart/form-data
+// @Produce application/json
+// @Param username formData string false "User Name"
+// @Param password formData string false "Password"
+// @Success 200 {string} string "Success"
+// @Failure 400 {string} string "Bad request"
+// @Failure 401 {string} string "Unauthorized"
+// @Failure 403 {string} string "Forbidden"
+// @Failure 404 {string} string "Not found"
+// @Router /api/v1/user/login [post]
 func UserLogin(c *gin.Context) {
 
 	var request userLogin

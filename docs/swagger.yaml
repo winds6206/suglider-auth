@@ -1,8 +1,8 @@
 basePath: /
 info:
   contact:
-    email: geek@openmind.ng
-    name: Above and Beyond
+    email: geek@openmind.np
+    name: Above&Beyond
   description: API Doc for Suglider Auth
   license:
     name: MIT
@@ -11,7 +11,465 @@ info:
   title: Suglider-Auth API Doc
   version: "1.0"
 paths:
-  /info:
+  /api/v1/rbac/member/{name}:
+    get:
+      consumes:
+      - application/json
+      description: show all roles attached to this member
+      parameters:
+      - description: Member Name
+        in: path
+        name: name
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            type: string
+        "400":
+          description: Bad request
+          schema:
+            type: string
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+        "403":
+          description: Forbidden
+          schema:
+            type: string
+        "404":
+          description: Not found
+          schema:
+            type: string
+      summary: Get Roles with Member
+      tags:
+      - privilege
+  /api/v1/rbac/member/{name}/delete:
+    post:
+      consumes:
+      - application/json
+      description: delete a member
+      parameters:
+      - description: Member Name
+        in: path
+        name: name
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            type: string
+        "400":
+          description: Bad request
+          schema:
+            type: string
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+        "403":
+          description: Forbidden
+          schema:
+            type: string
+        "404":
+          description: Not found
+          schema:
+            type: string
+      summary: Delete RBAC Member
+      tags:
+      - privilege
+  /api/v1/rbac/member/add:
+    post:
+      consumes:
+      - multipart/form-data
+      description: new a role-member policy
+      parameters:
+      - description: Subject
+        in: formData
+        name: subject
+        type: string
+      - description: Object
+        in: formData
+        name: object
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            type: string
+        "400":
+          description: Bad request
+          schema:
+            type: string
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+        "403":
+          description: Forbidden
+          schema:
+            type: string
+        "404":
+          description: Not found
+          schema:
+            type: string
+      summary: Add RBAC Role-Member Policy
+      tags:
+      - privilege
+  /api/v1/rbac/members:
+    get:
+      consumes:
+      - application/json
+      description: show all members defined in the server
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            type: string
+        "400":
+          description: Bad request
+          schema:
+            type: string
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+        "403":
+          description: Forbidden
+          schema:
+            type: string
+        "404":
+          description: Not found
+          schema:
+            type: string
+      summary: List All Members
+      tags:
+      - privilege
+  /api/v1/rbac/object/delete:
+    post:
+      consumes:
+      - multipart/form-data
+      description: delete a rbac object
+      parameters:
+      - description: Object
+        in: formData
+        name: object
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            type: string
+        "400":
+          description: Bad request
+          schema:
+            type: string
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+        "403":
+          description: Forbidden
+          schema:
+            type: string
+        "404":
+          description: Not found
+          schema:
+            type: string
+      summary: Delete RBAC Object
+      tags:
+      - privilege
+  /api/v1/rbac/role/{name}:
+    get:
+      consumes:
+      - application/json
+      description: show all members with this role
+      parameters:
+      - description: Role Name
+        in: path
+        name: name
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            type: string
+        "400":
+          description: Bad request
+          schema:
+            type: string
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+        "403":
+          description: Forbidden
+          schema:
+            type: string
+        "404":
+          description: Not found
+          schema:
+            type: string
+      summary: Get Members With Role
+      tags:
+      - privilege
+  /api/v1/rbac/role/{name}/delete:
+    post:
+      consumes:
+      - application/json
+      description: delete a role
+      parameters:
+      - description: Role Name
+        in: path
+        name: name
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            type: string
+        "400":
+          description: Bad request
+          schema:
+            type: string
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+        "403":
+          description: Forbidden
+          schema:
+            type: string
+        "404":
+          description: Not found
+          schema:
+            type: string
+      summary: Delete RBAC Role
+      tags:
+      - privilege
+  /api/v1/rbac/role/add:
+    post:
+      consumes:
+      - multipart/form-data
+      description: new a role/policy
+      parameters:
+      - description: Subject
+        in: formData
+        name: subject
+        type: string
+      - description: Object
+        in: formData
+        name: object
+        type: string
+      - description: Action
+        in: formData
+        name: action
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            type: string
+        "400":
+          description: Bad request
+          schema:
+            type: string
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+        "403":
+          description: Forbidden
+          schema:
+            type: string
+        "404":
+          description: Not found
+          schema:
+            type: string
+      summary: Add RBAC Role/Policy
+      tags:
+      - privilege
+  /api/v1/rbac/roles:
+    get:
+      consumes:
+      - application/json
+      description: show all roles defined in the server
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            type: string
+        "400":
+          description: Bad request
+          schema:
+            type: string
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+        "403":
+          description: Forbidden
+          schema:
+            type: string
+        "404":
+          description: Not found
+          schema:
+            type: string
+      summary: List All Roles
+      tags:
+      - privilege
+  /api/v1/user/delete:
+    post:
+      consumes:
+      - multipart/form-data
+      description: delete an existing user
+      parameters:
+      - description: User Name
+        in: formData
+        name: username
+        type: string
+      - description: e-Mail
+        in: formData
+        name: mail
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            type: string
+        "400":
+          description: Bad request
+          schema:
+            type: string
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+        "403":
+          description: Forbidden
+          schema:
+            type: string
+        "404":
+          description: Not found
+          schema:
+            type: string
+      summary: Delete User
+      tags:
+      - users
+  /api/v1/user/login:
+    post:
+      consumes:
+      - multipart/form-data
+      description: user login
+      parameters:
+      - description: User Name
+        in: formData
+        name: username
+        type: string
+      - description: Password
+        in: formData
+        name: password
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            type: string
+        "400":
+          description: Bad request
+          schema:
+            type: string
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+        "403":
+          description: Forbidden
+          schema:
+            type: string
+        "404":
+          description: Not found
+          schema:
+            type: string
+      summary: User Login
+      tags:
+      - users
+  /api/v1/user/sign-up:
+    post:
+      consumes:
+      - multipart/form-data
+      description: registry new user
+      parameters:
+      - description: User Name
+        in: formData
+        name: username
+        type: string
+      - description: Password
+        in: formData
+        name: password
+        type: string
+      - description: e-Mail
+        in: formData
+        name: mail
+        type: string
+      - description: Address
+        in: formData
+        name: address
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            type: string
+        "400":
+          description: Bad request
+          schema:
+            type: string
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+        "403":
+          description: Forbidden
+          schema:
+            type: string
+        "404":
+          description: Not found
+          schema:
+            type: string
+      summary: Sign Up User
+      tags:
+      - users
+  /healthz:
     get:
       consumes:
       - application/json
