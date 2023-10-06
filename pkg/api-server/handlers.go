@@ -1,8 +1,8 @@
 package api_server
 
 import (
-    "net/http"
-    "github.com/gin-gonic/gin"
+	"github.com/gin-gonic/gin"
+	"net/http"
 )
 
 // @Summary Show Information (Simple Health Check)
@@ -15,11 +15,11 @@ import (
 // @Failure 401 {string} string "Unauthorized"
 // @Failure 403 {string} string "Forbidden"
 // @Failure 404 {string} string "Not found"
-// @Router /info [get]
+// @Router /healthz [get]
 func (aa *AuthApiSettings) healthzHandler(c *gin.Context) {
-    c.IndentedJSON(http.StatusOK, gin.H {
-        "Name":            aa.Name,
-        "Version":         aa.Version,
-        "X-FORWARDED-FOR": c.Request.Header.Get("X-Forwarded-For"),
-    })
+	c.IndentedJSON(http.StatusOK, gin.H {
+		"Name":            aa.Name,
+		"Version":         aa.Version,
+		"X-FORWARDED-FOR": c.Request.Header.Get("X-Forwarded-For"),
+	})
 }
