@@ -11,6 +11,83 @@ info:
   title: Suglider-Auth API Doc
   version: "1.0"
 paths:
+  /api/v1/rbac/grouping/{name}/delete:
+    post:
+      consumes:
+      - application/json
+      description: delete a grouping policy
+      parameters:
+      - description: Member Name
+        in: path
+        name: name
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            type: string
+        "400":
+          description: Bad request
+          schema:
+            type: string
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+        "403":
+          description: Forbidden
+          schema:
+            type: string
+        "404":
+          description: Not found
+          schema:
+            type: string
+      summary: Delete RBAC Grouping Policy
+      tags:
+      - privilege
+  /api/v1/rbac/grouping/add:
+    post:
+      consumes:
+      - multipart/form-data
+      description: new a group (role-member) policy
+      parameters:
+      - description: Subject
+        in: formData
+        name: subject
+        type: string
+      - description: Object
+        in: formData
+        name: object
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            type: string
+        "400":
+          description: Bad request
+          schema:
+            type: string
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+        "403":
+          description: Forbidden
+          schema:
+            type: string
+        "404":
+          description: Not found
+          schema:
+            type: string
+      summary: Add RBAC Grouping Policy
+      tags:
+      - privilege
   /api/v1/rbac/member/{name}:
     get:
       consumes:
@@ -48,83 +125,6 @@ paths:
       summary: Get Roles with Member
       tags:
       - privilege
-  /api/v1/rbac/member/{name}/delete:
-    post:
-      consumes:
-      - application/json
-      description: delete a member
-      parameters:
-      - description: Member Name
-        in: path
-        name: name
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: Success
-          schema:
-            type: string
-        "400":
-          description: Bad request
-          schema:
-            type: string
-        "401":
-          description: Unauthorized
-          schema:
-            type: string
-        "403":
-          description: Forbidden
-          schema:
-            type: string
-        "404":
-          description: Not found
-          schema:
-            type: string
-      summary: Delete RBAC Member
-      tags:
-      - privilege
-  /api/v1/rbac/member/add:
-    post:
-      consumes:
-      - multipart/form-data
-      description: new a role-member policy
-      parameters:
-      - description: Subject
-        in: formData
-        name: subject
-        type: string
-      - description: Object
-        in: formData
-        name: object
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: Success
-          schema:
-            type: string
-        "400":
-          description: Bad request
-          schema:
-            type: string
-        "401":
-          description: Unauthorized
-          schema:
-            type: string
-        "403":
-          description: Forbidden
-          schema:
-            type: string
-        "404":
-          description: Not found
-          schema:
-            type: string
-      summary: Add RBAC Role-Member Policy
-      tags:
-      - privilege
   /api/v1/rbac/members:
     get:
       consumes:
@@ -156,47 +156,11 @@ paths:
       summary: List All Members
       tags:
       - privilege
-  /api/v1/rbac/object/delete:
+  /api/v1/rbac/policy/{name}/delete:
     post:
       consumes:
-      - multipart/form-data
-      description: delete a rbac object
-      parameters:
-      - description: Object
-        in: formData
-        name: object
-        type: string
-      produces:
       - application/json
-      responses:
-        "200":
-          description: Success
-          schema:
-            type: string
-        "400":
-          description: Bad request
-          schema:
-            type: string
-        "401":
-          description: Unauthorized
-          schema:
-            type: string
-        "403":
-          description: Forbidden
-          schema:
-            type: string
-        "404":
-          description: Not found
-          schema:
-            type: string
-      summary: Delete RBAC Object
-      tags:
-      - privilege
-  /api/v1/rbac/role/{name}:
-    get:
-      consumes:
-      - application/json
-      description: show all members with this role
+      description: delete a policy
       parameters:
       - description: Role Name
         in: path
@@ -226,47 +190,10 @@ paths:
           description: Not found
           schema:
             type: string
-      summary: Get Members With Role
+      summary: Delete RBAC Policy
       tags:
       - privilege
-  /api/v1/rbac/role/{name}/delete:
-    post:
-      consumes:
-      - application/json
-      description: delete a role
-      parameters:
-      - description: Role Name
-        in: path
-        name: name
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: Success
-          schema:
-            type: string
-        "400":
-          description: Bad request
-          schema:
-            type: string
-        "401":
-          description: Unauthorized
-          schema:
-            type: string
-        "403":
-          description: Forbidden
-          schema:
-            type: string
-        "404":
-          description: Not found
-          schema:
-            type: string
-      summary: Delete RBAC Role
-      tags:
-      - privilege
-  /api/v1/rbac/role/add:
+  /api/v1/rbac/policy/add:
     post:
       consumes:
       - multipart/form-data
@@ -307,7 +234,44 @@ paths:
           description: Not found
           schema:
             type: string
-      summary: Add RBAC Role/Policy
+      summary: Add RBAC Policy
+      tags:
+      - privilege
+  /api/v1/rbac/role/{name}:
+    get:
+      consumes:
+      - application/json
+      description: show all members with this role
+      parameters:
+      - description: Role Name
+        in: path
+        name: name
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            type: string
+        "400":
+          description: Bad request
+          schema:
+            type: string
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+        "403":
+          description: Forbidden
+          schema:
+            type: string
+        "404":
+          description: Not found
+          schema:
+            type: string
+      summary: Get Members With Role
       tags:
       - privilege
   /api/v1/rbac/roles:

@@ -31,6 +31,8 @@ type AuthApiSettings struct {
 	EnablePprof     bool
 }
 
+type CasbinConfig = v1_routers.CasbinConfig
+
 func (aa * AuthApiSettings) SetupRouter(swag gin.HandlerFunc) *gin.Engine {
 	router := gin.New()
 	router.Use(gin.Logger())
@@ -82,22 +84,14 @@ func (aa * AuthApiSettings) SetupRouter(swag gin.HandlerFunc) *gin.Engine {
 		panic(err)
 	}
 	csbnEnforcer.EnableAutoSave(true)
+	csbnConfig := &CasbinConfig {
+		Enforcer:    csbnEnforcer,
+		CasbinTable: aa.CasbinTable,
+	}
 
 	apiv1Router := router.Group(aa.SubpathPrefix + "/api/v1")
 	{
-		v1_routers.Apiv1Handler(apiv1Router)
-		router.Group("/rbac")
-		{
-			router.GET("/roles", aa.CasbinListRoles)
-			router.GET("/members", aa.CasbinListMembers)
-			router.GET("/role/:name", aa.CasbinGetRole)
-			router.GET("/member/:name", aa.CasbinGetMember)
-			router.POST("/rbac/role/add", aa.CasbinAddRole)
-			router.POST("/rbac/member/add", aa.CasbinAttachRoleToMember)
-			router.POST("/rbac/role/:name/delete", aa.CasbinDeleteRole)
-			router.POST("/rbac/member/:name/delete", aa.CasbinDeleteMember)
-			router.POST("/rbac/object/delete", aa.CasbinDeleteObject)
-		}
+		v1_routers.Apiv1Handler(apiv1Router, csbnConfig)
 	}
 
 	return router
