@@ -7,7 +7,7 @@ import (
 	"log/slog"
 	"net/http"
 	"net/url"
-	mariadb "suglider-auth/internal/database/connect"
+	mariadb "suglider-auth/internal/database"
 )
 
 type CasbinConfig struct {
