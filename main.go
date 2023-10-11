@@ -44,14 +44,11 @@ var (
 // @name                       X-API-KEY
 
 func init() {
-	srvName := fmt.Sprintf("[%s]", ServiceName)
-	log.SetPrefix(srvName)
-	log.SetFlags(log.LstdFlags|log.Lshortfile)
-
 	if configs.ApplicationConfig.Log.Filelog.Filename == "" {
 		configs.ApplicationConfig.Log.Filelog.Filename = fmt.Sprintf("/var/log/%s/%s.log", ServiceName, ServiceName)
 	}
 
+	srvName := fmt.Sprintf("[%s]", ServiceName)
 	flog := configs.ApplicationConfig.Log.Filelog
 	mw := io.MultiWriter(os.Stdout, flog)
 
@@ -64,6 +61,8 @@ func init() {
 			log.SetOutput(mlw)
 		}
 	}
+	log.SetPrefix(srvName)
+	log.SetFlags(log.LstdFlags|log.Lshortfile)
 	log.SetOutput(mw)
 
 	sqltable.SugliderTableInit()
@@ -73,6 +72,8 @@ func main() {
 	apiServer := &authApiSettings {
 		Name:           ServiceName,
 		Version:        Version,
+		CasbinConfig:   configs.ApplicationConfig.Server.CasbinConfig,
+		CasbinTable:    configs.ApplicationConfig.Server.CasbinTable,
 		ReadTimeout:    configs.ApplicationConfig.Server.ReadTimeout,
 		WriteTimeout:   configs.ApplicationConfig.Server.WriteTimeout,
 		MaxHeaderBytes: configs.ApplicationConfig.Server.MaxHeaderBytes,

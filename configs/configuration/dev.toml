@@ -5,9 +5,12 @@
   user     = ""
   password = ""
 [server]
+  graceful_timeout = 5
   read_timeout     = 5
   write_timeout    = 15
   max_header_bytes = 2
+  casbin_config    = "/usr/local/app/configs/rbac_model.conf"
+  casbin_table     = "casbin_policies"
 [log]
   [log.filelog]
     filename   = "/usr/local/app/logs/suglider-auth.log"

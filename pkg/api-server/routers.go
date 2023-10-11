@@ -8,24 +8,32 @@ import (
 	"context"
 	"net/http"
 	"log"
+	"log/slog"
 	"github.com/gin-gonic/gin"
 	"github.com/gin-contrib/pprof"
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-contrib/sessions/cookie"
-	v1_routers "suglider-auth/pkg/api-server/api_v1/routers"
+	"github.com/casbin/casbin/v2"
+	"github.com/memwey/casbin-sqlx-adapter"
 
+	v1_routers "suglider-auth/pkg/api-server/api_v1/routers"
 	docs "suglider-auth/docs"
+	mariadb "suglider-auth/internal/database/connect"
 )
 
 type AuthApiSettings struct {
 	Name            string
 	Version         string
 	SubpathPrefix   string
+	CasbinConfig    string
+	CasbinTable     string
 	ReadTimeout     int
 	WriteTimeout    int
 	MaxHeaderBytes  int
 	EnablePprof     bool
 }
+
+type CasbinConfig = v1_routers.CasbinConfig
 
 func (aa * AuthApiSettings) SetupRouter(swag gin.HandlerFunc) *gin.Engine {
 	router := gin.New()
@@ -41,7 +49,7 @@ func (aa * AuthApiSettings) SetupRouter(swag gin.HandlerFunc) *gin.Engine {
 	})
 
 	if aa.EnablePprof {
-		pprof.Register(router, "debug/pprof")
+		pprof.Register(router, aa.SubpathPrefix + "debug/pprof")
 	}
 	if swag != nil {
 		if aa.SubpathPrefix != "" {
@@ -53,9 +61,49 @@ func (aa * AuthApiSettings) SetupRouter(swag gin.HandlerFunc) *gin.Engine {
 	}
 	router.GET(aa.SubpathPrefix + "/healthz", aa.healthzHandler)
 
-	apiv1Router := router.Group("/api/v1")
+	// RBAC model
+	csbnAdapterOpts := &sqlxadapter.AdapterOptions {
+		DB:        mariadb.DataBase,
+		TableName: aa.CasbinTable,
+		// DriverName:     "mysql",
+		// DataSourceName: "root:1234@tcp(127.0.0.1:3306)/suglider",
+	}
+	csbnAdapter := sqlxadapter.NewAdapterFromOptions(csbnAdapterOpts)
+	csbnEnforcer, err := casbin.NewEnforcer(aa.CasbinConfig, csbnAdapter)
+	if err != nil {
+		slog.Error(err.Error())
+	}
+	if ok, err := csbnEnforcer.AddPolicy("admin", "/*", "*"); !ok {
+		if err != nil {
+			slog.Error(err.Error())
+		}
+		slog.Info("This policy already exists.")
+	}
+	if ok, err := csbnEnforcer.AddPolicy("anonymous", "/login", "POST"); !ok {
+		if err != nil {
+			slog.Error(err.Error())
+		}
+		slog.Info("This policy already exists.")
+	}
+	if ok, err := csbnEnforcer.AddPolicy("anonymous", "/logout", "POST"); !ok {
+		if err != nil {
+			slog.Error(err.Error())
+		}
+		slog.Info("This policy already exists.")
+	}
+	if err = csbnEnforcer.LoadPolicy(); err != nil {
+		slog.Error(err.Error())
+		panic(err)
+	}
+	csbnEnforcer.EnableAutoSave(true)
+	csbnConfig := &CasbinConfig {
+		Enforcer:    csbnEnforcer,
+		CasbinTable: aa.CasbinTable,
+	}
+
+	apiv1Router := router.Group(aa.SubpathPrefix + "/api/v1")
 	{
-		v1_routers.Apiv1Handler(apiv1Router)
+		v1_routers.Apiv1Handler(apiv1Router, csbnConfig)
 	}
 
 	return router

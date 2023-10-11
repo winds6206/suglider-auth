@@ -34,7 +34,7 @@ type (
 	}
 	Database struct {
 		Host           string             `toml:"host"`
-		Port	       string             `toml:"port"`
+		Port           string             `toml:"port"`
 		Name           string             `toml:"name"`
 		User           string             `toml:"user"`
 		Password       string             `toml:"password"`
@@ -44,9 +44,11 @@ type (
 		Port		string		`toml:"port"`
 	}
 	serverSettings struct {
-		ReadTimeout    int           `toml:"read_timeout"`
-		WriteTimeout   int           `toml:"write_timeout"`
-		MaxHeaderBytes int           `toml:"max_header_bytes"`
+		CasbinConfig    string        `toml:"casbin_config"`
+		CasbinTable     string        `toml:"casbin_table"`
+		ReadTimeout     int           `toml:"read_timeout"`
+		WriteTimeout    int           `toml:"write_timeout"`
+		MaxHeaderBytes  int           `toml:"max_header_bytes"`
 	}
 	logSettings struct {
 		Filelog        *lumberjack.Logger `toml:"filelog"`
