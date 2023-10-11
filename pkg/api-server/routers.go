@@ -12,7 +12,6 @@ import (
 	"github.com/gin-contrib/pprof"
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-contrib/sessions/cookie"
-	// "github.com/gin-contrib/sessions/redis"
 	v1_routers "suglider-auth/pkg/api-server/api_v1/routers"
 
 	docs "suglider-auth/docs"
