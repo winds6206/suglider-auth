@@ -3,7 +3,7 @@ package sql_table
 import (
 	"log"
 	_ "github.com/go-sql-driver/mysql"
-	mariadb "suglider-auth/internal/database/connect"
+	mariadb "suglider-auth/internal/database"
 	"io/ioutil"
 	"os"
 	"strings"

@@ -18,7 +18,7 @@ import (
 
 	v1_routers "suglider-auth/pkg/api-server/api_v1/routers"
 	docs "suglider-auth/docs"
-	mariadb "suglider-auth/internal/database/connect"
+	mariadb "suglider-auth/internal/database"
 )
 
 type AuthApiSettings struct {

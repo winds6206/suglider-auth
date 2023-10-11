@@ -8,7 +8,7 @@ import (
 	"github.com/gin-gonic/gin"
 
 	sqltable "suglider-auth/init/sql_table"
-	mariadb "suglider-auth/internal/database/connect"
+	mariadb "suglider-auth/internal/database"
 	"suglider-auth/internal/redis"
 	"suglider-auth/configs"
 	"suglider-auth/pkg/api-server"

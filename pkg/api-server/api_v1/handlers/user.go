@@ -4,7 +4,7 @@ import (
 	"log"
 	"net/http"
 	"github.com/gin-gonic/gin"
-	mariadb "suglider-auth/internal/database/connect"
+	mariadb "suglider-auth/internal/database"
 	"suglider-auth/pkg/encrypt"
 	"database/sql"
 	// "fmt"
