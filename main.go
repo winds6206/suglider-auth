@@ -9,6 +9,7 @@ import (
 
 	sqltable "suglider-auth/init/sql_table"
 	mariadb "suglider-auth/internal/database/connect"
+	"suglider-auth/internal/redis"
 	"suglider-auth/configs"
 	"suglider-auth/pkg/api-server"
 )
@@ -89,4 +90,8 @@ func main() {
 	apiServer.StartServer(addr, swag)
 
 	mariadb.Close()
+	log.Println("Close database connection.")
+
+	redis.Close()
+	log.Println("Close redis connection.")
 }

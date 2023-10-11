@@ -133,36 +133,19 @@ func UserLogin(c *gin.Context) {
 		return
 	}
 
-	// var sessData session.SessContent
-
-	// sessData.Username = userDBInfo.Username
-
-	// // Genertate session ID with no Dash
-	// sessionID := encrypt.GenertateUUID(true)
-
-	// session.AddSession(sessionID, sessData)
-
-	// // Store session ID into client browser
-	// http.SetCookie(c.Writer, &http.Cookie{
-	// 	Name:     "session-id",
-	// 	Value:    sessionID,
-	// 	Expires:  time.Now().Add(24 * time.Hour),
-	// })
-
-	// AddSession(c)
+	session.AddSession(c)
 
 }
 
+// Test Function
 func Test(c *gin.Context) {
 
 	session.AddSession(c)
 
-	c.JSON(http.StatusOK, gin.H{"message": "Session set successfully"})
-
 }
 
+// Test Function
 func Testv2(c *gin.Context) {
 
-	session.GetSession(c)
-
+	session.ReadSession(c)
 }

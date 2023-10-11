@@ -10,6 +10,9 @@ import (
 	"log"
 	"github.com/gin-gonic/gin"
 	"github.com/gin-contrib/pprof"
+	"github.com/gin-contrib/sessions"
+	"github.com/gin-contrib/sessions/cookie"
+	// "github.com/gin-contrib/sessions/redis"
 	v1_routers "suglider-auth/pkg/api-server/api_v1/routers"
 
 	docs "suglider-auth/docs"
@@ -28,6 +31,16 @@ type AuthApiSettings struct {
 func (aa * AuthApiSettings) SetupRouter(swag gin.HandlerFunc) *gin.Engine {
 	router := gin.New()
 	router.Use(gin.Logger())
+
+	cookieStore := cookie.NewStore([]byte("suglider"))
+	router.Use(sessions.Sessions("session-key", cookieStore))
+
+	// Set session expire time
+	cookieStore.Options(sessions.Options{
+		MaxAge:   1 * 60 * 60,  // 24hr unit second
+		HttpOnly: true,
+	})
+
 	if aa.EnablePprof {
 		pprof.Register(router, "debug/pprof")
 	}
