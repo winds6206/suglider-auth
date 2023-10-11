@@ -7,7 +7,9 @@ import (
 	mariadb "suglider-auth/internal/database/connect"
 	"suglider-auth/pkg/encrypt"
 	"database/sql"
-
+	// "fmt"
+	// "time"
+	"suglider-auth/pkg/session"
 )
 
 type userSignUp struct {
@@ -171,4 +173,20 @@ func UserLogin(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
 		return
 	}
+
+	session.AddSession(c)
+
+}
+
+// Test Function
+func Test(c *gin.Context) {
+
+	session.AddSession(c)
+
+}
+
+// Test Function
+func Testv2(c *gin.Context) {
+
+	session.ReadSession(c)
 }

@@ -27,6 +27,7 @@ type Arguments struct {
 type (
 	Config struct {
 		Database       *Database          `toml:"database"`
+		Redis		   *Redis			  `toml:"redis"`
 		Server         *serverSettings    `toml:"server"`
 		Log            *logSettings       `toml:"log"`
 		Swagger        *swaggerSettings   `toml:"swagger"`
@@ -37,6 +38,10 @@ type (
 		Name           string             `toml:"name"`
 		User           string             `toml:"user"`
 		Password       string             `toml:"password"`
+	}
+	Redis struct {
+		Host		string		`toml:"host"`
+		Port		string		`toml:"port"`
 	}
 	serverSettings struct {
 		CasbinConfig    string        `toml:"casbin_config"`
@@ -80,11 +85,16 @@ func parseFlags() *Arguments {
 func loadConfig() {
 	Args = parseFlags()
 	if Args.Config == "" {
+		// Database
 		ApplicationConfig.Database.Host = os.Getenv("DB_HOST")
 		ApplicationConfig.Database.Port = os.Getenv("DB_PORT")
 		ApplicationConfig.Database.Name = os.Getenv("DB_NAME")
 		ApplicationConfig.Database.User = os.Getenv("DB_USER")
 		ApplicationConfig.Database.Password = os.Getenv("DB_PASSWORD")
+
+		// Redis
+		ApplicationConfig.Redis.Host = os.Getenv("Redis_HOST")
+		ApplicationConfig.Redis.Port = os.Getenv("Redis_PORT")
 	} else {
 		_, err := toml.DecodeFile(Args.Config, &ApplicationConfig)
 		if err != nil {
