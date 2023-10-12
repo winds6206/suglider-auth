@@ -28,6 +28,7 @@ type (
 	Config struct {
 		Database       *Database          `toml:"database"`
 		Redis		   *Redis			  `toml:"redis"`
+		Session		   *Session			  `toml:"session"`
 		Server         *serverSettings    `toml:"server"`
 		Log            *logSettings       `toml:"log"`
 		Swagger        *swaggerSettings   `toml:"swagger"`
@@ -43,6 +44,9 @@ type (
 	Redis struct {
 		Host		string		`toml:"host"`
 		Port		string		`toml:"port"`
+	}
+	Session struct {
+		Timeout		string		`toml:"timeout"`
 	}
 	serverSettings struct {
 		CasbinConfig    string        `toml:"casbin_config"`
@@ -97,6 +101,9 @@ func loadConfig() {
 		// Redis
 		ApplicationConfig.Redis.Host = os.Getenv("Redis_HOST")
 		ApplicationConfig.Redis.Port = os.Getenv("Redis_PORT")
+
+		// Session
+		ApplicationConfig.Redis.Host = os.Getenv("Session_TIMEOUT")
 	} else {
 		_, err := toml.DecodeFile(Args.Config, &ApplicationConfig)
 		if err != nil {

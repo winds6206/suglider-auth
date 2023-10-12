@@ -27,26 +27,37 @@ func init() {
 	log.Println("Connected to Redis successfully, redis master return:", pong)
 }
 
+// // Redis SET
+// func Set(key, value , ttl string) {
+
+// 	var (
+// 		err error
+// 		ttlDuration time.Duration
+// 	)
+
+//     ttlDuration, err = time.ParseDuration(ttl)
+//     if err != nil {
+//         log.Println("TTL string convert to duration failed:", err)
+// 		return
+//     }
+
+// 	err = rdb.Set(ctx, key, value, ttlDuration).Err()
+// 	if err != nil {
+// 		log.Println("Redis SET data have something problem:", err)
+// 		return
+// 	}
+// }
+
 // Redis SET
-func Set(key, value , ttl string) {
+func Set(key, value string, ttl time.Duration) {
 
-	var (
-		err error
-		ttlDuration time.Duration
-	)
-
-    ttlDuration, err = time.ParseDuration(ttl)
-    if err != nil {
-        log.Println("TTL string convert to duration failed:", err)
-		return
-    }
-
-	err = rdb.Set(ctx, key, value, ttlDuration).Err()
+	err := rdb.Set(ctx, key, value, ttl).Err()
 	if err != nil {
 		log.Println("Redis SET data have something problem:", err)
 		return
 	}
 }
+
 
 // Close redis connection
 func Close() {

@@ -5,10 +5,28 @@ import (
 	"github.com/gin-gonic/gin"
 	"suglider-auth/pkg/encrypt"
 	"suglider-auth/internal/redis"
+	"encoding/json"
+	"net/http"
+	"log"
+	"suglider-auth/pkg/time_convert"
   )
 
+type sessionData struct {
+	Username	string	`json:"username"`
+}
 
-func AddSession(c *gin.Context) {
+func AddSession(user string, c *gin.Context) {
+
+	sessionValue := sessionData{
+		Username: user,
+	}
+
+	jsonSessionValue, err := json.Marshal(sessionValue)
+	if err != nil {
+		log.Println("Failed to create session value JSON data:", err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create session value JSON data"})
+		return
+	}
 
 	// Genertate session ID with no Dash
 	sessionID := encrypt.GenertateUUID(true)
@@ -19,13 +37,16 @@ func AddSession(c *gin.Context) {
 	session.Save()
 
 	redisKey := "sid:" + sessionID
-	redisValue := `{"username": "tony"}`
+	redisValue := string(jsonSessionValue)
+
+	log.Println(redisValue)
 
 	// Value can be 1h, 1m, 10s, 2days would be 48h.
 	// Value 0 means no limit TTL.
-	redisTTL := "0"
+	// redisTTL := "0"
 
-	redis.Set(redisKey, redisValue, redisTTL)
+	// time_convert.RedisTTL is a global variable from time_convert.go
+	redis.Set(redisKey, redisValue, time_convert.RedisTTL)
 	c.JSON(200, gin.H{"add-sid": session.Get("sid")})
 }
 
