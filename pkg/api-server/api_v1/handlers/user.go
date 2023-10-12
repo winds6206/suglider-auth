@@ -60,7 +60,7 @@ func UserSignUp(c *gin.Context) {
 	err = mariadb.UserSignUp(request.Username, passwordEncode, request.Mail, request.Address)
 	if err != nil {
 		log.Println("Insert user_info table failed:", err)
-		c.JSON(http.StatusBadRequest, gin.H{"message": "User create failed"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
 		return
 	} else {
 		c.JSON(http.StatusOK, gin.H{"message": "User created successfully"})
@@ -93,13 +93,17 @@ func UserDelete(c *gin.Context) {
 	if request.User_id == "" {
 		result, err := mariadb.UserDelete(request.Username, request.Mail)
 
-		rowsAffected, _ := result.RowsAffected()
-
+		// First, check if error or not
 		if err != nil {
 			log.Println("Delete user_info data failed:", err)
-			c.JSON(http.StatusBadRequest, gin.H{"message": "User delete failed"})
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
 			return
-		} else if rowsAffected == 0 {
+		} 
+
+		// Second, get affected row
+		rowsAffected, _ := result.RowsAffected()
+
+		if rowsAffected == 0 {
 			c.JSON(http.StatusOK, gin.H{"message": "No search this user"})
 		} else if rowsAffected > 0 {
 			c.JSON(http.StatusOK, gin.H{"message": "User deleted successfully"})
@@ -108,13 +112,17 @@ func UserDelete(c *gin.Context) {
 
 		result, err := mariadb.UserDeleteByUUID(request.User_id, request.Username, request.Mail)
 
-		rowsAffected, _ := result.RowsAffected()
-
+		// First, check if error or not
 		if err != nil {
 			log.Println("Delete user_info data failed:", err)
-			c.JSON(http.StatusBadRequest, gin.H{"message": "User delete failed"})
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
 			return
-		} else if rowsAffected == 0 {
+		} 
+
+		// Second, get affected row
+		rowsAffected, _ := result.RowsAffected()
+
+		if rowsAffected == 0 {
 			c.JSON(http.StatusOK, gin.H{"message": "No search this user"})
 		} else if rowsAffected > 0 {
 			c.JSON(http.StatusOK, gin.H{"message": "User deleted successfully"})
@@ -171,6 +179,7 @@ func UserLogin(c *gin.Context) {
 		c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
 		return
 	} else if err != nil {
+		log.Println("Login failed:", err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
 		return
 	}

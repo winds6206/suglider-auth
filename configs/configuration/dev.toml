@@ -4,6 +4,7 @@
   name     = "suglider"
   user     = ""
   password = ""
+  timeout  = "5s"
 [redis]
   host     = "localhost"
   port     = "6379"
