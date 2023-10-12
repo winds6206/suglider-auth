@@ -38,6 +38,7 @@ type (
 		Name           string             `toml:"name"`
 		User           string             `toml:"user"`
 		Password       string             `toml:"password"`
+		Timeout		   string			  `toml:"timeout"`
 	}
 	Redis struct {
 		Host		string		`toml:"host"`
@@ -91,6 +92,7 @@ func loadConfig() {
 		ApplicationConfig.Database.Name = os.Getenv("DB_NAME")
 		ApplicationConfig.Database.User = os.Getenv("DB_USER")
 		ApplicationConfig.Database.Password = os.Getenv("DB_PASSWORD")
+		ApplicationConfig.Database.Password = os.Getenv("DB_TIMEOUT")
 
 		// Redis
 		ApplicationConfig.Redis.Host = os.Getenv("Redis_HOST")
