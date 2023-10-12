@@ -184,14 +184,14 @@ func UserLogin(c *gin.Context) {
 		return
 	}
 
-	session.AddSession(c)
+	session.AddSession(request.Username, c)
 
 }
 
 // Test Function
 func Test(c *gin.Context) {
 
-	session.AddSession(c)
+	session.AddSession("tony", c)
 
 }
 

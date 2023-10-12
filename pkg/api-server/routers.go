@@ -19,6 +19,7 @@ import (
 	v1_routers "suglider-auth/pkg/api-server/api_v1/routers"
 	docs "suglider-auth/docs"
 	mariadb "suglider-auth/internal/database"
+	"suglider-auth/pkg/time_convert"
 )
 
 type AuthApiSettings struct {
@@ -44,7 +45,7 @@ func (aa * AuthApiSettings) SetupRouter(swag gin.HandlerFunc) *gin.Engine {
 
 	// Set session expire time
 	cookieStore.Options(sessions.Options{
-		MaxAge:   1 * 60 * 60,  // 24hr unit second
+		MaxAge:   time_convert.CookieMaxAge,  // unit second
 		HttpOnly: true,
 	})
 

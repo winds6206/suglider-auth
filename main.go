@@ -12,6 +12,7 @@ import (
 	"suglider-auth/internal/redis"
 	"suglider-auth/configs"
 	"suglider-auth/pkg/api-server"
+	"suglider-auth/pkg/time_convert"
 )
 
 type (
@@ -66,6 +67,7 @@ func init() {
 	log.SetOutput(mw)
 
 	sqltable.SugliderTableInit()
+	time_convert.ConvertTimeFormat(configs.ApplicationConfig.Session.Timeout)
 }
 
 func main() {
