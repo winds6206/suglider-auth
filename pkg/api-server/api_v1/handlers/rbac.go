@@ -15,6 +15,27 @@ type (
 	CasbinObject         = csbn.CasbinObject
 )
 
+// @Summary List All Policies
+// @Description show all policies defined in the server
+// @Tags privilege
+// @Accept application/json
+// @Produce application/json
+// @Success 200 {string} string "Success"
+// @Failure 400 {string} string "Bad request"
+// @Failure 401 {string} string "Unauthorized"
+// @Failure 403 {string} string "Forbidden"
+// @Failure 404 {string} string "Not found"
+// @Router /api/v1/rbac/policies [get]
+func CasbinListPolicies(csbn *CasbinEnforcerConfig) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		policies := csbn.ListRoles()
+		c.JSON(http.StatusOK, gin.H {
+			"status": "success",
+			"policies":  policies,
+		})
+	}
+}
+
 // @Summary List All Roles
 // @Description show all roles defined in the server
 // @Tags privilege
@@ -138,7 +159,7 @@ func CasbinGetRolesOfMember(csbn *CasbinEnforcerConfig) gin.HandlerFunc {
 // @Summary Add RBAC Policy
 // @Description new a role/policy
 // @Tags privilege
-// @Accept multipart/form-data
+// @Accept application/json
 // @Produce application/json
 // @Param subject formData string false "Subject"
 // @Param object formData string false "Object"
@@ -164,6 +185,13 @@ func CasbinAddPolicy(csbn *CasbinEnforcerConfig) gin.HandlerFunc {
 			c.JSON(http.StatusBadRequest, gin.H {
 				"status":  "fail",
 				"message": "Fail to bind POST form data.",
+			})
+			return
+		}
+		if postData.Sub == "" || postData.Obj == "" || postData.Act == "" {
+			c.JSON(http.StatusBadRequest, gin.H {
+				"status":  "fail",
+				"message": "Invalid data.",
 			})
 			return
 		}
@@ -196,12 +224,12 @@ func CasbinAddPolicy(csbn *CasbinEnforcerConfig) gin.HandlerFunc {
 }
 
 // @Summary Add RBAC Grouping Policy
-// @Description new a group (role-member) policy
+// @Description new a group (member-role) policy
 // @Tags privilege
-// @Accept multipart/form-data
+// @Accept application/json
 // @Produce application/json
-// @Param subject formData string false "Subject"
-// @Param object formData string false "Object"
+// @Param member formData string false "Member"
+// @Param role formData string false "Role"
 // @Success 200 {string} string "Success"
 // @Failure 400 {string} string "Bad request"
 // @Failure 401 {string} string "Unauthorized"
@@ -223,6 +251,13 @@ func CasbinAddGroupingPolicy(csbn *CasbinEnforcerConfig) gin.HandlerFunc {
 			c.JSON(http.StatusBadRequest, gin.H {
 				"status":  "fail",
 				"message": "Fail to bind POST form data.",
+			})
+			return
+		}
+		if postData.Member == "" || postData.Role == "" {
+			c.JSON(http.StatusBadRequest, gin.H {
+				"status":  "fail",
+				"message": "Invalid data.",
 			})
 			return
 		}
@@ -255,7 +290,7 @@ func CasbinAddGroupingPolicy(csbn *CasbinEnforcerConfig) gin.HandlerFunc {
 // @Summary Delete RBAC Single Policy
 // @Description delete a single policy
 // @Tags privilege
-// @Accept multipart/form-data
+// @Accept application/json
 // @Produce application/json
 // @Param subject formData string false "Subject"
 // @Param object formData string false "Object"
@@ -265,7 +300,7 @@ func CasbinAddGroupingPolicy(csbn *CasbinEnforcerConfig) gin.HandlerFunc {
 // @Failure 401 {string} string "Unauthorized"
 // @Failure 403 {string} string "Forbidden"
 // @Failure 404 {string} string "Not found"
-// @Router /api/v1/rbac/policy/delete [post]
+// @Router /api/v1/rbac/policy/delete [delete]
 func CasbinDeleteSinglePolicy(csbn *CasbinEnforcerConfig) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var err error
@@ -281,6 +316,13 @@ func CasbinDeleteSinglePolicy(csbn *CasbinEnforcerConfig) gin.HandlerFunc {
 			c.JSON(http.StatusBadRequest, gin.H {
 				"status":  "fail",
 				"message": "Fail to bind POST form data.",
+			})
+			return
+		}
+		if postData.Sub == "" || postData.Obj == "" || postData.Act == "" {
+			c.JSON(http.StatusBadRequest, gin.H {
+				"status":  "fail",
+				"message": "Invalid data.",
 			})
 			return
 		}
@@ -312,6 +354,70 @@ func CasbinDeleteSinglePolicy(csbn *CasbinEnforcerConfig) gin.HandlerFunc {
 	}
 }
 
+// @Summary Delete RBAC Single Grouping Policy (Remove Role of Member)
+// @Description delete a single policy (remove role of member)
+// @Tags privilege
+// @Accept application/json
+// @Produce application/json
+// @Param member formData string false "Member"
+// @Param role formData string false "Role"
+// @Success 200 {string} string "Success"
+// @Failure 400 {string} string "Bad request"
+// @Failure 401 {string} string "Unauthorized"
+// @Failure 403 {string} string "Forbidden"
+// @Failure 404 {string} string "Not found"
+// @Router /api/v1/rbac/grouping/delete [delete]
+func CasbinDeleteSingleGroupingPolicy(csbn *CasbinEnforcerConfig) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		var err error
+		if err = c.Request.ParseForm(); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H {
+				"status":  "fail",
+				"message": "Fail to parse POST form data.",
+			})
+			return
+		}
+		postData := &CasbinGroupingPolicy{}
+		if err = c.Bind(&postData); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H {
+				"status":  "fail",
+				"message": "Fail to bind POST form data.",
+			})
+			return
+		}
+		if postData.Member == "" || postData.Role == "" {
+			c.JSON(http.StatusBadRequest, gin.H {
+				"status":  "fail",
+				"message": "Invalid data.",
+			})
+			return
+		}
+		if err = csbn.DeleteGroupingPolicy(postData); err != nil {
+			if err.Error() == "This grouping policy not exists." {
+				c.JSON(http.StatusOK, gin.H {
+					"status":  "nothing happens",
+					"message": "This grouping policy not exists.",
+					"member":  postData.Member,
+					"role":    postData.Role,
+				})
+				return
+			}
+			slog.ErrorContext(c, err.Error())
+			c.JSON(http.StatusBadRequest, gin.H {
+					"status":  "fail",
+					"message": "Delete Grouping Policy Error",
+			})
+			return
+		}
+		c.JSON(http.StatusOK, gin.H {
+			"status":  "success",
+			"message": "Deleted grouping policy successfully.",
+			"member":  postData.Member,
+			"role":    postData.Role,
+		})
+	}
+}
+
 // @Summary Delete RBAC Policy (Role)
 // @Description delete a policy (role)
 // @Tags privilege
@@ -323,7 +429,7 @@ func CasbinDeleteSinglePolicy(csbn *CasbinEnforcerConfig) gin.HandlerFunc {
 // @Failure 401 {string} string "Unauthorized"
 // @Failure 403 {string} string "Forbidden"
 // @Failure 404 {string} string "Not found"
-// @Router /api/v1/rbac/policy/{name}/delete [post]
+// @Router /api/v1/rbac/policy/{name}/delete [delete]
 func CasbinDeletePolicy(csbn *CasbinEnforcerConfig) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		name, err := url.QueryUnescape(c.Param("name"))
@@ -370,7 +476,7 @@ func CasbinDeletePolicy(csbn *CasbinEnforcerConfig) gin.HandlerFunc {
 // @Failure 401 {string} string "Unauthorized"
 // @Failure 403 {string} string "Forbidden"
 // @Failure 404 {string} string "Not found"
-// @Router /api/v1/rbac/grouping/{name}/delete [post]
+// @Router /api/v1/rbac/grouping/{name}/delete [delete]
 func CasbinDeleteGroupingPolicy(csbn *CasbinEnforcerConfig) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		name, err := url.QueryUnescape(c.Param("name"))

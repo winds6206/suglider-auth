@@ -74,6 +74,8 @@ func main() {
 	apiServer := &authApiSettings {
 		Name:           ServiceName,
 		Version:        Version,
+		TemplatePath:   configs.ApplicationConfig.Server.TemplatePath,
+		StaticPath:     configs.ApplicationConfig.Server.StaticPath,
 		CasbinConfig:   configs.ApplicationConfig.Server.CasbinConfig,
 		CasbinTable:    configs.ApplicationConfig.Server.CasbinTable,
 		ReadTimeout:    configs.ApplicationConfig.Server.ReadTimeout,

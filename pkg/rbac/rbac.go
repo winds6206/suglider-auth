@@ -11,9 +11,9 @@ import (
 )
 
 type CasbinSettings struct {
-	Config  string
-	Table   string
-	Db      *sqlx.DB
+	Config      string
+	Table       string
+	Db          *sqlx.DB
 }
 
 type CasbinEnforcerConfig struct {
@@ -22,18 +22,18 @@ type CasbinEnforcerConfig struct {
 }
 
 type CasbinPolicy struct {
-	Sub         string
-	Obj         string
-	Act         string
+	Sub         string    `json:"subject"`
+	Obj         string    `json:"object"`
+	Act         string    `json:"action"`
 }
 
 type CasbinGroupingPolicy struct {
-	Member      string
-	Role        string
+	Member      string    `json:"member"`
+	Role        string    `json:"role"`
 }
 
 type CasbinObject struct {
-	Obj         string
+	Obj         string    `json:"object"`
 }
 
 func NewCasbinCachedEnforcer(cs *CasbinSettings) (*casbin.CachedEnforcer, error) {
@@ -72,6 +72,7 @@ func(cec *CasbinEnforcerConfig) InitPolicies() error {
 		slog.Info("This policy already exists.")
 	}
 	anonymousPolicies := []string{
+		"/static",
 		"/login",
 		"/sign-up",
 		"/api/v1/user/login",
@@ -187,14 +188,25 @@ func(cs *CasbinSettings) GetRolesOfMemberCtx(ctx context.Context, name string) (
 	return roles, nil
 }
 
+func(cec *CasbinEnforcerConfig) ListAllPolicies() [][]string {
+	policies := cec.Enforcer.GetPolicy()
+	return policies
+}
+
 func(cec *CasbinEnforcerConfig) ListRoles() []string {
-	roles := cec.Enforcer.GetAllRoles()
+	// roles := cec.Enforcer.GetAllRoles()
+	roles := cec.Enforcer.GetAllSubjects()
 	return roles
 }
 
 func(cec *CasbinEnforcerConfig) ListMembers() []string {
-	members := cec.Enforcer.GetAllSubjects()
-	return members
+	members := make([]string, 0)
+	gps := cec.Enforcer.GetGroupingPolicy()
+	for _, item := range gps {
+		members = append(members, item[0])
+	}
+	list := removeDuplicated(members)
+	return list
 }
 
 func(cec *CasbinEnforcerConfig) GetMembersWithRole(name string) ([]string, error) {
@@ -243,6 +255,16 @@ func(cec *CasbinEnforcerConfig) DeletePolicy(cp *CasbinPolicy) error {
 	return nil
 }
 
+func(cec *CasbinEnforcerConfig) DeleteGroupingPolicy(cgp *CasbinGroupingPolicy) error {
+	if ok, err := cec.Enforcer.RemoveGroupingPolicy(cgp.Member, cgp.Role); !ok {
+		if err != nil {
+			return err
+		}
+		return fmt.Errorf("This grouping policy not exists.")
+	}
+	return nil
+}
+
 func(cec *CasbinEnforcerConfig) DeleteRole(name string) error {
 	if ok, err := cec.Enforcer.RemoveFilteredPolicy(0, name); !ok {
 		if err != nil {
@@ -261,4 +283,16 @@ func(cec *CasbinEnforcerConfig) DeleteMemeber(name string) error {
 		return fmt.Errorf("No groupiing policy (member) exists.")
 	}
 	return nil
+}
+
+func removeDuplicated(list []string) []string {
+	allKeys := make(map[string]bool)
+	result := make([]string, 0)
+	for _, item := range list {
+		if _, value := allKeys[item]; !value {
+			allKeys[item] = true
+			result = append(result, item)
+		}
+	}
+	return result
 }

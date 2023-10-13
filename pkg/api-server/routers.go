@@ -2,6 +2,7 @@ package api_server
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"log/slog"
 	"net/http"
@@ -26,6 +27,8 @@ type AuthApiSettings struct {
 	Name            string
 	Version         string
 	SubpathPrefix   string
+	TemplatePath    string
+	StaticPath      string
 	CasbinConfig    string
 	CasbinTable     string
 	GracefulTimeout int
@@ -64,6 +67,16 @@ func (aa * AuthApiSettings) SetupRouter(swag gin.HandlerFunc) *gin.Engine {
 		router.GET("/swagger/*any", swag)
 	}
 	router.GET(aa.SubpathPrefix + "/healthz", aa.healthzHandler)
+
+	// Load HTML templates and static resources
+	if aa.TemplatePath == "" {
+		aa.TemplatePath = "web/template"
+	}
+	if aa.StaticPath == "" {
+		aa.StaticPath = "web/static"
+	}
+	router.LoadHTMLGlob(fmt.Sprintf("%s/*", aa.TemplatePath))
+	router.Static("/static", aa.StaticPath)
 
 	// RBAC model
 	csbn, err := rbac.NewCasbinEnforcerConfig(

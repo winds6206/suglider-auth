@@ -18,6 +18,8 @@
   casbin_config    = "/usr/local/app/configs/rbac_model.conf"
   casbin_table     = "casbin_policies"
   enable_rbac      = true
+  template_path    = "/usr/local/app/web/template"
+  static_path      = "/usr/local/app/web/static"
 [log]
   [log.filelog]
     filename   = "/usr/local/app/logs/suglider-auth.log"

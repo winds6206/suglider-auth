@@ -12,7 +12,7 @@ func UserHandler(router *gin.RouterGroup) {
 	router.POST("/login", handlers.UserLogin)
 	router.POST("/logout", handlers.UserLogOut)
 
-	// Test 
+	// Test
 	router.GET("/test", handlers.Test)
 	router.GET("/test-v2", handlers.Testv2)
 }

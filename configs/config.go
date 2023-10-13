@@ -49,6 +49,8 @@ type (
 		Timeout    string    `toml:"timeout"`
 	}
 	serverSettings struct {
+		TemplatePath    string        `toml:"template_path"`
+		StaticPath      string        `toml:"static_path"`
 		CasbinConfig    string        `toml:"casbin_config"`
 		CasbinTable     string        `toml:"casbin_table"`
 		GracefulTimeout int           `toml:"graceful_timeout"`
