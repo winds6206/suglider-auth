@@ -28,6 +28,7 @@ type AuthApiSettings struct {
 	SubpathPrefix   string
 	CasbinConfig    string
 	CasbinTable     string
+	GracefulTimeout int
 	ReadTimeout     int
 	WriteTimeout    int
 	MaxHeaderBytes  int
@@ -130,7 +131,10 @@ func (aa * AuthApiSettings) StartServer(addr string, swag gin.HandlerFunc) {
 	<-quit
 	log.Println("Shutting down server...")
 
-	ctx, cancel := context.WithTimeout(context.Background(), 10 * time.Second)
+	ctx, cancel := context.WithTimeout(
+		context.Background(),
+		time.Duration(aa.GracefulTimeout) * time.Second,
+	)
 	defer cancel()
 	if err := srv.Shutdown(ctx); err != nil {
 		log.Fatal("Server forced to shutdown: ", err)
