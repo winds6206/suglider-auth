@@ -86,7 +86,7 @@ const docTemplate = `{
         },
         "/api/v1/rbac/grouping/{name}/delete": {
             "post": {
-                "description": "delete a grouping policy",
+                "description": "delete a grouping policy (member)",
                 "consumes": [
                     "application/json"
                 ],
@@ -96,7 +96,7 @@ const docTemplate = `{
                 "tags": [
                     "privilege"
                 ],
-                "summary": "Delete RBAC Grouping Policy",
+                "summary": "Delete RBAC Grouping Policy (Member)",
                 "parameters": [
                     {
                         "type": "string",
@@ -152,7 +152,7 @@ const docTemplate = `{
                 "tags": [
                     "privilege"
                 ],
-                "summary": "Get Roles with Member",
+                "summary": "Get Roles of Member",
                 "parameters": [
                     {
                         "type": "string",
@@ -310,9 +310,76 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/v1/rbac/policy/delete": {
+            "post": {
+                "description": "delete a single policy",
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "privilege"
+                ],
+                "summary": "Delete RBAC Single Policy",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Subject",
+                        "name": "subject",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Object",
+                        "name": "object",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Action",
+                        "name": "action",
+                        "in": "formData"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "404": {
+                        "description": "Not found",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
         "/api/v1/rbac/policy/{name}/delete": {
             "post": {
-                "description": "delete a policy",
+                "description": "delete a policy (role)",
                 "consumes": [
                     "application/json"
                 ],
@@ -322,7 +389,7 @@ const docTemplate = `{
                 "tags": [
                     "privilege"
                 ],
-                "summary": "Delete RBAC Policy",
+                "summary": "Delete RBAC Policy (Role)",
                 "parameters": [
                     {
                         "type": "string",

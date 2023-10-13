@@ -55,6 +55,7 @@ type (
 		ReadTimeout     int           `toml:"read_timeout"`
 		WriteTimeout    int           `toml:"write_timeout"`
 		MaxHeaderBytes  int           `toml:"max_header_bytes"`
+		EnableRbac      bool          `toml:"enable_rbac"`
 	}
 	logSettings struct {
 		Filelog        *lumberjack.Logger `toml:"filelog"`

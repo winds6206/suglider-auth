@@ -79,6 +79,7 @@ func main() {
 		ReadTimeout:    configs.ApplicationConfig.Server.ReadTimeout,
 		WriteTimeout:   configs.ApplicationConfig.Server.WriteTimeout,
 		MaxHeaderBytes: configs.ApplicationConfig.Server.MaxHeaderBytes,
+		EnableRbac:     configs.ApplicationConfig.Server.EnableRbac,
 		EnablePprof:    configs.Args.Debug,
 	}
 
