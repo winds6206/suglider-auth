@@ -164,7 +164,7 @@ func UserLogin(c *gin.Context) {
 		pwdVerify := encrypt.VerifySaltedPasswordHash(userInfo.Password, request.Password)
 
 		// Check password true or false
-		if pwdVerify {
+		if pwdVerify {		
 			c.JSON(http.StatusOK, gin.H{"message": "User Logined successfully"})
 		} else if !pwdVerify {
 			c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid password"})
@@ -184,19 +184,58 @@ func UserLogin(c *gin.Context) {
 		return
 	}
 
-	session.AddSession(request.Username, c)
+	sid := session.ReadSession(c)
 
+	// Check session exist or not
+	ok := session.CheckSession(c)
+	if !ok {
+		session.AddSession(c, request.Username)
+	} else {
+		session.DeleteSession(sid)
+		session.AddSession(c, request.Username)
+	}
+
+}
+
+func UserLogOut(c *gin.Context) {
+
+	sid := session.ReadSession(c)
+
+	// Check session exist or not
+	ok := session.CheckSession(c)
+	if !ok {
+		log.Printf("session ID %s doesn't exsit in redis\n", sid)
+		return
+	}
+
+	session.DeleteSession(sid)
 }
 
 // Test Function
 func Test(c *gin.Context) {
-
-	session.AddSession("tony", c)
+	// session.AddSession(c, "tony")
+	sid := session.ReadSession(c)
+	log.Printf("sid:%s\n", sid)
+	
+	if sid == "<nil>" {
+		log.Println("sid is nil")
+	}
 
 }
 
 // Test Function
 func Testv2(c *gin.Context) {
 
-	session.ReadSession(c)
+	sid := session.ReadSession(c)
+	log.Println("sid:", sid)
+
+	// Check session exist or not	
+	ok := session.CheckSession(c)
+	if !ok {
+		log.Printf("session ID %s doesn't exsit in redis\n", sid)
+		return
+	}
+
+	session.DeleteSession(sid)
+
 }

@@ -9,13 +9,14 @@ import (
 	"net/http"
 	"log"
 	"suglider-auth/pkg/time_convert"
+	"fmt"
   )
 
 type sessionData struct {
 	Username	string	`json:"username"`
 }
 
-func AddSession(user string, c *gin.Context) {
+func AddSession(c *gin.Context, user string) {
 
 	sessionValue := sessionData{
 		Username: user,
@@ -39,20 +40,33 @@ func AddSession(user string, c *gin.Context) {
 	redisKey := "sid:" + sessionID
 	redisValue := string(jsonSessionValue)
 
-	log.Println(redisValue)
-
-	// Value can be 1h, 1m, 10s, 2days would be 48h.
-	// Value 0 means no limit TTL.
-	// redisTTL := "0"
-
 	// time_convert.RedisTTL is a global variable from time_convert.go
 	redis.Set(redisKey, redisValue, time_convert.RedisTTL)
 	c.JSON(200, gin.H{"add-sid": session.Get("sid")})
 }
 
-func ReadSession(c *gin.Context) {
-
+func CheckSession(c *gin.Context) bool {
 	session := sessions.Default(c)
+	sid := session.Get("sid")
 
-	c.JSON(200, gin.H{"read-sid": session.Get("sid")})
+	// Process key format
+	sessionKey := fmt.Sprintf("sid:%s", sid)
+	
+	// Exists() function will return bool
+	return redis.Exists(sessionKey)
+}
+
+func DeleteSession(sid string) {
+	// Process key format
+	sessionKey := fmt.Sprintf("sid:%s", sid)
+	redis.Delete(sessionKey)
+}
+
+func ReadSession(c *gin.Context) string {
+	session := sessions.Default(c)
+	sid := session.Get("sid")
+
+	// Convert interface{} type to String type
+	StrSid := fmt.Sprintf("%v", sid)
+	return StrSid
 }
