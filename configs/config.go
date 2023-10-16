@@ -27,8 +27,8 @@ type Arguments struct {
 type (
 	Config struct {
 		Database       *Database          `toml:"database"`
-		Redis		   *Redis			  `toml:"redis"`
-		Session		   *Session			  `toml:"session"`
+		Redis          *Redis             `toml:"redis"`
+		Session        *Session           `toml:"session"`
 		Server         *serverSettings    `toml:"server"`
 		Log            *logSettings       `toml:"log"`
 		Swagger        *swaggerSettings   `toml:"swagger"`
@@ -39,21 +39,25 @@ type (
 		Name           string             `toml:"name"`
 		User           string             `toml:"user"`
 		Password       string             `toml:"password"`
-		Timeout		   string			  `toml:"timeout"`
+		Timeout        string             `toml:"timeout"`
 	}
 	Redis struct {
-		Host		string		`toml:"host"`
-		Port		string		`toml:"port"`
+		Host    string    `toml:"host"`
+		Port    string    `toml:"port"`
 	}
 	Session struct {
-		Timeout		string		`toml:"timeout"`
+		Timeout    string    `toml:"timeout"`
 	}
 	serverSettings struct {
+		TemplatePath    string        `toml:"template_path"`
+		StaticPath      string        `toml:"static_path"`
 		CasbinConfig    string        `toml:"casbin_config"`
 		CasbinTable     string        `toml:"casbin_table"`
+		GracefulTimeout int           `toml:"graceful_timeout"`
 		ReadTimeout     int           `toml:"read_timeout"`
 		WriteTimeout    int           `toml:"write_timeout"`
 		MaxHeaderBytes  int           `toml:"max_header_bytes"`
+		EnableRbac      bool          `toml:"enable_rbac"`
 	}
 	logSettings struct {
 		Filelog        *lumberjack.Logger `toml:"filelog"`

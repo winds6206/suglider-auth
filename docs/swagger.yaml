@@ -12,10 +12,10 @@ info:
   version: "1.0"
 paths:
   /api/v1/rbac/grouping/{name}/delete:
-    post:
+    delete:
       consumes:
       - application/json
-      description: delete a grouping policy
+      description: delete a grouping policy (member)
       parameters:
       - description: Member Name
         in: path
@@ -45,22 +45,22 @@ paths:
           description: Not found
           schema:
             type: string
-      summary: Delete RBAC Grouping Policy
+      summary: Delete RBAC Grouping Policy (Member)
       tags:
       - privilege
   /api/v1/rbac/grouping/add:
     post:
       consumes:
-      - multipart/form-data
-      description: new a group (role-member) policy
+      - application/json
+      description: new a group (member-role) policy
       parameters:
-      - description: Subject
+      - description: Member
         in: formData
-        name: subject
+        name: member
         type: string
-      - description: Object
+      - description: Role
         in: formData
-        name: object
+        name: role
         type: string
       produces:
       - application/json
@@ -86,6 +86,46 @@ paths:
           schema:
             type: string
       summary: Add RBAC Grouping Policy
+      tags:
+      - privilege
+  /api/v1/rbac/grouping/delete:
+    delete:
+      consumes:
+      - application/json
+      description: delete a single policy (remove role of member)
+      parameters:
+      - description: Member
+        in: formData
+        name: member
+        type: string
+      - description: Role
+        in: formData
+        name: role
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            type: string
+        "400":
+          description: Bad request
+          schema:
+            type: string
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+        "403":
+          description: Forbidden
+          schema:
+            type: string
+        "404":
+          description: Not found
+          schema:
+            type: string
+      summary: Delete RBAC Single Grouping Policy (Remove Role of Member)
       tags:
       - privilege
   /api/v1/rbac/member/{name}:
@@ -122,7 +162,7 @@ paths:
           description: Not found
           schema:
             type: string
-      summary: Get Roles with Member
+      summary: Get Roles of Member
       tags:
       - privilege
   /api/v1/rbac/members:
@@ -156,11 +196,42 @@ paths:
       summary: List All Members
       tags:
       - privilege
-  /api/v1/rbac/policy/{name}/delete:
-    post:
+  /api/v1/rbac/policies:
+    get:
       consumes:
       - application/json
-      description: delete a policy
+      description: show all policies defined in the server
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            type: string
+        "400":
+          description: Bad request
+          schema:
+            type: string
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+        "403":
+          description: Forbidden
+          schema:
+            type: string
+        "404":
+          description: Not found
+          schema:
+            type: string
+      summary: List All Policies
+      tags:
+      - privilege
+  /api/v1/rbac/policy/{name}/delete:
+    delete:
+      consumes:
+      - application/json
+      description: delete a policy (role)
       parameters:
       - description: Role Name
         in: path
@@ -190,13 +261,13 @@ paths:
           description: Not found
           schema:
             type: string
-      summary: Delete RBAC Policy
+      summary: Delete RBAC Policy (Role)
       tags:
       - privilege
   /api/v1/rbac/policy/add:
     post:
       consumes:
-      - multipart/form-data
+      - application/json
       description: new a role/policy
       parameters:
       - description: Subject
@@ -235,6 +306,50 @@ paths:
           schema:
             type: string
       summary: Add RBAC Policy
+      tags:
+      - privilege
+  /api/v1/rbac/policy/delete:
+    delete:
+      consumes:
+      - application/json
+      description: delete a single policy
+      parameters:
+      - description: Subject
+        in: formData
+        name: subject
+        type: string
+      - description: Object
+        in: formData
+        name: object
+        type: string
+      - description: Action
+        in: formData
+        name: action
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            type: string
+        "400":
+          description: Bad request
+          schema:
+            type: string
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+        "403":
+          description: Forbidden
+          schema:
+            type: string
+        "404":
+          description: Not found
+          schema:
+            type: string
+      summary: Delete RBAC Single Policy
       tags:
       - privilege
   /api/v1/rbac/role/{name}:

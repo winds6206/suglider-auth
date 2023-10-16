@@ -3,21 +3,30 @@ package api_server
 import (
 	"log/slog"
 	"net/http"
-	"github.com/casbin/casbin/v2"
 	"github.com/gin-gonic/gin"
+	"suglider-auth/pkg/rbac"
 )
 
-func userPrivilege(csbn *casbin.CachedEnforcer) gin.HandlerFunc {
+func userPrivilege(csbn *rbac.CasbinEnforcerConfig) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		sub := c.GetHeader("User-Name")
+		sub, exist := c.Get("Username")
+		if ! exist {
+			c.AbortWithStatusJSON(http.StatusForbidden, gin.H {
+				"status": "forbidden",
+				"message": "Username Not Found.",
+			})
+		}
 		obj := c.Request.URL.Path  // c.Request.URL.RequestURI()
 		act := c.Request.Method
 
-		if c.Request.URL.Path == "/login" || c.Request.URL.Path == "/logout" {
-			sub = "anonymous"
+		switch c.Request.URL.Path {
+		case "/login", "/sing-up", "/api/v1/user/login",
+			 "/api/v1/user/logout", "/api/v1/user/sing-up":
+				sub = "anonymous"
+		default:
 		}
 
-		if pass, err := csbn.Enforce(sub, obj, act); !pass {
+		if pass, err := csbn.Enforcer.Enforce(sub, obj, act); !pass {
 			if err != nil {
 				slog.ErrorContext(c, err.Error())
 			}

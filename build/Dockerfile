@@ -20,6 +20,11 @@ ENV GOOS linux
 ENV GOARCH amd64
 RUN mkdir -p /build
 COPY ./ /build
+RUN if [ ! -d /build/web ]; then \
+      mkdir -p /build/web/template; \
+      mkdir -p /build/web/static; \
+      touch /build/web/template/prehold.html; \
+    fi
 WORKDIR /build
 # RUN apk add -U --no-cache gcc musl-dev # for "-race" parameter
 RUN go build -mod mod -o suglider-auth \
@@ -32,11 +37,13 @@ FROM runtime
 RUN mkdir -p /usr/local/app/configs && \
     mkdir -p /usr/local/app/bin && \
     mkdir -p /usr/local/app/logs && \
-    mkdir -p /usr/local/app/docs
+    mkdir -p /usr/local/app/docs && \
+    mkdir -p /usr/local/app/web
 RUN chown suglider:root /usr/local/app/logs
 COPY --from='builder' /build/suglider-auth /usr/local/app/bin/suglider-auth
 COPY --from='builder' /build/configs/ /usr/local/app/configs
 COPY --from='builder' /build/docs/ /usr/local/app/docs
+COPY --from='builder' /build/web /usr/local/app/web
 STOPSIGNAL SIGTERM
 WORKDIR /usr/local/app
 USER suglider

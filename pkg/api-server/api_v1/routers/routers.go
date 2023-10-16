@@ -6,9 +6,9 @@ import (
 	"suglider-auth/pkg/api-server/api_v1/routers/rbac"
 )
 
-type CasbinConfig = rbac.CasbinConfig
+type CasbinEnforcerConfig = rbac.CasbinEnforcerConfig
 
-func Apiv1Handler(router *gin.RouterGroup, csbn *CasbinConfig) {
+func Apiv1Handler(router *gin.RouterGroup, csbn *CasbinEnforcerConfig) {
 	userRouter := router.Group("/user")
 	{
 		user.UserHandler(userRouter)
