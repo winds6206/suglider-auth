@@ -14,6 +14,7 @@ type CasbinSettings struct {
 	Config      string
 	Table       string
 	Db          *sqlx.DB
+	EnableCache bool
 }
 
 type CasbinEnforcerConfig struct {
@@ -57,7 +58,7 @@ func NewCasbinEnforcerConfig(cs *CasbinSettings) (*CasbinEnforcerConfig, error) 
 		return nil, err
 	}
 	enforcer.EnableAutoSave(true)
-	enforcer.EnableCache(true)
+	enforcer.EnableCache(cs.EnableCache)
 	csbnConfig := &CasbinEnforcerConfig {
 		Enforcer:    enforcer,
 		CasbinTable: cs.Table,
@@ -94,6 +95,7 @@ func(cec *CasbinEnforcerConfig) InitPolicies() error {
 			slog.Info("This policy already exists.")
 		}
 	}
+	cec.Enforcer.LoadPolicy()
 	return nil
 }
 
@@ -274,6 +276,7 @@ func(cec *CasbinEnforcerConfig) AddPolicy(cp *CasbinPolicy) error {
 		}
 		return fmt.Errorf("This policy already exists.")
 	}
+	cec.Enforcer.LoadPolicy()
 	return nil
 }
 
@@ -284,6 +287,7 @@ func(cec *CasbinEnforcerConfig) AddGroupingPolicy(cgp *CasbinGroupingPolicy) err
 		}
 		return fmt.Errorf("This grouping policy already exists.")
 	}
+	cec.Enforcer.LoadPolicy()
 	return nil
 }
 
@@ -294,6 +298,7 @@ func(cec *CasbinEnforcerConfig) DeletePolicy(cp *CasbinPolicy) error {
 		}
 		return fmt.Errorf("This policy not exists.")
 	}
+	cec.Enforcer.LoadPolicy()
 	return nil
 }
 
@@ -304,6 +309,7 @@ func(cec *CasbinEnforcerConfig) DeleteGroupingPolicy(cgp *CasbinGroupingPolicy) 
 		}
 		return fmt.Errorf("This grouping policy not exists.")
 	}
+	cec.Enforcer.LoadPolicy()
 	return nil
 }
 
@@ -317,6 +323,7 @@ func(cec *CasbinEnforcerConfig) DeleteRole(name string) error {
 	if _, err := cec.Enforcer.RemoveFilteredGroupingPolicy(1, name); err != nil {
 		return err
 	}
+	cec.Enforcer.LoadPolicy()
 	return nil
 }
 
@@ -327,6 +334,7 @@ func(cec *CasbinEnforcerConfig) DeleteMemeber(name string) error {
 		}
 		return fmt.Errorf("This groupiing policy (member) not exists.")
 	}
+	cec.Enforcer.LoadPolicy()
 	return nil
 }
 

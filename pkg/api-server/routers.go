@@ -37,6 +37,7 @@ type AuthApiSettings struct {
 	MaxHeaderBytes  int
 	EnablePprof     bool
 	EnableRbac      bool
+	CasbinCache     bool
 }
 
 type CasbinEnforcerConfig = rbac.CasbinEnforcerConfig
@@ -80,9 +81,10 @@ func (aa * AuthApiSettings) SetupRouter(swag gin.HandlerFunc) *gin.Engine {
 
 	// RBAC model
 	csbnConf := &rbac.CasbinSettings {
-			Config: aa.CasbinConfig,
-			Table:  aa.CasbinTable,
-			Db:     mariadb.DataBase,
+			Config:      aa.CasbinConfig,
+			Table:       aa.CasbinTable,
+			Db:          mariadb.DataBase,
+			EnableCache: aa.CasbinCache,
 	}
 	csbn, err := rbac.NewCasbinEnforcerConfig(csbnConf)
 	if err != nil {
