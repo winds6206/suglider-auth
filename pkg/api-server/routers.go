@@ -79,12 +79,12 @@ func (aa * AuthApiSettings) SetupRouter(swag gin.HandlerFunc) *gin.Engine {
 	router.Static("/static", aa.StaticPath)
 
 	// RBAC model
-	csbn, err := rbac.NewCasbinEnforcerConfig(
-		&rbac.CasbinSettings {
+	csbnConf := &rbac.CasbinSettings {
 			Config: aa.CasbinConfig,
 			Table:  aa.CasbinTable,
 			Db:     mariadb.DataBase,
-	})
+	}
+	csbn, err := rbac.NewCasbinEnforcerConfig(csbnConf)
 	if err != nil {
 		slog.Error(err.Error())
 	}
