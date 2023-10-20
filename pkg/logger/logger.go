@@ -49,7 +49,9 @@ func SlogMultiWriter(ServiceName string) {
 		} else {
 			mlw := io.MultiWriter(os.Stdout, flog, logger)
 
-			jsonHandler := slog.NewJSONHandler(mlw, nil)
+			// Add attributes to all logs
+			jsonHandler := slog.NewJSONHandler(mlw, nil).
+				WithAttrs([]slog.Attr{slog.String("app", ServiceName)})
 			logger := slog.New(jsonHandler)
 			slog.SetDefault(logger)
 		}
