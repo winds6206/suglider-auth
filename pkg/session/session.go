@@ -6,7 +6,7 @@ import (
 	"suglider-auth/pkg/encrypt"
 	"suglider-auth/internal/redis"
 	"encoding/json"
-	"log"
+	"log/slog"
 	"suglider-auth/pkg/time_convert"
 	"fmt"
   )
@@ -23,7 +23,8 @@ func AddSession(c *gin.Context, user string) (string, error) {
 
 	jsonSessionValue, err := json.Marshal(sessionValue)
 	if err != nil {
-		log.Println("Failed to create session value JSON data:", err)
+		errorMessage := fmt.Sprintf("Failed to create session value JSON data: %v", err)
+		slog.Error(errorMessage)
 		return "", err
 	}
 

@@ -1,8 +1,9 @@
 package handlers
 
 import (
-	"log"
+	"log/slog"
 	"net/http"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	mariadb "suglider-auth/internal/database"
 	"suglider-auth/pkg/encrypt"
@@ -60,7 +61,9 @@ func UserSignUp(c *gin.Context) {
 
 	err = mariadb.UserSignUp(request.Username, passwordEncode, request.Mail, request.Address)
 	if err != nil {
-		log.Println("Insert user_info table failed:", err)
+		errorMessage := fmt.Sprintf("Insert user_info table failed: %v", err)
+		slog.Error(errorMessage)
+
 		c.JSON(http.StatusInternalServerError, utils.ErrorResponse(c, 1002, err))
 		return
 	} else {
@@ -96,7 +99,9 @@ func UserDelete(c *gin.Context) {
 
 		// First, check if error or not
 		if err != nil {
-			log.Println("Delete user_info data failed:", err)
+			errorMessage := fmt.Sprintf("Delete user_info data failed: %v", err)
+			slog.Error(errorMessage)
+
 			c.JSON(http.StatusInternalServerError, utils.ErrorResponse(c, 1002, err))
 			return
 		} 
@@ -115,7 +120,9 @@ func UserDelete(c *gin.Context) {
 
 		// First, check if error or not
 		if err != nil {
-			log.Println("Delete user_info data failed:", err)
+			errorMessage := fmt.Sprintf("Delete user_info data failed: %v", err)
+			slog.Error(errorMessage)
+
 			c.JSON(http.StatusInternalServerError, utils.ErrorResponse(c, 1002, err))
 			return
 		} 
@@ -173,11 +180,15 @@ func UserLogin(c *gin.Context) {
 		}
 
 	} else if err == sql.ErrNoRows {
-		log.Println("User Login failed:", err)
+		errorMessage := fmt.Sprintf("User Login failed: %v", err)
+		slog.Error(errorMessage)
+
 		c.JSON(http.StatusNotFound, utils.ErrorResponse(c, 1003, err))
 		return
 	} else if err != nil {
-		log.Println("Login failed:", err)
+		errorMessage := fmt.Sprintf("Login failed: %v", err)
+		slog.Error(errorMessage)
+
 		c.JSON(http.StatusInternalServerError, utils.ErrorResponse(c, 1002, err))
 		return
 	}
@@ -210,7 +221,7 @@ func UserLogOut(c *gin.Context) {
 	// Check session exist or not
 	ok := session.CheckSession(c)
 	if !ok {
-		log.Printf("session ID %s doesn't exsit in redis\n", sid)
+		slog.Info(fmt.Sprintf("session ID %s doesn't exsit in redis", sid))
 		return
 	}
 
@@ -221,10 +232,10 @@ func UserLogOut(c *gin.Context) {
 func Test(c *gin.Context) {
 	// session.AddSession(c, "tony")
 	sid := session.ReadSession(c)
-	log.Printf("sid:%s\n", sid)
+	slog.Info(fmt.Sprintf("sid:%s", sid))
 	
 	if sid == "<nil>" {
-		log.Println("sid is nil")
+		slog.Info("sid is nil")
 	}
 
 }
@@ -233,12 +244,12 @@ func Test(c *gin.Context) {
 func Testv2(c *gin.Context) {
 
 	sid := session.ReadSession(c)
-	log.Println("sid:", sid)
+	slog.Info(fmt.Sprintf("sid:%s", sid))
 
 	// Check session exist or not	
 	ok := session.CheckSession(c)
 	if !ok {
-		log.Printf("session ID %s doesn't exsit in redis\n", sid)
+		slog.Info(fmt.Sprintf("session ID %s doesn't exsit in redis", sid))
 		return
 	}
 
