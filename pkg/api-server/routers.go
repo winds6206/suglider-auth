@@ -53,7 +53,7 @@ func (aa * AuthApiSettings) SetupRouter(swag gin.HandlerFunc) *gin.Engine {
 	// CORS setting
 	if enableCors {
 		slog.Info("The API server CORS feature is enabled.")
-		router.Use(CORSMiddleware())
+		router.Use(corsMiddleware())
 	} else {
 		slog.Info("The API server CORS feature is disabled.")
 	} 
@@ -120,7 +120,7 @@ func (aa * AuthApiSettings) SetupRouter(swag gin.HandlerFunc) *gin.Engine {
 	return router
 }
 
-func CORSMiddleware() gin.HandlerFunc {
+func corsMiddleware() gin.HandlerFunc {
 
 	corsCredentials := configs.ApplicationConfig.Server.CorsCredentials
 	corsOrigin		:= configs.ApplicationConfig.Server.CorsOrigin
