@@ -25,6 +25,8 @@
   enable_cors       = true
   cors_credentials  = false # if value is "true", cors_origin setting can not be wildcard *
   cors_origin       = "http://localhost:9453, http://localhost:9487"
+  cors_methods      = "POST, GET, OPTIONS, PUT, DELETE"
+  cors_headers      = "Origin, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization"
   template_path     = "/usr/local/app/web/template"
   static_path       = "/usr/local/app/web/static"
 [log]

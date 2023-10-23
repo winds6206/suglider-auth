@@ -64,6 +64,8 @@ type (
 		EnableCors      bool          `toml:"enable_cors"`
 		CorsCredentials bool		  `toml:"cors_credentials"`
 		CorsOrigin      string		  `toml:"cors_origin"`
+		CorsMethods     string		  `toml:"cors_methods"`
+		CorsHeaders     string		  `toml:"cors_headers"`
 		CasbinCache     bool          `toml:"casbin_cache"`
 	}
 	logSettings struct {
