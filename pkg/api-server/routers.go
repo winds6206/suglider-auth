@@ -9,6 +9,7 @@ import (
 	"os/signal"
 	"syscall"
 	"time"
+	"strconv"
 
 	"github.com/gin-contrib/pprof"
 	"github.com/gin-contrib/sessions"
@@ -20,6 +21,7 @@ import (
 	v1_routers "suglider-auth/pkg/api-server/api_v1/routers"
 	"suglider-auth/pkg/rbac"
 	"suglider-auth/pkg/time_convert"
+	"suglider-auth/configs"
 )
 
 type AuthApiSettings struct {
@@ -46,16 +48,15 @@ type CasbinEnforcerConfig = rbac.CasbinEnforcerConfig
 func (aa * AuthApiSettings) SetupRouter(swag gin.HandlerFunc) *gin.Engine {
 	router := gin.New()
 
-	router.Use(func(c *gin.Context) {
-		c.Writer.Header().Set("Access-Control-Allow-Origin", "*")
-		c.Writer.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
-		c.Writer.Header().Set("Access-Control-Allow-Headers", "Origin, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization")
-		if c.Request.Method == "OPTIONS" {
-			c.AbortWithStatus(200)
-			return
-		}
-		c.Next()
-	})
+	enableCors := configs.ApplicationConfig.Server.EnableCors
+
+	// CORS setting
+	if enableCors {
+		slog.Info("The API server CORS feature is enabled.")
+		router.Use(CORSMiddleware())
+	} else {
+		slog.Info("The API server CORS feature is disabled.")
+	} 
 
 	router.Use(gin.Logger())
 
@@ -117,6 +118,33 @@ func (aa * AuthApiSettings) SetupRouter(swag gin.HandlerFunc) *gin.Engine {
 	}
 
 	return router
+}
+
+func CORSMiddleware() gin.HandlerFunc {
+
+	corsCredentials := configs.ApplicationConfig.Server.CorsCredentials
+	corsOrigin		:= configs.ApplicationConfig.Server.CorsOrigin
+
+	slog.Info(fmt.Sprintf("cors_credentials = %v", corsCredentials))
+	slog.Info(fmt.Sprintf("cors_origin = %s", corsOrigin))
+
+	if corsCredentials && corsOrigin == "*" {
+		slog.Error("Configuration cors_origin variable can't be wildcatd(*) because cors_credentials is true")
+		os.Exit(1)
+	}
+
+    return func(c *gin.Context) {
+		c.Writer.Header().Set("Access-Control-Allow-Credentials", strconv.FormatBool(corsCredentials))
+		c.Writer.Header().Set("Access-Control-Allow-Origin", corsOrigin)
+		c.Writer.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
+		c.Writer.Header().Set("Access-Control-Allow-Headers", "Origin, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization")
+		if c.Request.Method == "OPTIONS" {
+			c.AbortWithStatus(200)
+			return
+		}
+		c.Next()
+	}
+
 }
 
 func (aa * AuthApiSettings) StartServer(addr string, swag gin.HandlerFunc) {

@@ -22,6 +22,9 @@
   casbin_table      = "casbin_policies"
   casbin_cache      = false
   enable_rbac       = true
+  enable_cors       = true
+  cors_credentials  = false # if value is "true", cors_origin setting can not be wildcard *
+  cors_origin       = "http://localhost:9453, http://localhost:9487"
   template_path     = "/usr/local/app/web/template"
   static_path       = "/usr/local/app/web/static"
 [log]
