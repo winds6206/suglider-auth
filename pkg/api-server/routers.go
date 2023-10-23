@@ -124,6 +124,8 @@ func CORSMiddleware() gin.HandlerFunc {
 
 	corsCredentials := configs.ApplicationConfig.Server.CorsCredentials
 	corsOrigin		:= configs.ApplicationConfig.Server.CorsOrigin
+	corsMethods		:= configs.ApplicationConfig.Server.CorsMethods
+	corsHeaders		:= configs.ApplicationConfig.Server.CorsHeaders
 
 	slog.Info(fmt.Sprintf("cors_credentials = %v", corsCredentials))
 	slog.Info(fmt.Sprintf("cors_origin = %s", corsOrigin))
@@ -136,15 +138,14 @@ func CORSMiddleware() gin.HandlerFunc {
     return func(c *gin.Context) {
 		c.Writer.Header().Set("Access-Control-Allow-Credentials", strconv.FormatBool(corsCredentials))
 		c.Writer.Header().Set("Access-Control-Allow-Origin", corsOrigin)
-		c.Writer.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
-		c.Writer.Header().Set("Access-Control-Allow-Headers", "Origin, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization")
+		c.Writer.Header().Set("Access-Control-Allow-Methods", corsMethods)
+		c.Writer.Header().Set("Access-Control-Allow-Headers", corsHeaders)
 		if c.Request.Method == "OPTIONS" {
 			c.AbortWithStatus(200)
 			return
 		}
 		c.Next()
 	}
-
 }
 
 func (aa * AuthApiSettings) StartServer(addr string, swag gin.HandlerFunc) {
