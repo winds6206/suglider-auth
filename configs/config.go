@@ -61,6 +61,9 @@ type (
 		WriteTimeout    int           `toml:"write_timeout"`
 		MaxHeaderBytes  int           `toml:"max_header_bytes"`
 		EnableRbac      bool          `toml:"enable_rbac"`
+		EnableCors      bool          `toml:"enable_cors"`
+		CorsCredentials bool		  `toml:"cors_credentials"`
+		CorsOrigin      string		  `toml:"cors_origin"`
 		CasbinCache     bool          `toml:"casbin_cache"`
 	}
 	logSettings struct {
