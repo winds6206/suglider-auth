@@ -67,7 +67,7 @@ func UserSignUp(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, utils.ErrorResponse(c, 1002, err))
 		return
 	} else {
-		c.JSON(http.StatusOK, utils.SuccessResponse(c, 200))
+		c.JSON(http.StatusOK, utils.SuccessResponse(c, 200, nil))
 	}
 }
 
@@ -112,7 +112,7 @@ func UserDelete(c *gin.Context) {
 		if rowsAffected == 0 {
 			c.JSON(http.StatusNotFound, utils.ErrorResponse(c, 1003))
 		} else if rowsAffected > 0 {
-			c.JSON(http.StatusOK, utils.SuccessResponse(c, 200))
+			c.JSON(http.StatusOK, utils.SuccessResponse(c, 200, nil))
 		}
 	} else {
 
@@ -133,7 +133,7 @@ func UserDelete(c *gin.Context) {
 		if rowsAffected == 0 {
 			c.JSON(http.StatusNotFound, utils.ErrorResponse(c, 1003))
 		} else if rowsAffected > 0 {
-			c.JSON(http.StatusOK, utils.SuccessResponse(c, 200))
+			c.JSON(http.StatusOK, utils.SuccessResponse(c, 200, nil))
 		}
 	}
 }
@@ -154,7 +154,6 @@ func UserDelete(c *gin.Context) {
 func UserLogin(c *gin.Context) {
 
 	var request userLogin
-	// var userDBInfo userDBInfo
 
 	// Check the parameter trasnfer from POST
 	err := c.ShouldBindJSON(&request)
@@ -172,8 +171,17 @@ func UserLogin(c *gin.Context) {
 		pwdVerify := encrypt.VerifySaltedPasswordHash(userInfo.Password, request.Password)
 
 		// Check password true or false
-		if pwdVerify {		
-			c.JSON(http.StatusOK, utils.SuccessResponse(c, 200))
+		if pwdVerify {
+			totpUserData, errTotpUserData := mariadb.TotpUserData(userInfo.UserID, userInfo.Username)
+			if errTotpUserData != nil {
+				c.JSON(http.StatusInternalServerError, utils.ErrorResponse(c, 1002, err))
+				return
+			}
+		
+			c.JSON(http.StatusOK, utils.SuccessResponse(c, 200, map[string]interface{}{
+				"username": request.Username,
+				"totp_enabled": totpUserData.TotpEnabled,
+			}))
 		} else {
 			c.JSON(http.StatusUnauthorized, utils.ErrorResponse(c, 1004))
 			return
@@ -192,26 +200,6 @@ func UserLogin(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, utils.ErrorResponse(c, 1002, err))
 		return
 	}
-
-	sid := session.ReadSession(c)
-
-	// Check session exist or not
-	ok := session.CheckSession(c)
-	if !ok {
-		_, err := session.AddSession(c, request.Username)
-		if err != nil {
-			c.JSON(http.StatusInternalServerError, utils.ErrorResponse(c, 1005, err))
-			return
-		}
-	} else {
-		session.DeleteSession(sid)
-		_, err := session.AddSession(c, request.Username)
-		if err != nil {
-			c.JSON(http.StatusInternalServerError, utils.ErrorResponse(c, 1005, err))
-			return
-		}
-	}
-
 }
 
 func UserLogOut(c *gin.Context) {

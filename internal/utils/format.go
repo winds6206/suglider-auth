@@ -4,11 +4,12 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func SuccessResponse(c *gin.Context, errCode int64) (responseData gin.H) {
+func SuccessResponse(c *gin.Context, errCode int64, data interface{}) (responseData gin.H) {
 	responseData = gin.H{
 		"status":    "success",
 		"code":      errCode,
 		"message":   CodeMap[errCode],
+		"data":      data,
 	}
 
 	return
