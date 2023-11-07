@@ -14,5 +14,7 @@ func ResponseStatusCode() {
 		1003: "No search this user",
 		1004: "Invalid password",
 		1005: "Failed to create session value JSON data",
+		1006: "User ID not found.",
+		1007: "Totp code verify failed",
 	}
 }

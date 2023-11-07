@@ -23,6 +23,16 @@ CREATE TABLE IF NOT EXISTS rsa (
     rsa_private_key TEXT NOT NULL,
     PRIMARY KEY(user_id));
 
+CREATE TABLE IF NOT EXISTS suglider.totp (
+    user_id BINARY(16) NOT NULL,
+    username VARCHAR(256) NOT NULL,
+    totp_enabled BOOL DEFAULT false,
+    totp_verified BOOL DEFAULT false,
+    totp_secret VARCHAR(256) NOT NULL,
+    totp_url VARCHAR(256) NOT NULL,
+    PRIMARY KEY(user_id),
+	FOREIGN KEY(user_id) REFERENCES user_info(user_id) ON DELETE CASCADE);
+
 CREATE TABLE IF NOT EXISTS `casbin_policies` (
     `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
     `p_type` VARCHAR(32) NOT NULL DEFAULT '',

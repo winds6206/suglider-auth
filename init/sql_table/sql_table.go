@@ -31,7 +31,11 @@ func SugliderTableInit() {
 			continue
 		}
 
-		mariadb.DataBase.Exec(sqlStatement)
+		_, err := mariadb.DataBase.Exec(sqlStatement)
+		if err != nil {
+			slog.Error(err.Error())
+			panic("SQL table initial failed.")
+		}
 	}
 
 	slog.Info("SQL file excution complete!")
