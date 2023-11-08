@@ -12,7 +12,6 @@ type UserIDInfo struct {
 
 type TotpUserInfo struct {
     UserID       string `db:"user_id"`
-    Username     string `db:"username"`
     TotpEnabled  bool   `db:"totp_enabled"`
     TotpVerified bool   `db:"totp_verified"`
     TotpSecret   string `db:"totp_secret"`

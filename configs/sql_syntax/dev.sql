@@ -25,7 +25,6 @@ CREATE TABLE IF NOT EXISTS rsa (
 
 CREATE TABLE IF NOT EXISTS suglider.totp (
     user_id BINARY(16) NOT NULL,
-    username VARCHAR(256) NOT NULL,
     totp_enabled BOOL DEFAULT false,
     totp_verified BOOL DEFAULT false,
     totp_secret VARCHAR(256) NOT NULL,

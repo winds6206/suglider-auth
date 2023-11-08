@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"database/sql"
 	"net/http"
 	"github.com/gin-gonic/gin"
 	mariadb "suglider-auth/internal/database"
@@ -14,6 +15,18 @@ type totpInput struct {
 	TotpCode string `json:"totpCode"`
 }
 
+// @Summary Enable TOTP
+// @Description generate QRcode
+// @Tags users
+// @Accept multipart/form-data
+// @Produce application/json
+// @Param username formData string false "User Name"
+// @Success 200 {string} string "Success"
+// @Failure 400 {string} string "Bad request"
+// @Failure 401 {string} string "Unauthorized"
+// @Failure 403 {string} string "Forbidden"
+// @Failure 404 {string} string "Not found"
+// @Router /api/v1/totp/generate [post]
 func TotpGenerate(c *gin.Context) {
 	var request *totpInput
 
@@ -24,23 +37,42 @@ func TotpGenerate(c *gin.Context) {
 		return
 	}
 
+	// Look up user ID
 	userIDInfo, err := mariadb.LookupUserID(request.Username)
 	if err != nil {
+        if err == sql.ErrNoRows {
+			c.JSON(http.StatusBadRequest, utils.ErrorResponse(c, 1006, err))
+			return
+		}
 		c.JSON(http.StatusInternalServerError, utils.ErrorResponse(c, 1002, err))
 		return
-	}
+    }
 
-	if userIDInfo.UserID == "" {
-		c.JSON(http.StatusBadRequest, utils.ErrorResponse(c, 1006))
-		return
+	// Generate TOTP QRcode
+	totpInfo, imageData, errCode, err := totp.TotpGernate(request.Username, userIDInfo.UserID)
+	if errCode != 0 {
+		c.JSON(http.StatusInternalServerError, utils.ErrorResponse(c, errCode, err))
 	}
-
-	totpInfo, imageData := totp.TotpGernate(request.Username, userIDInfo.UserID)
 	c.Header("Content-Type", "image/png")
 	c.JSON(http.StatusOK, utils.SuccessResponse(c, 200, totpInfo))
 	c.Data(http.StatusOK, "image/png", imageData)
 }
 
+// @Summary Verify TOTP
+// @Description The API uses the first enabled TOTP feature to verify the TOTP code.
+// @Tags users
+// @Accept multipart/form-data
+// @Produce application/json
+// @Param username formData string false "User Name"
+// @Param username formData string false "TOTP Code"
+// @Success 200 {string} string "Success"
+// @Failure 400 {string} string "Bad request"
+// @Failure 401 {string} string "Unauthorized"
+// @Failure 403 {string} string "Forbidden"
+// @Failure 404 {string} string "Not found"
+// @Router /api/v1/totp/generate [post]
+
+// The API uses the first enabled TOTP feature to verify the TOTP code.
 func TotpVerify(c *gin.Context) {
 
 	var request totpInput
@@ -52,19 +84,18 @@ func TotpVerify(c *gin.Context) {
 		return
 	}
 
-	userIDInfo, err := mariadb.LookupUserID(request.Username)
+	// To get TOTP secret
+	totpData, err := mariadb.TotpUserData(request.Username)
 	if err != nil {
+        if err == sql.ErrNoRows {
+			c.JSON(http.StatusBadRequest, utils.ErrorResponse(c, 1006, err))
+			return
+		}
 		c.JSON(http.StatusInternalServerError, utils.ErrorResponse(c, 1002, err))
 		return
-	}
+    }
 
-	if userIDInfo.UserID == "" {
-		c.JSON(http.StatusBadRequest, utils.ErrorResponse(c, 1006))
-		return
-	}
-
-	totpData, _ := mariadb.TotpUserData(userIDInfo.UserID, request.Username)
-
+	// Verify TOTP Code from user input
 	valid := totp.TotpValidate(request.TotpCode, totpData.TotpSecret)
 
 	if !valid {
@@ -72,7 +103,8 @@ func TotpVerify(c *gin.Context) {
 		return
 	}
 
-	errTotpUpdateVerify := mariadb.TotpUpdateVerify(userIDInfo.UserID, request.Username, true, true)
+	// Update TOTP enabled and verified column status in database
+	errTotpUpdateVerify := mariadb.TotpUpdateVerify(request.Username, true, true)
 	if errTotpUpdateVerify != nil {
 		c.JSON(http.StatusInternalServerError, utils.ErrorResponse(c, 1002, err))
 		return
@@ -81,6 +113,21 @@ func TotpVerify(c *gin.Context) {
 	c.JSON(http.StatusOK, utils.SuccessResponse(c, 200, nil))
 }
 
+// @Summary Verify TOTP Validate
+// @Description If a user has enabled TOTP, the API can be used during the login process to verify its validity.
+// @Tags users
+// @Accept multipart/form-data
+// @Produce application/json
+// @Param username formData string false "User Name"
+// @Param username formData string false "TOTP Code"
+// @Success 200 {string} string "Success"
+// @Failure 400 {string} string "Bad request"
+// @Failure 401 {string} string "Unauthorized"
+// @Failure 403 {string} string "Forbidden"
+// @Failure 404 {string} string "Not found"
+// @Router /api/v1/totp/generate [post]
+
+// If a user has enabled TOTP, the API can be used during the login process to verify its validity.
 func TotpValidate(c *gin.Context) {
 
 	var request totpInput
@@ -92,19 +139,18 @@ func TotpValidate(c *gin.Context) {
 		return
 	}
 
-	userIDInfo, err := mariadb.LookupUserID(request.Username)
+	// To get TOTP secret
+	totpData, err := mariadb.TotpUserData(request.Username)
 	if err != nil {
+        if err == sql.ErrNoRows {
+			c.JSON(http.StatusBadRequest, utils.ErrorResponse(c, 1006, err))
+			return
+		}
 		c.JSON(http.StatusInternalServerError, utils.ErrorResponse(c, 1002, err))
 		return
-	}
+    }
 
-	if userIDInfo.UserID == "" {
-		c.JSON(http.StatusBadRequest, utils.ErrorResponse(c, 1006))
-		return
-	}
-
-	totpData, _ := mariadb.TotpUserData(userIDInfo.UserID, request.Username)
-
+	// Verify TOTP Code from user input
 	valid := totp.TotpValidate(request.TotpCode, totpData.TotpSecret)
 
 	if !valid {
@@ -135,6 +181,18 @@ func TotpValidate(c *gin.Context) {
 
 }
 
+// @Summary Disable TOTP
+// @Description disable TOTP
+// @Tags users
+// @Accept multipart/form-data
+// @Produce application/json
+// @Param username formData string false "User Name"
+// @Success 200 {string} string "Success"
+// @Failure 400 {string} string "Bad request"
+// @Failure 401 {string} string "Unauthorized"
+// @Failure 403 {string} string "Forbidden"
+// @Failure 404 {string} string "Not found"
+// @Router /api/v1/totp/generate [post]
 func TotpDisable(c *gin.Context) {
 	var request totpInput
 
@@ -145,22 +203,16 @@ func TotpDisable(c *gin.Context) {
 		return
 	}
 
-	userIDInfo, err := mariadb.LookupUserID(request.Username)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, utils.ErrorResponse(c, 1002, err))
-		return
-	}
-
-	if userIDInfo.UserID == "" {
-		c.JSON(http.StatusBadRequest, utils.ErrorResponse(c, 1006))
-		return
-	}
-
-	errTotpUpdateEnabled := mariadb.TotpUpdateEnabled(userIDInfo.UserID, request.Username, false)
+	// Update TOTP enabled column status in database
+	errTotpUpdateEnabled := mariadb.TotpUpdateEnabled(request.Username, false)
 	if errTotpUpdateEnabled != nil {
-		c.JSON(http.StatusInternalServerError, utils.ErrorResponse(c, 1002, err))
+        if errTotpUpdateEnabled == sql.ErrNoRows {
+			c.JSON(http.StatusBadRequest, utils.ErrorResponse(c, 1006, errTotpUpdateEnabled))
+			return
+		}
+		c.JSON(http.StatusInternalServerError, utils.ErrorResponse(c, 1002, errTotpUpdateEnabled))
 		return
-	}
+    }
 
 	c.JSON(http.StatusOK, utils.SuccessResponse(c, 200, nil))
 
