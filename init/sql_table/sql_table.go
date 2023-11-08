@@ -4,6 +4,7 @@ import (
 	"log/slog"
 	_ "github.com/go-sql-driver/mysql"
 	mariadb "suglider-auth/internal/database"
+	"suglider-auth/configs"
 	"io/ioutil"
 	"os"
 	"strings"
@@ -11,13 +12,7 @@ import (
 
 func SugliderTableInit() {
 
-	env := os.Getenv("ENV")
-
-	if len(env) == 0 {
-		panic("ENV variable is empty!")
-	}
-
-	filePath := "./configs/sql_syntax/" + env + ".sql"
+	filePath := configs.ApplicationConfig.Database.SyntaxPath
 
 	sqlBytes := readSQLFile(filePath)
 
