@@ -12,7 +12,7 @@ services:
       - -debug=true
     environment:
       ENV: dev
-      # DISABLE_SWAGGER: Y
+      # SWAGGER_OFF: Y
       GIN_MODE: release
     volumes:
       - ./test/config.toml:/tmp/config.toml:ro
@@ -20,7 +20,6 @@ services:
       - "suglider-auth"
     ports:
       - 9527:9527
-      - 1997:1997
     ulimits:
       nproc: 65535
       nofile:

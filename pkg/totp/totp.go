@@ -15,7 +15,10 @@ type totpInfo struct {
 	AuthURL string `json:"auth_url"`
 }
 
-func TotpGernate(username, user_id string) (*totpInfo, []byte) {
+func TotpGernate(username, user_id string) (*totpInfo, []byte, int64, error) {
+
+	var errCode int64
+	errCode = 0
 
 	// Generate TOTP key
 	key, err := totp.Generate(totp.GenerateOpts{
@@ -25,7 +28,8 @@ func TotpGernate(username, user_id string) (*totpInfo, []byte) {
 	if err != nil {
 		errorMessage := fmt.Sprintf("Generate TOTP key have something problem: %v", err)
 		slog.Error(errorMessage)
-		return nil, nil
+		errCode = 1008
+		return nil, nil, errCode, err
 	}
 
 	totpData := &totpInfo {
@@ -39,39 +43,47 @@ func TotpGernate(username, user_id string) (*totpInfo, []byte) {
 	if err != nil {
 		errorMessage := fmt.Sprintf("Failed to save QR code: %v", err)
 		slog.Error(errorMessage)
-		return nil, nil
+		errCode = 1009
+		return nil, nil, errCode, err
 	}
 
     errEncode := png.Encode(&buf, img)
 	if errEncode != nil {
 		errorMessage := fmt.Sprintf("Encode PNG failed: %v", err)
 		slog.Error(errorMessage)
-		return nil, nil
+		errCode = 1010
+		return nil, nil, errCode, errEncode
 	}
 
-	count, _ := mariadb.TotpUserCheck(user_id, username)
+	// Check whether the user_id exists in the totp table or not.
+	count, err := mariadb.TotpUserCheck(user_id)
+
+	if err != nil {
+		errorMessage := fmt.Sprintf("Check whether the user_id exists or not failed: %v", err)
+		slog.Error(errorMessage)
+		errCode = 1011
+		return nil, nil, errCode, err
+    }
 
 	if count == 1 {
-		errTotpUpdateSecret := mariadb.TotpUpdateSecret(user_id, username, key.Secret(), key.URL())
-		if errTotpUpdateSecret != nil {
+		err := mariadb.TotpUpdateSecret(username, key.Secret(), key.URL())
+		if err != nil {
 			errorMessage := fmt.Sprintf("Update totp table failed: %v", err)
 			slog.Error(errorMessage)
-			return nil, nil
-		}
-	} else if count == 0 {
-		errTotpStoreSecret := mariadb.TotpStoreSecret(user_id, username, key.Secret(), key.URL())
-		if errTotpStoreSecret != nil {
-			errorMessage := fmt.Sprintf("Insert totp table failed: %v", err)
-			slog.Error(errorMessage)
-			return nil, nil
+			errCode = 1012
+			return nil, nil, errCode, err
 		}
 	} else {
-		errorMessage := fmt.Sprintf("TotpUserCheck() count problem, count=%d",count)
-		slog.Error(errorMessage)
-		return nil, nil
+		err := mariadb.TotpStoreSecret(user_id, key.Secret(), key.URL())
+		if err != nil {
+			errorMessage := fmt.Sprintf("Insert totp table failed: %v", err)
+			slog.Error(errorMessage)
+			errCode = 1013
+			return nil, nil, errCode, err
+		}
 	}
 
-	return totpData, buf.Bytes()
+	return totpData, buf.Bytes(), errCode, nil
 }
 
 func TotpValidate(totpCode, totpKey string) bool {

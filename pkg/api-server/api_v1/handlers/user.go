@@ -172,7 +172,8 @@ func UserLogin(c *gin.Context) {
 
 		// Check password true or false
 		if pwdVerify {
-			totpUserData, errTotpUserData := mariadb.TotpUserData(userInfo.UserID, userInfo.Username)
+			
+			totpUserData, errTotpUserData := mariadb.TotpUserData(userInfo.Username)
 			if errTotpUserData != nil {
 				c.JSON(http.StatusInternalServerError, utils.ErrorResponse(c, 1002, err))
 				return
