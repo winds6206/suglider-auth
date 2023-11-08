@@ -5,6 +5,7 @@ BUILD_TAGS  = doc
 BUILD_FLAGS = "-X main.Version=${VERSION} -X main.Build=${BUILD_DATE}"
 TZ          = Asia/Taipei
 GO_VERSION  = 1.21
+CONFIG_FILE = configs/configuration/dev.toml
 
 .PHONY: build
 build:
@@ -15,7 +16,7 @@ build:
 run:
 	go mod tidy
 	go run -race -mod mod -buildvcs=false -tags ${BUILD_TAGS} -ldflags ${BUILD_FLAGS} main.go \
-	-c configs/configuration/dev.toml
+	-c ${CONFIG_FILE}
 
 clean:
 	go clean
@@ -52,3 +53,5 @@ help:
 	@echo "make lint - check golang syntax"
 	@echo "make benchmark - run benchmark"
 	@echo "make test - run test with -race parameter"
+	@echo "make run CONFIG_FILE=path/to/config.toml - run the service with specific config file"
+
