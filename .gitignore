@@ -6,7 +6,6 @@ vendor/
 test/
 bin/
 tmp/
-web/
 oauth2-server/bin/
 oauth2-server/test/
 oauth2-server/vendor/

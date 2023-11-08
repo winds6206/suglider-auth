@@ -15,7 +15,7 @@ build:
 
 run:
 	go mod tidy
-	go run -race -mod mod -buildvcs=false -tags ${BUILD_TAGS} -ldflags ${BUILD_FLAGS} main.go \
+	go run -race -mod mod -buildvcs=false -tags ${BUILD_TAGS} -ldflags ${BUILD_FLAGS} . \
 	-c ${CONFIG_FILE}
 
 clean:
