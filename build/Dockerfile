@@ -20,11 +20,6 @@ ENV GOOS linux
 ENV GOARCH amd64
 RUN mkdir -p /build
 COPY ./ /build
-RUN if [ ! -d /build/web ]; then \
-      mkdir -p /build/web/template; \
-      mkdir -p /build/web/static; \
-      touch /build/web/template/prehold.html; \
-    fi
 WORKDIR /build
 # RUN apk add -U --no-cache gcc musl-dev # for "-race" parameter
 RUN go build -mod mod -o suglider-auth \
