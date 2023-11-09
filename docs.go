@@ -76,7 +76,7 @@ func redocHandler(c *gin.Context) {
 		}
 		_, _ = c.Writer.Write(buf.Bytes())
 	case "doc.json":
-		doc, err := ioutil.ReadFile("docs/swagger.json")
+		doc, err := ioutil.ReadFile(fmt.Sprintf("%s/swagger.json", configs.ApplicationConfig.Server.SwaggerPath))
 		if err != nil {
 			slog.Error(err.Error())
 			c.AbortWithStatus(http.StatusInternalServerError)

@@ -30,6 +30,7 @@
   cors_headers      = "Origin, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization"
   template_path     = "/usr/local/app/web/template"
   static_path       = "/usr/local/app/web/static"
+  swagger_path      = "/usr/local/app/docs"
 [log]
   [log.filelog]
     filename   = "/usr/local/app/logs/suglider-auth.log"
