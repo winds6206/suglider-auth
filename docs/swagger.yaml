@@ -92,7 +92,7 @@ paths:
     delete:
       consumes:
       - application/json
-      description: delete a single policy (remove role of member)
+      description: delete a single policy (remove a role of member)
       parameters:
       - description: Member
         in: formData
@@ -125,7 +125,7 @@ paths:
           description: Not found
           schema:
             type: string
-      summary: Delete RBAC Single Grouping Policy (Remove Role of Member)
+      summary: Delete RBAC Single Grouping Policy (Remove A Role of Member)
       tags:
       - privilege
   /api/v1/rbac/member/{name}:
@@ -420,6 +420,160 @@ paths:
       summary: List All Roles
       tags:
       - privilege
+  /api/v1/totp/disable:
+    post:
+      consumes:
+      - multipart/form-data
+      description: disable TOTP
+      parameters:
+      - description: User Name
+        in: formData
+        name: username
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            type: string
+        "400":
+          description: Bad request
+          schema:
+            type: string
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+        "403":
+          description: Forbidden
+          schema:
+            type: string
+        "404":
+          description: Not found
+          schema:
+            type: string
+      summary: Disable TOTP
+      tags:
+      - totp
+  /api/v1/totp/generate:
+    post:
+      consumes:
+      - multipart/form-data
+      description: generate QRcode
+      parameters:
+      - description: User Name
+        in: formData
+        name: username
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            type: string
+        "400":
+          description: Bad request
+          schema:
+            type: string
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+        "403":
+          description: Forbidden
+          schema:
+            type: string
+        "404":
+          description: Not found
+          schema:
+            type: string
+      summary: Enable TOTP
+      tags:
+      - totp
+  /api/v1/totp/validate:
+    post:
+      consumes:
+      - multipart/form-data
+      description: If a user has enabled TOTP, the API can be used during the login
+        process to verify its validity.
+      parameters:
+      - description: User Name
+        in: formData
+        name: username
+        type: string
+      - description: TOTP Code
+        in: formData
+        name: username
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            type: string
+        "400":
+          description: Bad request
+          schema:
+            type: string
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+        "403":
+          description: Forbidden
+          schema:
+            type: string
+        "404":
+          description: Not found
+          schema:
+            type: string
+      summary: Verify TOTP Validate
+      tags:
+      - totp
+  /api/v1/totp/verify:
+    post:
+      consumes:
+      - multipart/form-data
+      description: The API uses the first enabled TOTP feature to verify the TOTP
+        code.
+      parameters:
+      - description: User Name
+        in: formData
+        name: username
+        type: string
+      - description: TOTP Code
+        in: formData
+        name: username
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            type: string
+        "400":
+          description: Bad request
+          schema:
+            type: string
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+        "403":
+          description: Forbidden
+          schema:
+            type: string
+        "404":
+          description: Not found
+          schema:
+            type: string
+      summary: Verify TOTP
+      tags:
+      - totp
   /api/v1/user/delete:
     post:
       consumes:
