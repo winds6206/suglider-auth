@@ -19,12 +19,20 @@ Go to "bin" diretory and use `go run` command to run the http server.
 ```bash
 cd ./bin
 
-ENV=dev go run suglider-auth -c ~/tmp/dev.toml
+./suglider-auth -c ~/tmp/dev.toml
 ```
 
 we can use `make clean` to clean the binary file in the "bin" directory.
 ```bash
 make clean
+```
+
+### make run
+
+Compile and run the program.
+
+```bash
+make run CONFIG_FILE=~/tmp/dev.toml
 ```
 
 ### make docker
@@ -33,14 +41,6 @@ Command `make docker` can build docker images
 
 ```bash
 make docker VERSION=1.0.0
-```
-
-## Compile and run the main.go
-
-Compile and run the program through main.go
-
-```bash
-ENV=dev go run main.go -c ~/tmp/dev.toml
 ```
 
 ## Test

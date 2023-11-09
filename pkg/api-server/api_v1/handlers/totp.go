@@ -17,7 +17,7 @@ type totpInput struct {
 
 // @Summary Enable TOTP
 // @Description generate QRcode
-// @Tags users
+// @Tags totp
 // @Accept multipart/form-data
 // @Produce application/json
 // @Param username formData string false "User Name"
@@ -60,7 +60,7 @@ func TotpGenerate(c *gin.Context) {
 
 // @Summary Verify TOTP
 // @Description The API uses the first enabled TOTP feature to verify the TOTP code.
-// @Tags users
+// @Tags totp
 // @Accept multipart/form-data
 // @Produce application/json
 // @Param username formData string false "User Name"
@@ -70,10 +70,9 @@ func TotpGenerate(c *gin.Context) {
 // @Failure 401 {string} string "Unauthorized"
 // @Failure 403 {string} string "Forbidden"
 // @Failure 404 {string} string "Not found"
-// @Router /api/v1/totp/generate [post]
-
-// The API uses the first enabled TOTP feature to verify the TOTP code.
+// @Router /api/v1/totp/verify [post]
 func TotpVerify(c *gin.Context) {
+// The API uses the first enabled TOTP feature to verify the TOTP code.
 
 	var request totpInput
 
@@ -115,7 +114,7 @@ func TotpVerify(c *gin.Context) {
 
 // @Summary Verify TOTP Validate
 // @Description If a user has enabled TOTP, the API can be used during the login process to verify its validity.
-// @Tags users
+// @Tags totp
 // @Accept multipart/form-data
 // @Produce application/json
 // @Param username formData string false "User Name"
@@ -125,10 +124,9 @@ func TotpVerify(c *gin.Context) {
 // @Failure 401 {string} string "Unauthorized"
 // @Failure 403 {string} string "Forbidden"
 // @Failure 404 {string} string "Not found"
-// @Router /api/v1/totp/generate [post]
-
-// If a user has enabled TOTP, the API can be used during the login process to verify its validity.
+// @Router /api/v1/totp/validate [post]
 func TotpValidate(c *gin.Context) {
+// If a user has enabled TOTP, the API can be used during the login process to verify its validity.
 
 	var request totpInput
 
@@ -183,7 +181,7 @@ func TotpValidate(c *gin.Context) {
 
 // @Summary Disable TOTP
 // @Description disable TOTP
-// @Tags users
+// @Tags totp
 // @Accept multipart/form-data
 // @Produce application/json
 // @Param username formData string false "User Name"
@@ -192,7 +190,7 @@ func TotpValidate(c *gin.Context) {
 // @Failure 401 {string} string "Unauthorized"
 // @Failure 403 {string} string "Forbidden"
 // @Failure 404 {string} string "Not found"
-// @Router /api/v1/totp/generate [post]
+// @Router /api/v1/totp/disable [post]
 func TotpDisable(c *gin.Context) {
 	var request totpInput
 
