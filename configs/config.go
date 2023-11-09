@@ -40,7 +40,7 @@ type (
 		User           string             `toml:"user"`
 		Password       string             `toml:"password"`
 		Timeout        string             `toml:"timeout"`
-		SyntaxPath 	   string			  `toml:"syntax_path"`
+		SyntaxPath     string             `toml:"syntax_path"`
 	}
 	Redis struct {
 		Host     string    `toml:"host"`
@@ -55,6 +55,7 @@ type (
 	serverSettings struct {
 		TemplatePath    string        `toml:"template_path"`
 		StaticPath      string        `toml:"static_path"`
+		SwaggerPath     string        `toml:"swagger_path"`
 		CasbinConfig    string        `toml:"casbin_config"`
 		CasbinTable     string        `toml:"casbin_table"`
 		GracefulTimeout int           `toml:"graceful_timeout"`
@@ -63,10 +64,10 @@ type (
 		MaxHeaderBytes  int           `toml:"max_header_bytes"`
 		EnableRbac      bool          `toml:"enable_rbac"`
 		EnableCors      bool          `toml:"enable_cors"`
-		CorsCredentials bool		  `toml:"cors_credentials"`
-		CorsOrigin      string		  `toml:"cors_origin"`
-		CorsMethods     string		  `toml:"cors_methods"`
-		CorsHeaders     string		  `toml:"cors_headers"`
+		CorsCredentials bool          `toml:"cors_credentials"`
+		CorsOrigin      string        `toml:"cors_origin"`
+		CorsMethods     string        `toml:"cors_methods"`
+		CorsHeaders     string        `toml:"cors_headers"`
 		CasbinCache     bool          `toml:"casbin_cache"`
 	}
 	logSettings struct {
@@ -123,7 +124,6 @@ func loadConfig() {
 		if err != nil {
 			errorMessage := fmt.Sprintf("Failed to load the configuration: %v", err)
 			slog.Error(errorMessage)
-			
 			panic(err)
 		}
 	}
