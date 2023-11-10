@@ -10,6 +10,7 @@ import (
 	"database/sql"
 	"suglider-auth/pkg/session"
 	"suglider-auth/internal/utils"
+	"suglider-auth/pkg/jwt"
 )
 
 type userSignUp struct {
@@ -173,16 +174,50 @@ func UserLogin(c *gin.Context) {
 		// Check password true or false
 		if pwdVerify {
 			
+			// Check whether user enable TOTP or not.
 			totpUserData, errTotpUserData := mariadb.TotpUserData(userInfo.Username)
+
+			// Check error type
 			if errTotpUserData != nil {
-				c.JSON(http.StatusInternalServerError, utils.ErrorResponse(c, 1002, err))
-				return
+
+				// ErrNoRows means user never enable TOTP feature
+				if errTotpUserData == sql.ErrNoRows {
+					sid := session.ReadSession(c)
+
+					// Check session exist or not
+					ok := session.CheckSession(c)
+					if !ok {
+						_, err := session.AddSession(c, request.Username)
+						if err != nil {
+							c.JSON(http.StatusInternalServerError, utils.ErrorResponse(c, 1005, err))
+							return
+						}
+					} else {
+						session.DeleteSession(sid)
+						_, err := session.AddSession(c, request.Username)
+						if err != nil {
+							c.JSON(http.StatusInternalServerError, utils.ErrorResponse(c, 1005, err))
+							return
+						}
+					}
+
+					c.JSON(http.StatusOK, utils.SuccessResponse(c, 200, map[string]interface{}{
+						"username": request.Username,
+						"totp_enabled": totpUserData.TotpEnabled,
+					}))
+
+				} else {
+					c.JSON(http.StatusInternalServerError, utils.ErrorResponse(c, 1002, err))
+					return
+				}
+			
+			// No error means user had ever enabled TOTP and data is in the database
+			} else {
+				c.JSON(http.StatusOK, utils.SuccessResponse(c, 200, map[string]interface{}{
+					"username": request.Username,
+					"totp_enabled": totpUserData.TotpEnabled,
+				}))
 			}
-		
-			c.JSON(http.StatusOK, utils.SuccessResponse(c, 200, map[string]interface{}{
-				"username": request.Username,
-				"totp_enabled": totpUserData.TotpEnabled,
-			}))
 		} else {
 			c.JSON(http.StatusUnauthorized, utils.ErrorResponse(c, 1004))
 			return
@@ -203,7 +238,7 @@ func UserLogin(c *gin.Context) {
 	}
 }
 
-func UserLogOut(c *gin.Context) {
+func UserLogout(c *gin.Context) {
 
 	sid := session.ReadSession(c)
 
@@ -218,30 +253,80 @@ func UserLogOut(c *gin.Context) {
 }
 
 // Test Function
-func Test(c *gin.Context) {
-	// session.AddSession(c, "tony")
-	sid := session.ReadSession(c)
-	slog.Info(fmt.Sprintf("sid:%s", sid))
-	
-	if sid == "<nil>" {
-		slog.Info("sid is nil")
-	}
-
+func TestLogout(c *gin.Context) {
+	// immediately clear the token cookie
+	c.SetCookie("token", "", -1, "/", "localhost", false, true)
 }
 
 // Test Function
-func Testv2(c *gin.Context) {
+func TestLogin(c *gin.Context) {
 
-	sid := session.ReadSession(c)
-	slog.Info(fmt.Sprintf("sid:%s", sid))
+	var request userLogin
 
-	// Check session exist or not	
-	ok := session.CheckSession(c)
-	if !ok {
-		slog.Info(fmt.Sprintf("session ID %s doesn't exsit in redis", sid))
+	// Check the parameter trasnfer from POST
+	err := c.ShouldBindJSON(&request)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, utils.ErrorResponse(c, 1001, err))
 		return
 	}
 
-	session.DeleteSession(sid)
+	token, expirationTime, err := jwt.GenerateJWT(request.Username)
+
+	if err != nil {
+		// TODO
+		return
+	}
+
+	fmt.Println(token)
+	fmt.Println(expirationTime)
+
+	c.SetCookie("token", token, expirationTime, "/", "localhost", false, true)
+
+}
+
+func TestWelcome(c *gin.Context) {
+
+	cookie, err := c.Cookie("token")
+	if err != nil {
+		// If the cookie is not set, return an unauthorized status
+		// TODO
+		c.JSON(http.StatusUnauthorized, utils.ErrorResponse(c, 1003, err))
+		return
+	}
+
+	parseData, _ := jwt.ParseJWT(cookie)
+
+	c.JSON(http.StatusOK, gin.H{
+		"username": parseData,
+	})
+
+
+}
+
+func TestRefresh(c *gin.Context) {
+
+	cookie, err := c.Cookie("token")
+	if err != nil {
+		// If the cookie is not set, return an unauthorized status
+		// TODO
+		c.JSON(http.StatusUnauthorized, utils.ErrorResponse(c, 1003, err))
+		return
+	}
+
+	_, errParseJWT := jwt.ParseJWT(cookie)
+
+	if errParseJWT != nil {
+		// TODO
+	}
+
+	token, expirationTime, err := jwt.RefreshJWT(cookie)
+
+	if err != nil {
+		// TODO
+	}
+
+	// Set the new token as the users `token` cookie
+	c.SetCookie("token", token, expirationTime, "/", "localhost", false, true)
+
 
 }
