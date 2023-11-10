@@ -11,6 +11,7 @@ import (
 	"suglider-auth/pkg/session"
 	"suglider-auth/internal/utils"
 	"suglider-auth/pkg/jwt"
+	// "time"
 )
 
 type userSignUp struct {
@@ -182,6 +183,8 @@ func UserLogin(c *gin.Context) {
 
 				// ErrNoRows means user never enable TOTP feature
 				if errTotpUserData == sql.ErrNoRows {
+					
+					fmt.Println("ErrNoRows session start")
 					sid := session.ReadSession(c)
 
 					// Check session exist or not
@@ -201,6 +204,8 @@ func UserLogin(c *gin.Context) {
 						}
 					}
 
+					fmt.Println("ErrNoRows session finish")
+
 					c.JSON(http.StatusOK, utils.SuccessResponse(c, 200, map[string]interface{}{
 						"username": request.Username,
 						"totp_enabled": totpUserData.TotpEnabled,
@@ -212,7 +217,36 @@ func UserLogin(c *gin.Context) {
 				}
 			
 			// No error means user had ever enabled TOTP and data is in the database
+			} else if totpUserData.TotpEnabled == true {
+				c.JSON(http.StatusOK, utils.SuccessResponse(c, 200, map[string]interface{}{
+					"username": request.Username,
+					"totp_enabled": totpUserData.TotpEnabled,
+				}))
 			} else {
+
+				fmt.Println("TotpEnabled = false, session start")
+
+				sid := session.ReadSession(c)
+
+				// Check session exist or not
+				ok := session.CheckSession(c)
+				if !ok {
+					_, err := session.AddSession(c, request.Username)
+					if err != nil {
+						c.JSON(http.StatusInternalServerError, utils.ErrorResponse(c, 1005, err))
+						return
+					}
+				} else {
+					session.DeleteSession(sid)
+					_, err := session.AddSession(c, request.Username)
+					if err != nil {
+						c.JSON(http.StatusInternalServerError, utils.ErrorResponse(c, 1005, err))
+						return
+					}
+				}
+
+				fmt.Println("TotpEnabled = false, session finish")
+
 				c.JSON(http.StatusOK, utils.SuccessResponse(c, 200, map[string]interface{}{
 					"username": request.Username,
 					"totp_enabled": totpUserData.TotpEnabled,
@@ -280,7 +314,10 @@ func TestLogin(c *gin.Context) {
 	fmt.Println(token)
 	fmt.Println(expirationTime)
 
-	c.SetCookie("token", token, expirationTime, "/", "localhost", false, true)
+	// sec, _ := time.ParseDuration(expirationTime)
+	// fmt.Println(sec)
+
+	// c.SetCookie("token", token, sec, "/", "localhost", false, true)
 
 }
 
@@ -324,6 +361,9 @@ func TestRefresh(c *gin.Context) {
 	if err != nil {
 		// TODO
 	}
+
+	fmt.Println(token)
+	fmt.Println(expirationTime)
 
 	// Set the new token as the users `token` cookie
 	c.SetCookie("token", token, expirationTime, "/", "localhost", false, true)
