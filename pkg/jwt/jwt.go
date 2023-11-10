@@ -3,6 +3,7 @@ package jwt
 import (
 	"github.com/golang-jwt/jwt/v5"
 	"fmt"
+	"time"
 )
 
 var jwtKey = []byte("suglider")
@@ -12,14 +13,18 @@ type jwtData struct {
 	jwt.RegisteredClaims
 }
 
-func GenerateJWT(username string) (string, int, error) {
+func GenerateJWT(username string) (string, time.Time, error) {
 
 	// Declare the expiration time of the token
-	expirationTime := 3000
+	expirationTime := time.Now().Add(5 * time.Minute)
 
 	// Create the JWT claims, which includes the username and expiry time
 	claims := &jwtData{
 		Username: username,
+		RegisteredClaims: jwt.RegisteredClaims{
+			// In JWT, the expiry time is expressed as unix milliseconds
+			ExpiresAt: jwt.NewNumericDate(expirationTime),
+		},
 	}
 
 	// Declare the token with the algorithm used for signing, and the claims
@@ -29,7 +34,7 @@ func GenerateJWT(username string) (string, int, error) {
 	tokenString, err := token.SignedString(jwtKey)
 	if err != nil {
 		// TODO
-		return "", 0, err
+		return "", time.Time{}, err
 	}
 
 	return tokenString, expirationTime, nil
@@ -81,7 +86,7 @@ func RefreshJWT(token string) (string, int, error) {
 	// }
 
 	// Now, create a new token for the current use, with a renewed expiration time
-	expirationTime := 3000
+	expirationTime := 1200
 	newToken := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	tokenString, err := newToken.SignedString(jwtKey)
 	if err != nil {

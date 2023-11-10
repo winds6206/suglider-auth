@@ -16,5 +16,5 @@ func UserHandler(router *gin.RouterGroup) {
 	router.GET("/test-logout", handlers.TestLogout)
 	router.POST("/test-login", handlers.TestLogin)
 	router.GET("/test-welcome", handlers.TestWelcome)
-	router.POST("/test-refresh", handlers.TestRefresh)
+	router.GET("/test-refresh", handlers.TestRefresh)
 }
