@@ -22,5 +22,12 @@ func ResponseStatusCode() {
 		1011: "Check whether the user_id exists or not failed.",
 		1012: "Update totp table failed.",
 		1013: "Insert totp table failed.",
+		1014: "Generate the JWT string failed.",
+		1015: "JWT signature is invalid.",
+		1016: "Parse JWT claim data failed.",
+		1017: "Token is invalid.",
+		1018: "Generate new JWT failed.",
+		1019: "Cookie key is not found.",
+		1020: "Get cookie key failed.",
 	}
 }
