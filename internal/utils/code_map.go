@@ -29,5 +29,6 @@ func ResponseStatusCode() {
 		1018: "Generate new JWT failed.",
 		1019: "Cookie key is not found.",
 		1020: "Get cookie key failed.",
+		1021: "The sign up data is not satisfied of rule.",
 	}
 }
