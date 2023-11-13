@@ -184,7 +184,6 @@ func UserLogin(c *gin.Context) {
 				// ErrNoRows means user never enable TOTP feature
 				if errTotpUserData == sql.ErrNoRows {
 					
-					fmt.Println("ErrNoRows session start")
 					sid := session.ReadSession(c)
 
 					// Check session exist or not
@@ -204,8 +203,18 @@ func UserLogin(c *gin.Context) {
 						}
 					}
 
-					fmt.Println("ErrNoRows session finish")
+					token, expireTimeSec, err := jwt.GenerateJWT(request.Username)
 
+					if err != nil {
+						errorMessage := fmt.Sprintf("Generate the JWT string failed: %v", err)
+						slog.Error(errorMessage)
+						c.JSON(http.StatusBadRequest, utils.ErrorResponse(c, 1014, err))
+				
+						return
+					}
+				
+					c.SetCookie("token", token, expireTimeSec, "/", "localhost", false, true)
+				
 					c.JSON(http.StatusOK, utils.SuccessResponse(c, 200, map[string]interface{}{
 						"username": request.Username,
 						"totp_enabled": totpUserData.TotpEnabled,
@@ -216,15 +225,16 @@ func UserLogin(c *gin.Context) {
 					return
 				}
 			
-			// No error means user had ever enabled TOTP and data is in the database
-			} else if totpUserData.TotpEnabled == true {
+			// No error means user had ever enabled TOTP and data is in the database.
+			// his block means totpUserData.TotpEnabled = true
+			} else if totpUserData.TotpEnabled {
 				c.JSON(http.StatusOK, utils.SuccessResponse(c, 200, map[string]interface{}{
 					"username": request.Username,
 					"totp_enabled": totpUserData.TotpEnabled,
 				}))
+			
+			// This block means totpUserData.TotpEnabled = false
 			} else {
-
-				fmt.Println("TotpEnabled = false, session start")
 
 				sid := session.ReadSession(c)
 
@@ -245,8 +255,18 @@ func UserLogin(c *gin.Context) {
 					}
 				}
 
-				fmt.Println("TotpEnabled = false, session finish")
+				token, expireTimeSec, err := jwt.GenerateJWT(request.Username)
 
+				if err != nil {
+					errorMessage := fmt.Sprintf("Generate the JWT string failed: %v", err)
+					slog.Error(errorMessage)
+					c.JSON(http.StatusBadRequest, utils.ErrorResponse(c, 1014, err))
+			
+					return
+				}
+			
+				c.SetCookie("token", token, expireTimeSec, "/", "localhost", false, true)
+			
 				c.JSON(http.StatusOK, utils.SuccessResponse(c, 200, map[string]interface{}{
 					"username": request.Username,
 					"totp_enabled": totpUserData.TotpEnabled,
@@ -272,8 +292,23 @@ func UserLogin(c *gin.Context) {
 	}
 }
 
+// @Summary User Logout
+// @Description user logout
+// @Tags users
+// @Accept multipart/form-data
+// @Produce application/json
+// @Success 200 {string} string "Success"
+// @Failure 400 {string} string "Bad request"
+// @Failure 401 {string} string "Unauthorized"
+// @Failure 403 {string} string "Forbidden"
+// @Failure 404 {string} string "Not found"
+// @Router /api/v1/user/logout [post]
 func UserLogout(c *gin.Context) {
 
+	// Clear JWT
+	c.SetCookie("token", "", -1, "/", "localhost", false, true)
+
+	// Clear session
 	sid := session.ReadSession(c)
 
 	// Check session exist or not
@@ -284,6 +319,61 @@ func UserLogout(c *gin.Context) {
 	}
 
 	session.DeleteSession(sid)
+}
+
+// @Summary User Refresh JWT
+// @Description user refresh JWT
+// @Tags users
+// @Accept multipart/form-data
+// @Produce application/json
+// @Success 200 {string} string "Success"
+// @Failure 400 {string} string "Bad request"
+// @Failure 401 {string} string "Unauthorized"
+// @Failure 403 {string} string "Forbidden"
+// @Failure 404 {string} string "Not found"
+// @Router /api/v1/user/refresh [post]
+func RefreshJWT(c *gin.Context) {
+
+	cookie, err := c.Cookie("token")
+
+	if err != nil {
+		if err == http.ErrNoCookie {
+			c.JSON(http.StatusUnauthorized, utils.ErrorResponse(c, 1019, err))
+			return
+		}
+		c.JSON(http.StatusInternalServerError, utils.ErrorResponse(c, 1020, err))
+		return
+	}
+
+	_, errCode, errParseJWT := jwt.ParseJWT(cookie)
+
+	if errParseJWT != nil {
+
+		switch errCode {
+
+		  case 1015:
+			c.JSON(http.StatusUnauthorized, utils.ErrorResponse(c, errCode, err))
+	  
+		  case 1016:
+			c.JSON(http.StatusBadRequest, utils.ErrorResponse(c, errCode, err))
+	  
+		  case 1017:
+			c.JSON(http.StatusUnauthorized, utils.ErrorResponse(c, errCode, err))
+		}
+	}
+
+	token, expireTimeSec, err := jwt.RefreshJWT(cookie)
+
+	if err != nil {
+		errorMessage := fmt.Sprintf("Generate new JWT failed: %v", err)
+		slog.Error(errorMessage)
+		c.JSON(http.StatusInternalServerError, utils.ErrorResponse(c, 1018, err))
+
+		return
+	}
+
+	// Set the new token as the users `token` cookie
+	c.SetCookie("token", token, expireTimeSec, "/", "localhost", false, true)
 }
 
 // Test Function
@@ -304,69 +394,79 @@ func TestLogin(c *gin.Context) {
 		return
 	}
 
-	token, expirationTime, err := jwt.GenerateJWT(request.Username)
+	token, expireTimeSec, err := jwt.GenerateJWT(request.Username)
 
 	if err != nil {
-		// TODO
+		errorMessage := fmt.Sprintf("Create the JWT string failed: %v", err)
+		slog.Error(errorMessage)
+		c.JSON(http.StatusBadRequest, utils.ErrorResponse(c, 1014, err))
+
 		return
 	}
 
-	fmt.Println(token)
-	fmt.Println(expirationTime)
-
-	// sec, _ := time.ParseDuration(expirationTime)
-	// fmt.Println(sec)
-
-	// c.SetCookie("token", token, sec, "/", "localhost", false, true)
-
+	c.SetCookie("token", token, expireTimeSec, "/", "localhost", false, true)
 }
 
 func TestWelcome(c *gin.Context) {
 
 	cookie, err := c.Cookie("token")
 	if err != nil {
-		// If the cookie is not set, return an unauthorized status
-		// TODO
-		c.JSON(http.StatusUnauthorized, utils.ErrorResponse(c, 1003, err))
+		if err == http.ErrNoCookie {
+			c.JSON(http.StatusUnauthorized, utils.ErrorResponse(c, 1019, err))
+			return
+		}
+		c.JSON(http.StatusInternalServerError, utils.ErrorResponse(c, 1020, err))
 		return
 	}
 
-	parseData, _ := jwt.ParseJWT(cookie)
+	parseData , _, _ := jwt.ParseJWT(cookie)
 
 	c.JSON(http.StatusOK, gin.H{
 		"username": parseData,
 	})
-
-
 }
 
 func TestRefresh(c *gin.Context) {
 
 	cookie, err := c.Cookie("token")
+
 	if err != nil {
-		// If the cookie is not set, return an unauthorized status
-		// TODO
-		c.JSON(http.StatusUnauthorized, utils.ErrorResponse(c, 1003, err))
+		if err == http.ErrNoCookie {
+			c.JSON(http.StatusUnauthorized, utils.ErrorResponse(c, 1019, err))
+			return
+		}
+		c.JSON(http.StatusInternalServerError, utils.ErrorResponse(c, 1020, err))
 		return
 	}
 
-	_, errParseJWT := jwt.ParseJWT(cookie)
+	_, errCode, errParseJWT := jwt.ParseJWT(cookie)
 
 	if errParseJWT != nil {
-		// TODO
+
+		switch errCode {
+
+		  case 1015:
+			c.JSON(http.StatusUnauthorized, utils.ErrorResponse(c, errCode, err))
+	  
+		  case 1016:
+			c.JSON(http.StatusBadRequest, utils.ErrorResponse(c, errCode, err))
+	  
+		  case 1017:
+			c.JSON(http.StatusUnauthorized, utils.ErrorResponse(c, errCode, err))
+		}
+	  
 	}
 
-	token, expirationTime, err := jwt.RefreshJWT(cookie)
+	token, expireTimeSec, err := jwt.RefreshJWT(cookie)
 
 	if err != nil {
-		// TODO
+		errorMessage := fmt.Sprintf("Generate new JWT failed: %v", err)
+		slog.Error(errorMessage)
+		c.JSON(http.StatusInternalServerError, utils.ErrorResponse(c, 1018, err))
+
+		return
 	}
 
-	fmt.Println(token)
-	fmt.Println(expirationTime)
-
 	// Set the new token as the users `token` cookie
-	c.SetCookie("token", token, expirationTime, "/", "localhost", false, true)
-
-
+	c.SetCookie("token", token, expireTimeSec, "/", "localhost", false, true)
 }

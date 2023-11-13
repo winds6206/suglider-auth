@@ -54,7 +54,6 @@ type (
 		HttpOnly   bool      `toml:"http_only"`
 	}
 	serverSettings struct {
-		Domain          string        `toml:"domain"`
 		TemplatePath    string        `toml:"template_path"`
 		StaticPath      string        `toml:"static_path"`
 		SwaggerPath     string        `toml:"swagger_path"`
@@ -86,6 +85,7 @@ type (
 	}
 	mailSettings struct {
 		Smtp           *smtpSettings       `toml:"smtp"`
+		FrontendUrl    *frontendUrl        `toml:"frontend_url"`
 	}
 	smtpSettings struct {
 		Username       string              `toml:"username"`
@@ -93,6 +93,13 @@ type (
 		Mailer         string              `toml:"mailer"`
 		SmtpHost       string              `toml:"smtp_host"`
 		SmtpPort       int                 `toml:"smtp_port"`
+		Insecure       bool                `toml:"smtp_insecure"`
+	}
+	frontendUrl struct {
+		Scheme         string              `toml:"scheme"`
+		Domain         string              `toml:"domain"`
+		PathPrefix     string              `toml:"path_prefix"`
+		Port           int                 `toml:"port"`
 	}
 )
 

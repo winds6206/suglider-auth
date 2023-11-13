@@ -15,7 +15,6 @@
   path      = "/"
   http_only = true
 [server]
-  domain            = "localhost"
   graceful_timeout  = 5
   read_timeout      = 5
   write_timeout     = 15
@@ -48,8 +47,14 @@
   theme = "redoc" # default or redoc
 [mail]
   [mail.smtp]
-    smtp_host  = "live.smtp.mailtrap.io" # or "smtp.gmail.com"
-    smtp_port  = 587
-    username   = ""
-    password   = ""
-    mailer     = "admin@suglider.org"
+    smtp_host     = "" # or smtp.gmail.com/smtp.mail.yahoo.com/smtp-mail.outlook.com/live.smtp.mailtrap.io
+    smtp_port     = 587
+    smtp_insecure = false
+    username      = ""
+    password      = ""
+    mailer        = "admin@suglider.org"
+  [mail.frontend_url]
+    scheme        = "http"
+    domain        = "localhost"
+    port          = ""
+    path_prefix   = ""

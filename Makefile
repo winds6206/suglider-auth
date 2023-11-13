@@ -48,7 +48,7 @@ test:
 	go test -race -v ./...
 
 mailer:
-	go build -o bin/mailer cmd/mailer/main.go
+	go build -o bin/mailer ./cmd/mailer
 
 help:
 	@echo "make build VERSION=1.0.0 - compile the binary file with golang codes"
@@ -58,4 +58,5 @@ help:
 	@echo "make benchmark - run benchmark"
 	@echo "make test - run test with -race parameter"
 	@echo "make run CONFIG_FILE=path/to/config.toml - run the service with specific config file"
+	@echo "make mailer - build a simple tool for sending mail by smtp"
 

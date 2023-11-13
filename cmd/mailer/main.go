@@ -2,12 +2,11 @@ package main
 
 import (
 	"context"
-	"crypto/tls"
 	"flag"
 	"fmt"
 	"io/ioutil"
 	"os"
-	"gopkg.in/gomail.v2"
+	smtp "suglider-auth/pkg/mail"
 )
 
 var (
@@ -24,33 +23,7 @@ type args struct {
 	To         string
 	SmtpHost   string
 	SmtpPort   int
-}
-
-type SmtpMail struct {
-	Username  string // same as From if use gmail smtp
-	Password  string
-	From      string
-	SmtpHost  string
-	SmtpPort  int
-}
-
-func (sm *SmtpMail) Send(ctx context.Context, sub, cont, file string, to ...string) error {
-	msg := gomail.NewMessage()
-	msg.SetHeader("From", sm.From)
-	msg.SetHeader("To", to...)
-	msg.SetHeader("Subject", sub)
-	msg.SetBody("text/html", cont)
-	if file != "" {
-		msg.Attach(file)
-	}
-
-	d := gomail.NewDialer(sm.SmtpHost, sm.SmtpPort, sm.Username, sm.Password)
-	d.TLSConfig = &tls.Config{InsecureSkipVerify: true}
-
-	if err := d.DialAndSend(msg); err != nil {
-		return err
-	}
-	return nil
+	Insecure   bool
 }
 
 func parseArgs() *args {
@@ -73,6 +46,8 @@ func parseArgs() *args {
 	flag.StringVar(&settings.To, "t", "", "The receiver (to) of mail. (shorten)")
 	flag.StringVar(&settings.Subtile, "subtile", "How to join the open source project", "The subtile (title) of mail.")
 	flag.StringVar(&settings.Subtile, "s", "How to join the open source project", "The subtile (title) of mail. (shorten)")
+	flag.BoolVar(&settings.Insecure, "insecure", false, "Enable the InsecureSkipVerify for smtp dialer.")
+	flag.BoolVar(&settings.Insecure, "i", false, "Enable the InsecureSkipVerify for smtp dialer. (shorten)")
 	flag.Parse()
 	return settings
 }
@@ -109,12 +84,13 @@ func init() {
 
 func main() {
 	ctx := context.TODO()
-	smtp := &SmtpMail {
+	smtp := &smtp.SmtpMail {
 		SmtpHost: params.SmtpHost,
 		SmtpPort: params.SmtpPort,
 		From:     params.From,
 		Username: params.Username,
 		Password: params.Passowrd,
+		Insecure: params.Insecure,
 	}
 
 	message, err := ioutil.ReadFile(params.File)
@@ -122,7 +98,7 @@ func main() {
 		panic(err)
 	}
 
-	if err := smtp.Send(ctx, params.Subtile, string(message), params.File, params.To); err != nil {
+	if err := smtp.Send(ctx, params.Subtile, string(message), params.Attach, params.To); err != nil {
 		fmt.Printf("Fail to send mail: %v\n", err)
 		return
 	}
