@@ -11,6 +11,7 @@ import (
 	"suglider-auth/pkg/session"
 	"suglider-auth/internal/utils"
 	"suglider-auth/pkg/jwt"
+	pwd_validator "suglider-auth/pkg/pwd-validator"
 	// "time"
 )
 
@@ -55,6 +56,12 @@ func UserSignUp(c *gin.Context) {
 	err = c.ShouldBindJSON(&request)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, utils.ErrorResponse(c, 1001, err))
+		return
+	}
+
+	errPwdValidator := pwd_validator.PwdValidator(request.Username, request.Password, request.Mail)
+	if errPwdValidator != nil {
+		c.JSON(http.StatusBadRequest, utils.ErrorResponse(c, 1021, errPwdValidator))
 		return
 	}
 
