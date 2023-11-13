@@ -4,6 +4,7 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 	"fmt"
 	"time"
+	"log/slog"
 )
 
 var jwtKey = []byte("suglider")
@@ -13,10 +14,11 @@ type jwtData struct {
 	jwt.RegisteredClaims
 }
 
-func GenerateJWT(username string) (string, time.Time, error) {
+func GenerateJWT(username string) (string, int, error) {
 
 	// Declare the expiration time of the token
-	expirationTime := time.Now().Add(5 * time.Minute)
+	expireTime := 20 * time.Minute
+	expirationTime := time.Now().Add(expireTime)
 
 	// Create the JWT claims, which includes the username and expiry time
 	claims := &jwtData{
@@ -30,17 +32,22 @@ func GenerateJWT(username string) (string, time.Time, error) {
 	// Declare the token with the algorithm used for signing, and the claims
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 
-	// Create the JWT string
+	// Generate the JWT string
 	tokenString, err := token.SignedString(jwtKey)
 	if err != nil {
-		// TODO
-		return "", time.Time{}, err
+		return "", 0, err
 	}
 
-	return tokenString, expirationTime, nil
+	// Convert to Second
+	expireTimeSec := int(expireTime.Seconds())
+
+	return tokenString, expireTimeSec, nil
 }
 
-func ParseJWT(token string) (string, error) {
+func ParseJWT(token string) (string, int64, error) {
+
+	var errCode int64
+	errCode = 0
 
 	claims := &jwtData{}
 
@@ -50,24 +57,29 @@ func ParseJWT(token string) (string, error) {
 
 	if err != nil {
 		if err == jwt.ErrSignatureInvalid {
-			// TODO
-			fmt.Println("StatusUnauthorized")
-			return "", err
+			errorMessage := fmt.Sprintf("JWT signature is invalid: %v", err)
+			slog.Error(errorMessage)
+			errCode = 1015
+
+			return "", errCode, err
 		}
-		// TODO
-		fmt.Println("StatusBadRequest")
-		return "", err
+		errorMessage := fmt.Sprintf("Parse JWT claim data failed: %v", err)
+		slog.Error(errorMessage)
+		errCode = 1016
+
+		return "", errCode, err
 	}
 	if !tkn.Valid {
-		// TODO
-		fmt.Println("StatusUnauthorized")
-		return "", err
+		errorMessage := fmt.Sprintf("Token is invalid: %v", err)
+		slog.Error(errorMessage)
+		errCode = 1017
+
+		return "", errCode, err
 	}
 
-	fmt.Println(tkn)
 	fmt.Println(claims.Username)
 
-	return claims.Username, nil
+	return claims.Username, errCode, nil
 
 }
 
@@ -79,22 +91,20 @@ func RefreshJWT(token string) (string, int, error) {
 		return jwtKey, nil
 	})
 
-	// if time.Until(claims.ExpiresAt.Time) > 30*time.Second {
-	// 	// TODO
-	// 	fmt.Println("StatusBadRequest")
-	// 	return "", 0, err
-	// }
-
 	// Now, create a new token for the current use, with a renewed expiration time
-	expirationTime := 1200
+	expireTime := 20 * time.Minute
+	expirationTime := time.Now().Add(expireTime)
+	claims.ExpiresAt = jwt.NewNumericDate(expirationTime)
 	newToken := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	
 	tokenString, err := newToken.SignedString(jwtKey)
 	if err != nil {
-		// TODO
-		fmt.Println("StatusInternalServerError")
 		return "", 0, err
 	}
 
-	return tokenString, expirationTime, nil
+	// Convert to Second
+	expireTimeSec := int(expireTime.Seconds())
+
+	return tokenString, expireTimeSec, nil
 	
 }

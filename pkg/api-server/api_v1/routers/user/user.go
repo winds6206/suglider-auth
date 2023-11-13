@@ -11,6 +11,7 @@ func UserHandler(router *gin.RouterGroup) {
 	router.POST("/delete", handlers.UserDelete)
 	router.POST("/login", handlers.UserLogin)
 	router.POST("/logout", handlers.UserLogout)
+	router.GET("/refresh", handlers.RefreshJWT)
 
 	// Test
 	router.GET("/test-logout", handlers.TestLogout)

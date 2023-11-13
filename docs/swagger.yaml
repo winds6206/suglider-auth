@@ -654,6 +654,68 @@ paths:
       summary: User Login
       tags:
       - users
+  /api/v1/user/logout:
+    post:
+      consumes:
+      - multipart/form-data
+      description: user logout
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            type: string
+        "400":
+          description: Bad request
+          schema:
+            type: string
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+        "403":
+          description: Forbidden
+          schema:
+            type: string
+        "404":
+          description: Not found
+          schema:
+            type: string
+      summary: User Logout
+      tags:
+      - users
+  /api/v1/user/refresh:
+    post:
+      consumes:
+      - multipart/form-data
+      description: user refresh JWT
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            type: string
+        "400":
+          description: Bad request
+          schema:
+            type: string
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+        "403":
+          description: Forbidden
+          schema:
+            type: string
+        "404":
+          description: Not found
+          schema:
+            type: string
+      summary: User Refresh JWT
+      tags:
+      - users
   /api/v1/user/sign-up:
     post:
       consumes:
