@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <style type='text/css'>
+    .button {
+      font-family: 'Montserrat', sans-serif;
+      position: relative;
+      width: 125px;
+      height: 30px;
+      background: #184eec; /* background color */
+      color: #fff; /* Font color */
+      margin: 0 auto;
+      overflow: hidden;
+      font-size: 14px;
+      line-height: 30px;
+      text-align: center;
+      border: none;
+      transition: color .1s;
+      cursor: pointer;
+      z-index: 1;
+      border-radius: 5px;
+    }
+    
+    .button:after {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: #327aff; /* background color on hover */
+      content: "";
+      z-index: -2;
+      transition: transform .1s;
+    }
+    
+    .button:hover::after {
+      transform: translateY(-100%);
+      transition: transform .1s;
+    }
+    
+    .button:focus, .button:active,  .button:visited{
+      outline: none;
+    }
+    </style>
+</head>
+<body>
+  <p>
+    Hi {{.Name}},
+    <br>
+    <br>
+    We are happy you signed up for Suglider. <br>
+    Before you begin your journey, we need to verify your email.<br>
+    <br>
+    Click the following link to verify your email:<br>
+    <br>
+    <a href="{{.Url}}/{{.Uri}}??{{.QueryParams}}" target="_blank">
+      <button class="button">Verify</button>
+    </a>
+    <br>
+    <br>
+    If the link isn’t clickable, you can copy and paste this URL into your browser:
+    <a href="{{.Url}}/{{.Uri}}?{{.QueryParams}}" target="_blank">{{.Url}}/{{.Uri}}?{{.QueryParams}}</a>
+    <br>
+    <br>
+    After verification, you’ll have access to all the amazing features on Suglider.<br>
+    <br>
+    If you encounter any issues or have questions, our open source project and community is here to help. <br>
+    Simply reach out to us at <a href="https://github.com/winds6206/suglider-auth" target="_blank">Suglider project on github</a>.<br>
+    <br>
+    Welcome to Suglider!<br>
+    The Suglider Team<br>
+    <br>
+    Did your recieve this email without signing up? <a href="https:/{{.URL}}/">Click here</a>.
+    This verification link will expire in 24 hours.
+  </p>
+</body>
+</html>

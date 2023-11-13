@@ -23,6 +23,16 @@ func RandomString(length int, specials string) string {
 	return string(randString)
 }
 
+func RandomNumber(length int) string {
+	numbers := "0123456789"
+	rand.Seed(time.Now().UnixNano())
+	randNumber := make([]byte, length)
+	for n := 0; n < length; n++ {
+		randNumber[n] = numbers[rand.Intn(len(numbers))]
+	}
+	return string(randNumber)
+}
+
 func GenertateUUID(noDash bool) string {
 	id := uuid.New().String()
 	if noDash {

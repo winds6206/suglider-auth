@@ -22,6 +22,7 @@ clean:
 	go clean
 	go clean -testcache
 	@if [ -f bin/${BINARY_NAME} ] ; then rm -f bin/${BINARY_NAME} ; fi
+	@if [ -f bin/mailer ] ; then rm -rf bin/mailer ; fi
 
 docker:
 	docker buildx build --no-cache \
@@ -45,6 +46,9 @@ benchmark:
 test:
 	go mod tidy
 	go test -race -v ./...
+
+mailer:
+	go build -o bin/mailer cmd/mailer/main.go
 
 help:
 	@echo "make build VERSION=1.0.0 - compile the binary file with golang codes"
