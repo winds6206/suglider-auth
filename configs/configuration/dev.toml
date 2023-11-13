@@ -56,5 +56,5 @@
   [mail.frontend_url]
     scheme        = "http"
     domain        = "localhost"
-    port          = ""
+    port          = 443
     path_prefix   = ""

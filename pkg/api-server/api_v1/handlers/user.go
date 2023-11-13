@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	mariadb "suglider-auth/internal/database"
+	smtp "suglider-auth/internal/mail"
 	"suglider-auth/pkg/encrypt"
 	"database/sql"
 	"suglider-auth/pkg/session"
@@ -76,6 +77,10 @@ func UserSignUp(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, utils.ErrorResponse(c, 1002, err))
 		return
 	} else {
+		// mail verification
+		if err = smtp.SendVerifyMail(c, request.Username, request.Mail); err != nil {
+			slog.Error(err.Error())
+		}
 		c.JSON(http.StatusOK, utils.SuccessResponse(c, 200, nil))
 	}
 }

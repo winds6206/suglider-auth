@@ -3,13 +3,14 @@ package mail
 import (
 	"context"
 	"fmt"
+	"log/slog"
 	"net/url"
-	"time"
 	"suglider-auth/configs"
-	"suglider-auth/pkg/encrypt"
-	smtp "suglider-auth/pkg/mail"
 	db "suglider-auth/internal/database"
 	rds "suglider-auth/internal/redis"
+	"suglider-auth/pkg/encrypt"
+	smtp "suglider-auth/pkg/mail"
+	"time"
 )
 
 var (
@@ -52,17 +53,24 @@ func (umv *UserMailVerification) Unregister(ctx context.Context) {
 	rds.Delete(key)
 }
 
-func (umv *UserMailVerification) Verify(ctx context.Context) (bool, error) {
+func (umv *UserMailVerification) IsVerified(ctx context.Context) bool {
 	var isVerified int
 	query := fmt.Sprintf("SELECT mail_verified FROM %s WHERE %s = ?", "user_info", "mail")
 	row := db.DataBase.DB.QueryRowContext(ctx, query, umv.Mail)
 	if err := row.Scan(&isVerified); err != nil {
-		return false, err
+		slog.Error(err.Error())
 	}
 	if isVerified == 1 {
+		return true
+	}
+	return false
+}
+
+func (umv *UserMailVerification) Verify(ctx context.Context) (bool, error) {
+	isVerified := umv.IsVerified(ctx)
+	if isVerified {
 		return true, fmt.Errorf("This mail already verified.")
 	}
-
 	key := fmt.Sprintf("%s/%s", umv.Mail, umv.Id)
 	code := rds.Get(key)
 	switch code {
@@ -112,6 +120,10 @@ func init() {
 
 func SendVerifyMail(ctx context.Context, user, email string) error {
 	umv := NewUserMailVerification(email)
+	isVerified := umv.IsVerified(ctx)
+	if isVerified {
+		return fmt.Errorf("This mail already verified.")
+	}
 	params := umv.Register(ctx)
 	tempFile := fmt.Sprintf("%s/mail-verification.tmpl", htmlMail.TemplatePath)
 	cont, err := htmlMail.GenerateVerifyMail(ctx, tempFile, user, params)
@@ -125,8 +137,12 @@ func SendVerifyMail(ctx context.Context, user, email string) error {
 	return nil
 }
 
-func VerifyUserMail(ctx context.Context, email, id, code string) (bool, error) {
-	umv := NewUserMailVerification(email)
+func VerifyUserMailAddress(ctx context.Context, email, id, code string) (bool, error) {
+	umv := &UserMailVerification {
+		Mail: email,
+		Id: id,
+		Code: code,
+	}
 	ok, err := umv.Verify(ctx)
 	if ok && err == nil {
 		umv.Unregister(ctx)

@@ -30,5 +30,7 @@ func ResponseStatusCode() {
 		1019: "Cookie key is not found.",
 		1020: "Get cookie key failed.",
 		1021: "The sign up data is not satisfied of rule.",
+		1022: "Email verification failed.",
+		1023: "Email already verified.",
 	}
 }

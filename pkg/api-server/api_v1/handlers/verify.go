@@ -3,9 +3,10 @@ package handlers
 import (
 	"log/slog"
 	"net/http"
-	"github.com/gin-gonic/gin"
 	smtp "suglider-auth/internal/mail"
 	"suglider-auth/internal/utils"
+
+	"github.com/gin-gonic/gin"
 )
 
 type userMail struct {
@@ -28,11 +29,11 @@ type userMail struct {
 // @Failure 404 {string} string "Not found"
 // @Router /api/v1/user/verify-mail [post]
 func VerifyEmailAddress(c *gin.Context) {
-	mail := c.Query("name")
+	mail := c.Query("mail")
 	verifyId := c.Query("verifyId")
 	verifyCode := c.Query("verifyCode")
 
-	pass, err := smtp.VerifyUserMail(c, mail, verifyId, verifyCode)
+	pass, err := smtp.VerifyUserMailAddress(c, mail, verifyId, verifyCode)
 	if pass && err == nil {
 		c.JSON(
 			http.StatusOK,
@@ -59,21 +60,15 @@ func VerifyEmailAddress(c *gin.Context) {
 // @Failure 401 {string} string "Unauthorized"
 // @Failure 403 {string} string "Forbidden"
 // @Failure 404 {string} string "Not found"
-// @Router /api/v1/user/verify-mail/resend [post]
+// @Router /api/v1/user/verify-mail/resend [get]
 func ResnedVerifyEmail(c *gin.Context) {
-	var err error
-	if err = c.Request.ParseForm(); err != nil {
-		c.JSON(http.StatusBadRequest, utils.ErrorResponse(c, 1001, err))
-		return
-	}
-	postData := &userMail{}
-	if err = c.Bind(&postData); err != nil {
-		c.JSON(http.StatusBadRequest, utils.ErrorResponse(c, 1001, err))
-		return
-	}
+	user := c.Query("username")
+	mail := c.Query("mail")
 
 	// send mail
-	if err = smtp.SendVerifyMail(c, postData.Username, postData.Mail); err != nil {
+	//slog.Info("Username: ", user)
+	//slog.Info("Email: ", mail)
+	if err := smtp.SendVerifyMail(c, user, mail); err != nil {
 		slog.Error(err.Error())
 	}
 
