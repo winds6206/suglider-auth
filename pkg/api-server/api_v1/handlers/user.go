@@ -4,6 +4,7 @@ import (
 	"log/slog"
 	"net/http"
 	"fmt"
+	"time"
 	"github.com/gin-gonic/gin"
 	mariadb "suglider-auth/internal/database"
 	smtp "suglider-auth/internal/mail"
@@ -32,6 +33,10 @@ type userDelete struct {
 type userLogin struct {
 	Username string `json:"username" binding:"required"`
 	Password string `json:"password" binding:"required"`
+}
+
+type userPasswordExpire struct {
+	Username string `json:"username" binding:"required"`
 }
 
 // @Summary Sign Up User
@@ -68,8 +73,9 @@ func UserSignUp(c *gin.Context) {
 
 	// Encode user password
 	passwordEncode, _ := encrypt.SaltedPasswordHash(request.Password)
+	comfirmPwdEncode, _ := encrypt.SaltedPasswordHash(request.ComfirmPwd)
 
-	err = mariadb.UserSignUp(request.Username, passwordEncode, request.Mail, request.ComfirmPwd, request.Address)
+	err = mariadb.UserSignUp(request.Username, passwordEncode, comfirmPwdEncode, request.Mail, request.Address)
 	if err != nil {
 		errorMessage := fmt.Sprintf("Insert user_info table failed: %v", err)
 		slog.Error(errorMessage)
@@ -387,6 +393,57 @@ func RefreshJWT(c *gin.Context) {
 	// Set the new token as the users `token` cookie
 	c.SetCookie("token", token, expireTimeSec, "/", "localhost", false, true)
 }
+
+func PasswordExpire(c *gin.Context) {
+	var request userPasswordExpire
+
+	// Check the parameter trasnfer from POST
+	err := c.ShouldBindJSON(&request)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, utils.ErrorResponse(c, 1001, err))
+		return
+	}
+
+	resultData, err := mariadb.PasswordExpire(request.Username)
+
+	if err != nil {
+		if err != nil {
+			if err == sql.ErrNoRows {
+				c.JSON(http.StatusBadRequest, utils.ErrorResponse(c, 1003, err))
+				return
+			}
+			c.JSON(http.StatusInternalServerError, utils.ErrorResponse(c, 1002, err))
+			return
+		}
+	}
+
+	// Convert string to data
+	parsedDate, err := time.Parse("2006-01-02", resultData.PasswordExpireDate)
+	if err != nil {
+		errorMessage := fmt.Sprintf("Parse date failed: %v", err)
+		slog.Error(errorMessage)
+		c.JSON(http.StatusInternalServerError, utils.ErrorResponse(c, 1024, err))
+		
+		return
+	}
+
+	todayDate := time.Now().UTC().Truncate(24 * time.Hour)
+
+	if todayDate.After(parsedDate) {
+		c.JSON(http.StatusOK, utils.SuccessResponse(c, 200, map[string]interface{}{
+			"username": resultData.Username,
+			"password_expire_date": resultData.PasswordExpireDate,
+			"expired": true,
+		}))
+	} else {
+		c.JSON(http.StatusOK, utils.SuccessResponse(c, 200, map[string]interface{}{
+			"username": resultData.Username,
+			"password_expire_date": resultData.PasswordExpireDate,
+			"expired": false,
+		}))
+	}
+}
+
 
 // Test Function
 func TestLogout(c *gin.Context) {

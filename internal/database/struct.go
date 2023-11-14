@@ -4,6 +4,7 @@ type UserDBInfo struct {
 	Username string `db:"username"`
 	Password string `db:"password"`
     UserID   string `db:"user_id"`
+    PasswordExpireDate string `db:"password_expire_date"`
 }
 
 type UserIDInfo struct {

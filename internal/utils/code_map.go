@@ -32,5 +32,6 @@ func ResponseStatusCode() {
 		1021: "The sign up data is not satisfied of rule.",
 		1022: "Email verification failed.",
 		1023: "Email already verified.",
+		1024: "Parse date failed.",
 	}
 }

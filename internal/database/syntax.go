@@ -29,7 +29,7 @@ func UserSignUp(username, password, comfirm_pwd, mail, address string) (err erro
 	ctx, cancel := context.WithTimeout(context.Background(), dbTimeOut)
 	defer cancel()
 
-	sqlStr := "INSERT INTO suglider.user_info(user_id, username, password, comfirm_pwd, mail, address) VALUES (UNHEX(REPLACE(UUID(), '-', '')),?,?,?,?,?)"
+	sqlStr := "INSERT INTO suglider.user_info(user_id, username, password, comfirm_pwd, mail, address, password_expire_date) VALUES (UNHEX(REPLACE(UUID(), '-', '')),?,?,?,?,?,DATE_ADD(CURRENT_DATE, INTERVAL 90 DAY))"
 	_, err = DataBase.ExecContext(ctx, sqlStr, username, password, comfirm_pwd, mail, address)
 	return err
 }
@@ -58,6 +58,15 @@ func UserLogin(username string) (userInfo UserDBInfo ,err error){
 	defer cancel()
 
 	err = DataBase.GetContext(ctx, &userInfo, "SELECT username, password, LOWER(HEX(user_id)) AS user_id FROM suglider.user_info WHERE username=?", username)
+
+	return userInfo, err
+}
+
+func PasswordExpire(username string) (userInfo UserDBInfo ,err error){
+	ctx, cancel := context.WithTimeout(context.Background(), dbTimeOut)
+	defer cancel()
+
+	err = DataBase.GetContext(ctx, &userInfo, "SELECT username, password_expire_date FROM suglider.user_info WHERE username=?", username)
 
 	return userInfo, err
 }
