@@ -45,3 +45,16 @@
     protocol   = "udp"
 [swagger]
   theme = "redoc" # default or redoc
+[mail]
+  [mail.smtp]
+    smtp_host     = "" # or smtp.gmail.com/smtp.mail.yahoo.com/smtp-mail.outlook.com/live.smtp.mailtrap.io
+    smtp_port     = 587
+    smtp_insecure = false
+    username      = ""
+    password      = ""
+    mailer        = "admin@suglider.org"
+  [mail.frontend_url]
+    scheme        = "http"
+    domain        = "localhost"
+    port          = 443
+    path_prefix   = ""

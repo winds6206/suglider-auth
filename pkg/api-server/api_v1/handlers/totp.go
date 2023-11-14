@@ -64,7 +64,7 @@ func TotpGenerate(c *gin.Context) {
 // @Accept multipart/form-data
 // @Produce application/json
 // @Param username formData string false "User Name"
-// @Param username formData string false "TOTP Code"
+// @Param totpCode formData string false "TOTP Code"
 // @Success 200 {string} string "Success"
 // @Failure 400 {string} string "Bad request"
 // @Failure 401 {string} string "Unauthorized"
@@ -118,7 +118,7 @@ func TotpVerify(c *gin.Context) {
 // @Accept multipart/form-data
 // @Produce application/json
 // @Param username formData string false "User Name"
-// @Param username formData string false "TOTP Code"
+// @Param totpCode formData string false "TOTP Code"
 // @Success 200 {string} string "Success"
 // @Failure 400 {string} string "Bad request"
 // @Failure 401 {string} string "Unauthorized"

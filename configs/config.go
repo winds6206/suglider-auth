@@ -32,6 +32,7 @@ type (
 		Server         *serverSettings    `toml:"server"`
 		Log            *logSettings       `toml:"log"`
 		Swagger        *swaggerSettings   `toml:"swagger"`
+		Mail           *mailSettings      `toml:"mail"`
 	}
 	Database struct {
 		Host           string             `toml:"host"`
@@ -82,6 +83,24 @@ type (
 	swaggerSettings struct {
 		Theme          string             `toml:"theme"`
 	}
+	mailSettings struct {
+		Smtp           *smtpSettings       `toml:"smtp"`
+		FrontendUrl    *frontendUrl        `toml:"frontend_url"`
+	}
+	smtpSettings struct {
+		Username       string              `toml:"username"`
+		Password       string              `toml:"password"`
+		Mailer         string              `toml:"mailer"`
+		SmtpHost       string              `toml:"smtp_host"`
+		SmtpPort       int                 `toml:"smtp_port"`
+		Insecure       bool                `toml:"smtp_insecure"`
+	}
+	frontendUrl struct {
+		Scheme         string              `toml:"scheme"`
+		Domain         string              `toml:"domain"`
+		PathPrefix     string              `toml:"path_prefix"`
+		Port           int                 `toml:"port"`
+	}
 )
 
 func parseFlags() *Arguments {
@@ -96,8 +115,8 @@ func parseFlags() *Arguments {
 	flag.StringVar(&args.Config, "c", "", "The config with toml format for this server. (shorten)")
 	flag.BoolVar(&args.Syslog, "syslog", false, "Enable logging uses syslog protocol.")
 	flag.BoolVar(&args.Syslog, "s", false, "Enable logging uses syslog protocol. (shorten)")
-	flag.BoolVar(&args.Debug, "debug", false, "Enable debug mode which use pprof to analyze program with 1997 port.")
-	flag.BoolVar(&args.Debug, "d", false, "Enable debug mode which use pprof to analyze program with 1997 port (shorten).")
+	flag.BoolVar(&args.Debug, "debug", false, "Enable debug mode which use pprof to analyze program.")
+	flag.BoolVar(&args.Debug, "d", false, "Enable debug mode which use pprof to analyze program (shorten).")
 	flag.Parse()
 	return args
 }

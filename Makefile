@@ -22,6 +22,7 @@ clean:
 	go clean
 	go clean -testcache
 	@if [ -f bin/${BINARY_NAME} ] ; then rm -f bin/${BINARY_NAME} ; fi
+	@if [ -f bin/mailer ] ; then rm -rf bin/mailer ; fi
 
 docker:
 	docker buildx build --no-cache \
@@ -46,6 +47,9 @@ test:
 	go mod tidy
 	go test -race -v ./...
 
+mailer:
+	go build -o bin/mailer ./cmd/mailer
+
 help:
 	@echo "make build VERSION=1.0.0 - compile the binary file with golang codes"
 	@echo "make docker VERSION=1.0.0 GO_VERSION=1.21 - compile the docker image from build/Dockerfile"
@@ -54,4 +58,5 @@ help:
 	@echo "make benchmark - run benchmark"
 	@echo "make test - run test with -race parameter"
 	@echo "make run CONFIG_FILE=path/to/config.toml - run the service with specific config file"
+	@echo "make mailer - build a simple tool for sending mail by smtp"
 

@@ -7,6 +7,7 @@ CREATE TABLE IF NOT EXISTS user_info (
     username VARCHAR(256) NOT NULL,
     password VARCHAR(256) NOT NULL,
     mail VARCHAR(256) NOT NULL,
+    mail_verified INT UNSIGNED NOT NULL DEFAULT 0,
     address VARCHAR(256) NOT NULL,
     PRIMARY KEY(user_id),
     UNIQUE(username),
@@ -30,7 +31,7 @@ CREATE TABLE IF NOT EXISTS suglider.totp (
     totp_secret VARCHAR(256) NOT NULL,
     totp_url VARCHAR(256) NOT NULL,
     PRIMARY KEY(user_id),
-	FOREIGN KEY(user_id) REFERENCES user_info(user_id) ON DELETE CASCADE);
+    FOREIGN KEY(user_id) REFERENCES user_info(user_id) ON DELETE CASCADE);
 
 CREATE TABLE IF NOT EXISTS `casbin_policies` (
     `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
