@@ -33,5 +33,6 @@ func ResponseStatusCode() {
 		1022: "Email verification failed.",
 		1023: "Email already verified.",
 		1024: "Parse date failed.",
+		1025: "Update user_info table failed.",
 	}
 }

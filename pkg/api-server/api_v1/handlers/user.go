@@ -16,7 +16,7 @@ import (
 	pwd_validator "suglider-auth/pkg/pwd-validator"
 )
 
-type userSignUp struct {
+type userInfo struct {
 	Username	string `json:"username" binding:"required"`
 	Password	string `json:"password" binding:"required"`
 	ComfirmPwd	string `json:"comfirm_pwd" binding:"required"`
@@ -35,8 +35,8 @@ type userLogin struct {
 	Password string `json:"password" binding:"required"`
 }
 
-type userPasswordExpire struct {
-	Username string `json:"username" binding:"required"`
+type userPasswordOperate struct {
+	Username	string `json:"username" binding:"required"`
 }
 
 // @Summary Sign Up User
@@ -55,7 +55,7 @@ type userPasswordExpire struct {
 // @Failure 404 {string} string "Not found"
 // @Router /api/v1/user/sign-up [post]
 func UserSignUp(c *gin.Context) {
-	var request userSignUp
+	var request userInfo
 	var err error
 
 	// Check the parameter trasnfer from POST
@@ -395,7 +395,7 @@ func RefreshJWT(c *gin.Context) {
 }
 
 func PasswordExpire(c *gin.Context) {
-	var request userPasswordExpire
+	var request userPasswordOperate
 
 	// Check the parameter trasnfer from POST
 	err := c.ShouldBindJSON(&request)
@@ -444,6 +444,27 @@ func PasswordExpire(c *gin.Context) {
 	}
 }
 
+func PasswordExtension(c *gin.Context) {
+	var request userPasswordOperate
+
+	// Check the parameter trasnfer from POST
+	err := c.ShouldBindJSON(&request)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, utils.ErrorResponse(c, 1001, err))
+		return
+	}
+
+	errPasswordExtension := mariadb.PasswordExtension(request.Username)
+
+	if errPasswordExtension != nil {
+		errorMessage := fmt.Sprintf("Update user_info table failed: %v", err)
+		slog.Error(errorMessage)
+		c.JSON(http.StatusInternalServerError, utils.ErrorResponse(c, 1025, err))
+		return
+	}
+
+	c.JSON(http.StatusOK, utils.SuccessResponse(c, 200, nil))
+}
 
 // Test Function
 func TestLogout(c *gin.Context) {

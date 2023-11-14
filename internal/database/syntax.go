@@ -71,6 +71,17 @@ func PasswordExpire(username string) (userInfo UserDBInfo ,err error){
 	return userInfo, err
 }
 
+func PasswordExtension(username string) (err error){
+	ctx, cancel := context.WithTimeout(context.Background(), dbTimeOut)
+	defer cancel()
+
+	sqlStr := "UPDATE suglider.user_info " + 
+			"SET password_expire_date = DATE_ADD(CURRENT_DATE, INTERVAL 90 DAY)" +
+			"WHERE user_info.username = ?"
+	_, err = DataBase.ExecContext(ctx, sqlStr, username)
+	return err
+}
+
 func TotpStoreSecret(user_id, totp_secret, totp_url string) (err error) {
 	ctx, cancel := context.WithTimeout(context.Background(), dbTimeOut)
 	defer cancel()
