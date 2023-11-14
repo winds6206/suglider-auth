@@ -44,6 +44,8 @@ func ResponseStatusCode() {
 		1033: "Delete RBAC grouping policy error",
 		1034: "Delete RBAC role error",
 		1035: "Delete RBAC member error",
+		1036: "Parse date failed.",
+		1037: "Update user_info table failed.",
 		1101: "Fail to parse POST form data.",
 		1102: "Fail to bind POST form data.",
 		1103: "Fail to parse path parameters.",

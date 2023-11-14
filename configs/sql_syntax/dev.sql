@@ -8,8 +8,10 @@ CREATE TABLE IF NOT EXISTS user_info (
     password VARCHAR(256) NOT NULL,
     comfirm_pwd VARCHAR(256) NOT NULL,
     mail VARCHAR(256) NOT NULL,
-    mail_verified INT UNSIGNED NOT NULL DEFAULT 0,
     address VARCHAR(256) NOT NULL,
+    password_expire_date DATE NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     PRIMARY KEY(user_id),
     UNIQUE(username),
     UNIQUE(mail));

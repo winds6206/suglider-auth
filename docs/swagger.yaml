@@ -721,6 +721,78 @@ paths:
       summary: User Logout
       tags:
       - users
+  /api/v1/user/password-expire:
+    post:
+      consumes:
+      - multipart/form-data
+      description: Check whether a user's password has expired or not
+      parameters:
+      - description: User Name
+        in: formData
+        name: username
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            type: string
+        "400":
+          description: Bad request
+          schema:
+            type: string
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+        "403":
+          description: Forbidden
+          schema:
+            type: string
+        "404":
+          description: Not found
+          schema:
+            type: string
+      summary: User Password Expire Check
+      tags:
+      - users
+  /api/v1/user/password-extension:
+    post:
+      consumes:
+      - multipart/form-data
+      description: Extension user's password
+      parameters:
+      - description: User Name
+        in: formData
+        name: username
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            type: string
+        "400":
+          description: Bad request
+          schema:
+            type: string
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+        "403":
+          description: Forbidden
+          schema:
+            type: string
+        "404":
+          description: Not found
+          schema:
+            type: string
+      summary: User Password Extension
+      tags:
+      - users
   /api/v1/user/refresh:
     post:
       consumes:

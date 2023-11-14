@@ -4,6 +4,7 @@ import (
 	"log/slog"
 	"net/http"
 	"fmt"
+	"time"
 	"github.com/gin-gonic/gin"
 	mariadb "suglider-auth/internal/database"
 	smtp "suglider-auth/internal/mail"
@@ -15,7 +16,7 @@ import (
 	pwd_validator "suglider-auth/pkg/pwd-validator"
 )
 
-type userSignUp struct {
+type userInfo struct {
 	Username	string `json:"username" binding:"required"`
 	Password	string `json:"password" binding:"required"`
 	ComfirmPwd	string `json:"comfirm_pwd" binding:"required"`
@@ -34,6 +35,10 @@ type userLogin struct {
 	Password string `json:"password" binding:"required"`
 }
 
+type userPasswordOperate struct {
+	Username	string `json:"username" binding:"required"`
+}
+
 // @Summary Sign Up User
 // @Description registry new user
 // @Tags users
@@ -50,7 +55,7 @@ type userLogin struct {
 // @Failure 404 {string} string "Not found"
 // @Router /api/v1/user/sign-up [post]
 func UserSignUp(c *gin.Context) {
-	var request userSignUp
+	var request userInfo
 	var err error
 
 	// Check the parameter trasnfer from POST
@@ -68,8 +73,9 @@ func UserSignUp(c *gin.Context) {
 
 	// Encode user password
 	passwordEncode, _ := encrypt.SaltedPasswordHash(request.Password)
+	comfirmPwdEncode, _ := encrypt.SaltedPasswordHash(request.ComfirmPwd)
 
-	err = mariadb.UserSignUp(request.Username, passwordEncode, request.Mail, request.ComfirmPwd, request.Address)
+	err = mariadb.UserSignUp(request.Username, passwordEncode, comfirmPwdEncode, request.Mail, request.Address)
 	if err != nil {
 		errorMessage := fmt.Sprintf("Insert user_info table failed: %v", err)
 		slog.Error(errorMessage)
@@ -386,6 +392,102 @@ func RefreshJWT(c *gin.Context) {
 
 	// Set the new token as the users `token` cookie
 	c.SetCookie("token", token, expireTimeSec, "/", "localhost", false, true)
+}
+
+// @Summary User Password Expire Check
+// @Description Check whether a user's password has expired or not
+// @Tags users
+// @Accept multipart/form-data
+// @Produce application/json
+// @Param username formData string false "User Name"
+// @Success 200 {string} string "Success"
+// @Failure 400 {string} string "Bad request"
+// @Failure 401 {string} string "Unauthorized"
+// @Failure 403 {string} string "Forbidden"
+// @Failure 404 {string} string "Not found"
+// @Router /api/v1/user/password-expire [post]
+func PasswordExpire(c *gin.Context) {
+	var request userPasswordOperate
+
+	// Check the parameter trasnfer from POST
+	err := c.ShouldBindJSON(&request)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, utils.ErrorResponse(c, 1001, err))
+		return
+	}
+
+	resultData, err := mariadb.PasswordExpire(request.Username)
+
+	if err != nil {
+		if err != nil {
+			if err == sql.ErrNoRows {
+				c.JSON(http.StatusBadRequest, utils.ErrorResponse(c, 1003, err))
+				return
+			}
+			c.JSON(http.StatusInternalServerError, utils.ErrorResponse(c, 1002, err))
+			return
+		}
+	}
+
+	// Convert string to data
+	parsedDate, err := time.Parse("2006-01-02", resultData.PasswordExpireDate)
+	if err != nil {
+		errorMessage := fmt.Sprintf("Parse date failed: %v", err)
+		slog.Error(errorMessage)
+		c.JSON(http.StatusInternalServerError, utils.ErrorResponse(c, 1036, err))
+		
+		return
+	}
+
+	todayDate := time.Now().UTC().Truncate(24 * time.Hour)
+
+	if todayDate.After(parsedDate) {
+		c.JSON(http.StatusOK, utils.SuccessResponse(c, 200, map[string]interface{}{
+			"username": resultData.Username,
+			"password_expire_date": resultData.PasswordExpireDate,
+			"expired": true,
+		}))
+	} else {
+		c.JSON(http.StatusOK, utils.SuccessResponse(c, 200, map[string]interface{}{
+			"username": resultData.Username,
+			"password_expire_date": resultData.PasswordExpireDate,
+			"expired": false,
+		}))
+	}
+}
+
+// @Summary User Password Extension
+// @Description Extension user's password
+// @Tags users
+// @Accept multipart/form-data
+// @Produce application/json
+// @Param username formData string false "User Name"
+// @Success 200 {string} string "Success"
+// @Failure 400 {string} string "Bad request"
+// @Failure 401 {string} string "Unauthorized"
+// @Failure 403 {string} string "Forbidden"
+// @Failure 404 {string} string "Not found"
+// @Router /api/v1/user/password-extension [post]
+func PasswordExtension(c *gin.Context) {
+	var request userPasswordOperate
+
+	// Check the parameter trasnfer from POST
+	err := c.ShouldBindJSON(&request)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, utils.ErrorResponse(c, 1001, err))
+		return
+	}
+
+	errPasswordExtension := mariadb.PasswordExtension(request.Username)
+
+	if errPasswordExtension != nil {
+		errorMessage := fmt.Sprintf("Update user_info table failed: %v", err)
+		slog.Error(errorMessage)
+		c.JSON(http.StatusInternalServerError, utils.ErrorResponse(c, 1037, err))
+		return
+	}
+
+	c.JSON(http.StatusOK, utils.SuccessResponse(c, 200, nil))
 }
 
 // Test Function
