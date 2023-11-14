@@ -614,6 +614,42 @@ paths:
       summary: Delete User
       tags:
       - users
+  /api/v1/user/forgot-password:
+    get:
+      consumes:
+      - application/json
+      description: Send a mail to reset password
+      parameters:
+      - description: Email
+        in: query
+        name: mail
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            type: string
+        "400":
+          description: Bad request
+          schema:
+            type: string
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+        "403":
+          description: Forbidden
+          schema:
+            type: string
+        "404":
+          description: Not found
+          schema:
+            type: string
+      summary: Send Password Reset Email
+      tags:
+      - users
   /api/v1/user/login:
     post:
       consumes:
@@ -788,6 +824,54 @@ paths:
       summary: User Refresh JWT
       tags:
       - users
+  /api/v1/user/reset-password:
+    post:
+      consumes:
+      - application/json
+      description: reset password for user
+      parameters:
+      - description: New Password
+        in: formData
+        name: password
+        type: string
+      - description: Email
+        in: query
+        name: mail
+        type: string
+      - description: Reset ID
+        in: query
+        name: reset-id
+        type: string
+      - description: Reset Code
+        in: query
+        name: reset-code
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            type: string
+        "400":
+          description: Bad request
+          schema:
+            type: string
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+        "403":
+          description: Forbidden
+          schema:
+            type: string
+        "404":
+          description: Not found
+          schema:
+            type: string
+      summary: Reset Password
+      tags:
+      - users
   /api/v1/user/sign-up:
     post:
       consumes:
@@ -848,11 +932,11 @@ paths:
         type: string
       - description: Verify ID
         in: query
-        name: verifyId
+        name: verify-id
         type: string
       - description: Verify Code
         in: query
-        name: verifyCode
+        name: verify-code
         type: string
       produces:
       - application/json
@@ -877,7 +961,7 @@ paths:
           description: Not found
           schema:
             type: string
-      summary: Verify Email
+      summary: Verify Email Address
       tags:
       - users
   /api/v1/user/verify-mail/resend:

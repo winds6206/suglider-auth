@@ -86,6 +86,7 @@ type (
 	mailSettings struct {
 		Smtp           *smtpSettings       `toml:"smtp"`
 		FrontendUrl    *frontendUrl        `toml:"frontend_url"`
+		Expired        *mailExpired        `toml:"expired"`
 	}
 	smtpSettings struct {
 		Username       string              `toml:"username"`
@@ -100,6 +101,9 @@ type (
 		Domain         string              `toml:"domain"`
 		PathPrefix     string              `toml:"path_prefix"`
 		Port           int                 `toml:"port"`
+	}
+	mailExpired struct {
+		TTL            int64               `toml:"ttl"`
 	}
 )
 

@@ -2,10 +2,10 @@ package handlers
 
 import (
 	"github.com/gin-gonic/gin"
-	"log/slog"
 	"net/http"
 	"net/url"
 	csbn "suglider-auth/pkg/rbac"
+	"suglider-auth/internal/utils"
 )
 
 type (
@@ -29,10 +29,12 @@ type (
 func CasbinListPolicies(csbn *CasbinEnforcerConfig) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		policies := csbn.ListRoles()
-		c.JSON(http.StatusOK, gin.H {
-			"status": "success",
-			"policies":  policies,
-		})
+		c.JSON(
+			http.StatusOK,
+			utils.SuccessResponse(c, 200, map[string]interface{} {
+				"policies": policies,
+			}),
+		)
 	}
 }
 
@@ -50,10 +52,12 @@ func CasbinListPolicies(csbn *CasbinEnforcerConfig) gin.HandlerFunc {
 func CasbinListRoles(csbn *CasbinEnforcerConfig) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		roles := csbn.ListRoles()
-		c.JSON(http.StatusOK, gin.H {
-			"status": "success",
-			"roles":  roles,
-		})
+		c.JSON(
+			http.StatusOK,
+			utils.SuccessResponse(c, 200, map[string]interface{} {
+				"roles": roles,
+			}),
+		)
 	}
 }
 
@@ -71,10 +75,12 @@ func CasbinListRoles(csbn *CasbinEnforcerConfig) gin.HandlerFunc {
 func CasbinListMembers(csbn *CasbinEnforcerConfig) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		members := csbn.ListMembers()
-		c.JSON(http.StatusOK, gin.H {
-			"status":  "success",
-			"members": members,
-		})
+		c.JSON(
+			http.StatusOK,
+			utils.SuccessResponse(c, 200, map[string]interface{} {
+				"members": members,
+			}),
+		)
 	}
 }
 
@@ -94,26 +100,20 @@ func CasbinGetMembersWithRole(csbn *CasbinEnforcerConfig) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		name, err := url.QueryUnescape(c.Param("name"))
 		if err != nil {
-			slog.ErrorContext(c, err.Error())
-			c.JSON(http.StatusBadRequest, gin.H {
-				"status":  "fail",
-				"message": "Path Parameter Error",
-			})
+			c.JSON(http.StatusBadRequest, utils.ErrorResponse(c, 1103, err))
 			return
 		}
 		members, err := csbn.GetMembersWithRole(name)
 		if err != nil {
-			slog.ErrorContext(c, err.Error())
-			c.JSON(http.StatusBadRequest, gin.H {
-				"status":  "fail",
-				"message": "Get Memebers Error",
-			})
+			c.JSON(http.StatusBadRequest, utils.ErrorResponse(c, 1028, err))
 			return
 		}
-		c.JSON(http.StatusOK, gin.H {
-			"status":  "success",
-			"members": members,
-		})
+		c.JSON(
+			http.StatusOK,
+			utils.SuccessResponse(c, 200, map[string]interface{} {
+				"members": members,
+			}),
+		)
 	}
 }
 
@@ -133,26 +133,20 @@ func CasbinGetRolesOfMember(csbn *CasbinEnforcerConfig) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		name, err := url.QueryUnescape(c.Param("name"))
 		if err != nil {
-			slog.ErrorContext(c, err.Error())
-			c.JSON(http.StatusBadRequest, gin.H {
-				"status":  "fail",
-				"message": "Path Parameter Error",
-			})
+			c.JSON(http.StatusBadRequest, utils.ErrorResponse(c, 1103, err))
 			return
 		}
 		roles, err := csbn.GetRolesOfMember(name)
 		if err != nil {
-			slog.ErrorContext(c, err.Error())
-			c.JSON(http.StatusBadRequest, gin.H {
-				"status":  "fail",
-				"message": "Get Roles Error",
-			})
+			c.JSON(http.StatusBadRequest, utils.ErrorResponse(c, 1029, err))
 			return
 		}
-		c.JSON(http.StatusOK, gin.H {
-			"status": "success",
-			"roles":  roles,
-		})
+		c.JSON(
+			http.StatusOK,
+			utils.SuccessResponse(c, 200, map[string]interface{} {
+				"roles": roles,
+			}),
+		)
 	}
 }
 
@@ -174,52 +168,43 @@ func CasbinAddPolicy(csbn *CasbinEnforcerConfig) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var err error
 		if err = c.Request.ParseForm(); err != nil {
-			c.JSON(http.StatusBadRequest, gin.H {
-				"status":  "fail",
-				"message": "Fail to parse POST form data.",
-			})
+			c.JSON(http.StatusBadRequest, utils.ErrorResponse(c, 1101, err))
 			return
 		}
 		postData := &CasbinPolicy{}
 		if err = c.Bind(&postData); err != nil {
-			c.JSON(http.StatusBadRequest, gin.H {
-				"status":  "fail",
-				"message": "Fail to bind POST form data.",
-			})
+			c.JSON(http.StatusBadRequest, utils.ErrorResponse(c, 1102, err))
 			return
 		}
 		if postData.Sub == "" || postData.Obj == "" || postData.Act == "" {
-			c.JSON(http.StatusBadRequest, gin.H {
-				"status":  "fail",
-				"message": "Invalid data.",
-			})
+			c.JSON(http.StatusBadRequest, utils.ErrorResponse(c, 1104))
 			return
 		}
 		if err = csbn.AddPolicy(postData); err != nil {
 			if err.Error() == "This policy already exists." {
-				c.JSON(http.StatusOK, gin.H {
-					"status":  "nothing happens",
-					"message": "This policy already exists.",
-					"subject": postData.Sub,
-					"object":  postData.Obj,
-					"action":  postData.Act,
-				})
+				c.JSON(
+					http.StatusOK,
+					utils.SuccessResponse(c, 200, map[string]interface{} {
+						"event":   "nothing happens",
+						"warning": "This policy already exists.",
+						"subject": postData.Sub,
+						"object":  postData.Obj,
+						"action":  postData.Act,
+					}),
+				)
 				return
 			}
-			slog.ErrorContext(c, err.Error())
-			c.JSON(http.StatusBadRequest, gin.H {
-					"status":  "fail",
-					"message": "Add Policy Error",
-			})
+			c.JSON(http.StatusBadRequest, utils.ErrorResponse(c, 1030, err))
 			return
 		}
-		c.JSON(http.StatusOK, gin.H {
-			"status":  "success",
-			"message": "Added policy successfully.",
-			"subject": postData.Sub,
-			"object":  postData.Obj,
-			"action":  postData.Act,
-		})
+		c.JSON(
+			http.StatusOK,
+			utils.SuccessResponse(c, 200, map[string]interface{} {
+				"subject": postData.Sub,
+				"object":  postData.Obj,
+				"action":  postData.Act,
+			}),
+		)
 	}
 }
 
@@ -240,50 +225,41 @@ func CasbinAddGroupingPolicy(csbn *CasbinEnforcerConfig) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var err error
 		if err = c.Request.ParseForm(); err != nil {
-			c.JSON(http.StatusBadRequest, gin.H {
-				"status":  "fail",
-				"message": "Fail to parse POST form data.",
-			})
+			c.JSON(http.StatusBadRequest, utils.ErrorResponse(c, 1101, err))
 			return
 		}
 		postData := &CasbinGroupingPolicy{}
 		if err = c.Bind(&postData); err != nil {
-			c.JSON(http.StatusBadRequest, gin.H {
-				"status":  "fail",
-				"message": "Fail to bind POST form data.",
-			})
+			c.JSON(http.StatusBadRequest, utils.ErrorResponse(c, 1102, err))
 			return
 		}
 		if postData.Member == "" || postData.Role == "" {
-			c.JSON(http.StatusBadRequest, gin.H {
-				"status":  "fail",
-				"message": "Invalid data.",
-			})
+			c.JSON(http.StatusBadRequest, utils.ErrorResponse(c, 1104))
 			return
 		}
 		if err = csbn.AddGroupingPolicy(postData); err != nil {
 			if err.Error() == "This grouping policy already exists." {
-				c.JSON(http.StatusOK, gin.H {
-					"status":  "nothing happens",
-					"message": "This grouping policy already exists.",
-					"member":  postData.Member,
-					"role":    postData.Role,
-				})
+				c.JSON(
+					http.StatusOK,
+					utils.SuccessResponse(c, 200, map[string]interface{} {
+						"event":   "nothing happens",
+						"warning": "This grouping policy already exists.",
+						"member":  postData.Member,
+						"role":    postData.Role,
+					}),
+				)
 				return
 			}
-			slog.ErrorContext(c, err.Error())
-			c.JSON(http.StatusBadRequest, gin.H {
-					"status":  "fail",
-					"message": "Add Grouping Policy Error",
-			})
+			c.JSON(http.StatusBadRequest, utils.ErrorResponse(c, 1031, err))
 			return
 		}
-		c.JSON(http.StatusOK, gin.H {
-			"status":  "success",
-			"message": "Added grouping policy successfully.",
-			"member":  postData.Member,
-			"role":    postData.Role,
-		})
+		c.JSON(
+			http.StatusOK,
+			utils.SuccessResponse(c, 200, map[string]interface{} {
+				"member":  postData.Member,
+				"role":    postData.Role,
+			}),
+		)
 	}
 }
 
@@ -305,52 +281,43 @@ func CasbinDeleteSinglePolicy(csbn *CasbinEnforcerConfig) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var err error
 		if err = c.Request.ParseForm(); err != nil {
-			c.JSON(http.StatusBadRequest, gin.H {
-				"status":  "fail",
-				"message": "Fail to parse POST form data.",
-			})
+			c.JSON(http.StatusBadRequest, utils.ErrorResponse(c, 1101, err))
 			return
 		}
 		postData := &CasbinPolicy{}
 		if err = c.Bind(&postData); err != nil {
-			c.JSON(http.StatusBadRequest, gin.H {
-				"status":  "fail",
-				"message": "Fail to bind POST form data.",
-			})
+			c.JSON(http.StatusBadRequest, utils.ErrorResponse(c, 1102, err))
 			return
 		}
 		if postData.Sub == "" || postData.Obj == "" || postData.Act == "" {
-			c.JSON(http.StatusBadRequest, gin.H {
-				"status":  "fail",
-				"message": "Invalid data.",
-			})
+			c.JSON(http.StatusBadRequest, utils.ErrorResponse(c, 1104))
 			return
 		}
 		if err = csbn.DeletePolicy(postData); err != nil {
 			if err.Error() == "This policy not exists." {
-				c.JSON(http.StatusOK, gin.H {
-					"status":  "nothing happens",
-					"message": "This policy not exists.",
-					"subject": postData.Sub,
-					"object":  postData.Obj,
-					"action":  postData.Act,
-				})
+				c.JSON(
+					http.StatusOK,
+					utils.SuccessResponse(c, 200, map[string]interface{} {
+						"event":   "nothing happens",
+						"warning": "This policy not exists.",
+						"subject": postData.Sub,
+						"object":  postData.Obj,
+						"action":  postData.Act,
+					}),
+				)
 				return
 			}
-			slog.ErrorContext(c, err.Error())
-			c.JSON(http.StatusBadRequest, gin.H {
-					"status":  "fail",
-					"message": "Delete Policy Error",
-			})
+			c.JSON(http.StatusBadRequest, utils.ErrorResponse(c, 1032, err))
 			return
 		}
-		c.JSON(http.StatusOK, gin.H {
-			"status":  "success",
-			"message": "Deleted policy successfully.",
-			"subject": postData.Sub,
-			"object":  postData.Obj,
-			"action":  postData.Act,
-		})
+		c.JSON(
+			http.StatusOK,
+			utils.SuccessResponse(c, 200, map[string]interface{} {
+				"subject": postData.Sub,
+				"object":  postData.Obj,
+				"action":  postData.Act,
+			}),
+		)
 	}
 }
 
@@ -371,50 +338,41 @@ func CasbinDeleteSingleGroupingPolicy(csbn *CasbinEnforcerConfig) gin.HandlerFun
 	return func(c *gin.Context) {
 		var err error
 		if err = c.Request.ParseForm(); err != nil {
-			c.JSON(http.StatusBadRequest, gin.H {
-				"status":  "fail",
-				"message": "Fail to parse POST form data.",
-			})
+			c.JSON(http.StatusBadRequest, utils.ErrorResponse(c, 1101, err))
 			return
 		}
 		postData := &CasbinGroupingPolicy{}
 		if err = c.Bind(&postData); err != nil {
-			c.JSON(http.StatusBadRequest, gin.H {
-				"status":  "fail",
-				"message": "Fail to bind POST form data.",
-			})
+			c.JSON(http.StatusBadRequest, utils.ErrorResponse(c, 1102, err))
 			return
 		}
 		if postData.Member == "" || postData.Role == "" {
-			c.JSON(http.StatusBadRequest, gin.H {
-				"status":  "fail",
-				"message": "Invalid data.",
-			})
+			c.JSON(http.StatusBadRequest, utils.ErrorResponse(c, 1104))
 			return
 		}
 		if err = csbn.DeleteGroupingPolicy(postData); err != nil {
 			if err.Error() == "This grouping policy not exists." {
-				c.JSON(http.StatusOK, gin.H {
-					"status":  "nothing happens",
-					"message": "This grouping policy not exists.",
-					"member":  postData.Member,
-					"role":    postData.Role,
-				})
+				c.JSON(
+					http.StatusOK,
+					utils.SuccessResponse(c, 200, map[string]interface{} {
+						"event":   "nothing happens",
+						"warning": "This grouping policy not exists.",
+						"member":  postData.Member,
+						"role":    postData.Role,
+					}),
+				)
 				return
 			}
-			slog.ErrorContext(c, err.Error())
-			c.JSON(http.StatusBadRequest, gin.H {
-					"status":  "fail",
-					"message": "Delete Grouping Policy Error",
-			})
+			c.JSON(http.StatusBadRequest, utils.ErrorResponse(c, 1033, err))
 			return
 		}
-		c.JSON(http.StatusOK, gin.H {
-			"status":  "success",
-			"message": "Deleted grouping policy successfully.",
-			"member":  postData.Member,
-			"role":    postData.Role,
-		})
+		c.JSON(
+			http.StatusOK,
+			utils.SuccessResponse(c, 200, map[string]interface{} {
+				"member":  postData.Member,
+				"role":    postData.Role,
+			}),
+		)
 	}
 }
 
@@ -434,34 +392,30 @@ func CasbinDeletePolicy(csbn *CasbinEnforcerConfig) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		name, err := url.QueryUnescape(c.Param("name"))
 		if err != nil {
-			slog.ErrorContext(c, err.Error())
-			c.JSON(http.StatusBadRequest, gin.H {
-				"status":  "fail",
-				"message": "Path Parameter Error",
-			})
+			c.JSON(http.StatusBadRequest, utils.ErrorResponse(c, 1103, err))
 			return
 		}
 		if err = csbn.DeleteRole(name); err != nil {
 			if err.Error() == "This policy (role) not exists." {
-				c.JSON(http.StatusOK, gin.H {
-					"status":  "nothing happens",
-					"message": "This policy (role) not exists.",
-					"role":    name,
-				})
+				c.JSON(
+					http.StatusOK,
+					utils.SuccessResponse(c, 200, map[string]interface{} {
+						"event":   "nothing happens",
+						"warning": "This policy (role) not exists.",
+						"role":    name,
+					}),
+				)
 				return
 			}
-			slog.ErrorContext(c, err.Error())
-			c.JSON(http.StatusBadRequest, gin.H {
-					"status":  "fail",
-					"message": "Delete Role Error",
-			})
+			c.JSON(http.StatusBadRequest, utils.ErrorResponse(c, 1034, err))
 			return
 		}
-		c.JSON(http.StatusOK, gin.H {
-			"status":  "success",
-			"message": "Deleted role successfully.",
-			"role":    name,
-		})
+		c.JSON(
+			http.StatusOK,
+			utils.SuccessResponse(c, 200, map[string]interface{} {
+				"role":    name,
+			}),
+		)
 	}
 }
 
@@ -481,33 +435,29 @@ func CasbinDeleteGroupingPolicy(csbn *CasbinEnforcerConfig) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		name, err := url.QueryUnescape(c.Param("name"))
 		if err != nil {
-			slog.ErrorContext(c, err.Error())
-			c.JSON(http.StatusBadRequest, gin.H {
-				"status":  "fail",
-				"message": "Path Parameter Error",
-			})
+			c.JSON(http.StatusBadRequest, utils.ErrorResponse(c, 1103, err))
 			return
 		}
 		if err = csbn.DeleteMemeber(name); err != nil {
 			if err.Error() == "This groupiing policy (member) not exists." {
-				c.JSON(http.StatusOK, gin.H {
-					"status":  "nothing happens",
-					"message": "This groupiing policy (member) not exists.",
-					"member":  name,
-				})
+				c.JSON(
+					http.StatusOK,
+					utils.SuccessResponse(c, 200, map[string]interface{} {
+						"event":   "nothing happens",
+						"warning": "This groupiing policy (member) not exists.",
+						"member":  name,
+					}),
+				)
 				return
 			}
-			slog.ErrorContext(c, err.Error())
-			c.JSON(http.StatusBadRequest, gin.H {
-					"status":  "fail",
-					"message": "Delete member Error",
-			})
+			c.JSON(http.StatusBadRequest, utils.ErrorResponse(c, 1035, err))
 			return
 		}
-		c.JSON(http.StatusOK, gin.H {
-			"status":  "success",
-			"message": "Deleted member successfully.",
-			"member":  name,
-		})
+		c.JSON(
+			http.StatusOK,
+			utils.SuccessResponse(c, 200, map[string]interface{} {
+				"member":    name,
+			}),
+		)
 	}
 }

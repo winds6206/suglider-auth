@@ -434,7 +434,7 @@ func PasswordExpire(c *gin.Context) {
 	if err != nil {
 		errorMessage := fmt.Sprintf("Parse date failed: %v", err)
 		slog.Error(errorMessage)
-		c.JSON(http.StatusInternalServerError, utils.ErrorResponse(c, 1024, err))
+		c.JSON(http.StatusInternalServerError, utils.ErrorResponse(c, 1036, err))
 		
 		return
 	}
@@ -483,7 +483,7 @@ func PasswordExtension(c *gin.Context) {
 	if errPasswordExtension != nil {
 		errorMessage := fmt.Sprintf("Update user_info table failed: %v", err)
 		slog.Error(errorMessage)
-		c.JSON(http.StatusInternalServerError, utils.ErrorResponse(c, 1025, err))
+		c.JSON(http.StatusInternalServerError, utils.ErrorResponse(c, 1037, err))
 		return
 	}
 
