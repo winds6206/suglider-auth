@@ -13,7 +13,9 @@ func UserHandler(router *gin.RouterGroup) {
 	router.POST("/logout", handlers.UserLogout)
 	router.GET("/refresh", handlers.RefreshJWT)
 	router.POST("/verify-mail", handlers.VerifyEmailAddress)
-	router.GET("/verify-mail/resend", handlers.ResnedVerifyEmail)
+	router.GET("/verify-mail/resend", handlers.ResendVerifyEmail)
+	router.GET("/forgot-password", handlers.ForgotPasswordEmail)
+	router.POST("/reset-password", handlers.RestUserPassword)
 
 	// Test
 	router.GET("/test-logout", handlers.TestLogout)

@@ -3,7 +3,6 @@ package mail
 import (
 	"context"
 	"fmt"
-	"log/slog"
 	"net/url"
 	"suglider-auth/configs"
 	db "suglider-auth/internal/database"
@@ -23,7 +22,6 @@ type UserMailVerification struct {
 	Mail  string
 	Id    string
 	Code  string
-	TTL   int
 }
 
 func NewUserMailVerification(mail string) *UserMailVerification {
@@ -33,12 +31,12 @@ func NewUserMailVerification(mail string) *UserMailVerification {
 	return &mailVerify
 }
 
-func (umv *UserMailVerification) Register(ctx context.Context) string {
+func (umv *UserMailVerification) Register(ctx context.Context, ttl int64) string {
 	key := fmt.Sprintf("%s/%s", umv.Mail, umv.Id)
-	if umv.TTL <= 0 {
-		umv.TTL = 24
+	if ttl <= 0 {
+		ttl = 24
 	}
-	rds.Set(key, umv.Code, time.Duration(umv.TTL) * time.Hour)
+	rds.Set(key, umv.Code, time.Duration(ttl) * time.Hour)
 
 	params := url.Values{}
 	params.Add("mail", umv.Mail)
@@ -54,16 +52,9 @@ func (umv *UserMailVerification) Unregister(ctx context.Context) {
 }
 
 func (umv *UserMailVerification) IsVerified(ctx context.Context) bool {
-	var isVerified int
-	query := fmt.Sprintf("SELECT mail_verified FROM %s WHERE %s = ?", "user_info", "mail")
-	row := db.DataBase.DB.QueryRowContext(ctx, query, umv.Mail)
-	if err := row.Scan(&isVerified); err != nil {
-		slog.Error(err.Error())
-	}
-	if isVerified == 1 {
-		return true
-	}
-	return false
+	var isVerified bool
+	isVerified, _ = db.UserMailIsVerified(ctx, umv.Mail)
+	return isVerified
 }
 
 func (umv *UserMailVerification) Verify(ctx context.Context) (bool, error) {
@@ -75,10 +66,9 @@ func (umv *UserMailVerification) Verify(ctx context.Context) (bool, error) {
 	code := rds.Get(key)
 	switch code {
 	case "":
-		return false, fmt.Errorf("The verification has been expired, resend mail and try again.")
+		return false, fmt.Errorf("The verification has been expired or invalid, resend mail and try again.")
 	case umv.Code:
-		statmt := fmt.Sprintf("UPDATE %s SET mail_verified = ? WHERE %s = ?", "user_info", "mail")
-		if _, err := db.DataBase.DB.ExecContext(ctx, statmt, 1, umv.Mail); err != nil {
+		if err := db.UserSetMailVerified(ctx, umv.Mail); err != nil {
 			return false, err
 		}
 		return true, nil
@@ -115,6 +105,7 @@ func init() {
 	htmlMail = &smtp.HtmlMail {
 		RequestUrl:   requestUrl,
 		TemplatePath: configs.ApplicationConfig.Server.TemplatePath,
+		TTL:          configs.ApplicationConfig.Mail.Expired.TTL,
 	}
 }
 
@@ -124,7 +115,7 @@ func SendVerifyMail(ctx context.Context, user, email string) error {
 	if isVerified {
 		return fmt.Errorf("This mail already verified.")
 	}
-	params := umv.Register(ctx)
+	params := umv.Register(ctx, htmlMail.TTL)
 	tempFile := fmt.Sprintf("%s/mail-verification.tmpl", htmlMail.TemplatePath)
 	cont, err := htmlMail.GenerateVerifyMail(ctx, tempFile, user, params)
 	if err != nil {
@@ -140,12 +131,89 @@ func SendVerifyMail(ctx context.Context, user, email string) error {
 func VerifyUserMailAddress(ctx context.Context, email, id, code string) (bool, error) {
 	umv := &UserMailVerification {
 		Mail: email,
-		Id: id,
+		Id:   id,
 		Code: code,
 	}
 	ok, err := umv.Verify(ctx)
 	if ok && err == nil {
 		umv.Unregister(ctx)
+	}
+	return ok, err
+}
+
+type UserResetPassword struct {
+	Mail  string
+	Id    string
+	Code  string
+}
+
+func NewUserResetPassword(mail string) *UserResetPassword {
+	pwdReset := UserResetPassword { Mail: mail }
+	pwdReset.Id = encrypt.RandomString(12, "")
+	pwdReset.Code = encrypt.HashWithSHA(fmt.Sprintf("%s::_::%s", mail, pwdReset.Id), "sha512")
+	return &pwdReset
+}
+
+func (urp *UserResetPassword) Register(ctx context.Context, ttl int64) string {
+	key := fmt.Sprintf("%s/%s", urp.Mail, urp.Id)
+	if ttl <= 0 {
+		ttl = 24
+	}
+	rds.Set(key, urp.Code, time.Duration(ttl) * time.Hour)
+
+	params := url.Values{}
+	params.Add("mail", urp.Mail)
+	params.Add("reset-id", urp.Id)
+	params.Add("reset-code", urp.Code)
+
+	return params.Encode()
+}
+
+func (urp *UserResetPassword) Unregister(ctx context.Context) {
+	key := fmt.Sprintf("%s/%s", urp.Mail, urp.Id)
+	rds.Delete(key)
+}
+
+func (urp *UserResetPassword) Verify(ctx context.Context) (bool, error) {
+	key := fmt.Sprintf("%s/%s", urp.Mail, urp.Id)
+	code := rds.Get(key)
+	switch code {
+	case "":
+		return false, fmt.Errorf("The verification has been expired or invalid, resend mail and try again.")
+	case urp.Code:
+		return true, nil
+	}
+	return false, nil
+}
+
+func SendPasswordResetMail(ctx context.Context, email string) error {
+	urp := NewUserResetPassword(email)
+	user, err := db.UserGetNameByMail(ctx, email)
+	if err != nil {
+		return err
+	}
+	params := urp.Register(ctx, htmlMail.TTL)
+	tempFile := fmt.Sprintf("%s/forgot-password.tmpl", htmlMail.TemplatePath)
+	cont, err := htmlMail.GenerateForgotPasswordMail(ctx, tempFile, user, params)
+	if err != nil {
+		return err
+	}
+	if err = mail.Send(ctx, "Suglider Password Reset", cont, "", email);
+	err != nil {
+		return err
+	}
+	return nil
+}
+
+func CheckPasswordResetCode(ctx context.Context, email, id, code string) (bool, error) {
+	urp := &UserResetPassword {
+		Mail: email,
+		Id:   id,
+		Code: code,
+	}
+	ok, err := urp.Verify(ctx)
+	if ok && err == nil {
+		urp.Unregister(ctx)
 	}
 	return ok, err
 }
