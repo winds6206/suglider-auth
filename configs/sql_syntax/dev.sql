@@ -6,6 +6,7 @@ CREATE TABLE IF NOT EXISTS user_info (
     user_id BINARY(16) NOT NULL,
     username VARCHAR(256) NOT NULL,
     password VARCHAR(256) NOT NULL,
+    comfirm_pwd VARCHAR(256) NOT NULL,
     mail VARCHAR(256) NOT NULL,
     address VARCHAR(256) NOT NULL,
     PRIMARY KEY(user_id),

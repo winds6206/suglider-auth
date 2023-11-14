@@ -12,14 +12,14 @@ import (
 	"suglider-auth/internal/utils"
 	"suglider-auth/pkg/jwt"
 	pwd_validator "suglider-auth/pkg/pwd-validator"
-	// "time"
 )
 
 type userSignUp struct {
-	Username string `json:"username" binding:"required"`
-	Password string `json:"password" binding:"required"`
-	Mail     string `json:"mail" binding:"required"`
-	Address  string `json:"address" binding:"required"`
+	Username	string `json:"username" binding:"required"`
+	Password	string `json:"password" binding:"required"`
+	ComfirmPwd	string `json:"comfirm_pwd" binding:"required"`
+	Mail		string `json:"mail" binding:"required"`
+	Address		string `json:"address" binding:"required"`
 }
 
 type userDelete struct {
@@ -68,7 +68,7 @@ func UserSignUp(c *gin.Context) {
 	// Encode user password
 	passwordEncode, _ := encrypt.SaltedPasswordHash(request.Password)
 
-	err = mariadb.UserSignUp(request.Username, passwordEncode, request.Mail, request.Address)
+	err = mariadb.UserSignUp(request.Username, passwordEncode, request.Mail, request.ComfirmPwd, request.Address)
 	if err != nil {
 		errorMessage := fmt.Sprintf("Insert user_info table failed: %v", err)
 		slog.Error(errorMessage)

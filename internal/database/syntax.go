@@ -25,12 +25,12 @@ func init() {
 	}
 }
 
-func UserSignUp(username, password, mail, address string) (err error) {
+func UserSignUp(username, password, comfirm_pwd, mail, address string) (err error) {
 	ctx, cancel := context.WithTimeout(context.Background(), dbTimeOut)
 	defer cancel()
 
-	sqlStr := "INSERT INTO suglider.user_info(user_id, username, password, mail, address) VALUES (UNHEX(REPLACE(UUID(), '-', '')),?,?,?,?)"
-	_, err = DataBase.ExecContext(ctx, sqlStr, username, password, mail, address)
+	sqlStr := "INSERT INTO suglider.user_info(user_id, username, password, comfirm_pwd, mail, address) VALUES (UNHEX(REPLACE(UUID(), '-', '')),?,?,?,?,?)"
+	_, err = DataBase.ExecContext(ctx, sqlStr, username, password, comfirm_pwd, mail, address)
 	return err
 }
 
