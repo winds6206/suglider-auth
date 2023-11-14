@@ -58,3 +58,5 @@
     domain        = "localhost"
     port          = 443
     path_prefix   = ""
+  [mail.expired]
+    ttl           = 24 # in hours

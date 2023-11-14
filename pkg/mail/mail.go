@@ -62,6 +62,7 @@ type RequestUrl struct {
 type HtmlMail struct {
 	TemplatePath  string
 	RequestUrl    *RequestUrl
+	TTL           int64
 }
 
 type MailVerifyReplace struct {
@@ -84,6 +85,28 @@ func (hm *HtmlMail) GenerateVerifyMail(ctx context.Context, tempFile, userName, 
 		Name:        userName,
 		Url:         hm.RequestUrl.Url,
 		Uri:         fmt.Sprintf("%s%s", hm.RequestUrl.Path, "/user/verify-mail"),
+		QueryParams: queryParams,
+	}
+	buf := new(bytes.Buffer)
+	if err = tmpl.Execute(buf, replaceContent); err != nil {
+		return "", err
+	}
+	return buf.String(), nil
+}
+
+func (hm *HtmlMail) GenerateForgotPasswordMail(ctx context.Context, tempFile, userName, queryParams string) (string, error) {
+	tmplFile, err := ioutil.ReadFile(tempFile)
+	if err != nil {
+		return "", err
+	}
+	tmpl, err := template.New("htmlMail").Parse(string(tmplFile))
+	if err != nil {
+		return "", err
+	}
+	replaceContent := MailVerifyReplace {
+		Name:        userName,
+		Url:         hm.RequestUrl.Url,
+		Uri:         fmt.Sprintf("%s%s", hm.RequestUrl.Path, "/user/forgot-password"),
 		QueryParams: queryParams,
 	}
 	buf := new(bytes.Buffer)

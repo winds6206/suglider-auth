@@ -774,7 +774,7 @@
                     {
                         "type": "string",
                         "description": "TOTP Code",
-                        "name": "username",
+                        "name": "totpCode",
                         "in": "formData"
                     }
                 ],
@@ -835,7 +835,7 @@
                     {
                         "type": "string",
                         "description": "TOTP Code",
-                        "name": "username",
+                        "name": "totpCode",
                         "in": "formData"
                     }
                 ],
@@ -898,6 +898,61 @@
                         "description": "e-Mail",
                         "name": "mail",
                         "in": "formData"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "404": {
+                        "description": "Not found",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/user/forgot-password": {
+            "get": {
+                "description": "Send a mail to reset password",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "users"
+                ],
+                "summary": "Send Password Reset Email",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Email",
+                        "name": "mail",
+                        "in": "query"
                     }
                 ],
                 "responses": {
@@ -1089,6 +1144,79 @@
                 }
             }
         },
+        "/api/v1/user/reset-password": {
+            "post": {
+                "description": "reset password for user",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "users"
+                ],
+                "summary": "Reset Password",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "New Password",
+                        "name": "password",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Email",
+                        "name": "mail",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Reset ID",
+                        "name": "reset-id",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Reset Code",
+                        "name": "reset-code",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "404": {
+                        "description": "Not found",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
         "/api/v1/user/sign-up": {
             "post": {
                 "description": "registry new user",
@@ -1126,6 +1254,134 @@
                         "description": "Address",
                         "name": "address",
                         "in": "formData"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "404": {
+                        "description": "Not found",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/user/verify-mail": {
+            "post": {
+                "description": "verify email address for user",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "users"
+                ],
+                "summary": "Verify Email Address",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Email",
+                        "name": "mail",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Verify ID",
+                        "name": "verify-id",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Verify Code",
+                        "name": "verify-code",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "404": {
+                        "description": "Not found",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/user/verify-mail/resend": {
+            "get": {
+                "description": "Resem a mail to verify email address for user",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "users"
+                ],
+                "summary": "Resend Verify Email",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Username",
+                        "name": "username",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Email",
+                        "name": "mail",
+                        "in": "query"
                     }
                 ],
                 "responses": {

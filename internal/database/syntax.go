@@ -62,6 +62,48 @@ func UserLogin(username string) (userInfo UserDBInfo ,err error){
 	return userInfo, err
 }
 
+func UserSetMailVerified(ctx context.Context, mail string) error {
+	statmt := fmt.Sprintf("UPDATE %s SET mail_verified = ? WHERE %s = ?", "user_info", "mail")
+	if _, err := DataBase.ExecContext(ctx, statmt, 1, mail); err != nil {
+		return err
+	}
+	return nil
+}
+
+func UserMailIsVerified(ctx context.Context, mail string) (bool, error) {
+	var isVerified int
+	query := fmt.Sprintf("SELECT mail_verified FROM %s WHERE %s = ?", "user_info", "mail")
+	row := DataBase.QueryRowContext(ctx, query, mail)
+	err := row.Scan(&isVerified)
+	if err != nil {
+		slog.Error(err.Error())
+	}
+	if isVerified == 1 {
+		return true, err
+	}
+	return false, err
+}
+
+func UserResetPassword(ctx context.Context, mail, password string) error {
+	statmt := fmt.Sprintf("UPDATE %s SET password = ? WHERE %s = ?", "user_info", "mail")
+	if _, err := DataBase.ExecContext(ctx, statmt, password, mail); err != nil {
+		return err
+	}
+	return nil
+}
+
+func UserGetNameByMail(ctx context.Context, mail string) (string, error) {
+	var name string
+	query := fmt.Sprintf("SELECT username FROM %s WHERE %s = ?", "user_info", "mail")
+	row := DataBase.QueryRowContext(ctx, query, mail)
+	err := row.Scan(&name)
+	if err != nil {
+		slog.Error(err.Error())
+		return "", err
+	}
+	return name, nil
+}
+
 func TotpStoreSecret(user_id, totp_secret, totp_url string) (err error) {
 	ctx, cancel := context.WithTimeout(context.Background(), dbTimeOut)
 	defer cancel()
