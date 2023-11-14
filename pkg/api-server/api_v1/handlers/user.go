@@ -394,6 +394,18 @@ func RefreshJWT(c *gin.Context) {
 	c.SetCookie("token", token, expireTimeSec, "/", "localhost", false, true)
 }
 
+// @Summary User Password Expire Check
+// @Description Check whether a user's password has expired or not
+// @Tags users
+// @Accept multipart/form-data
+// @Produce application/json
+// @Param username formData string false "User Name"
+// @Success 200 {string} string "Success"
+// @Failure 400 {string} string "Bad request"
+// @Failure 401 {string} string "Unauthorized"
+// @Failure 403 {string} string "Forbidden"
+// @Failure 404 {string} string "Not found"
+// @Router /api/v1/user/password-expire [post]
 func PasswordExpire(c *gin.Context) {
 	var request userPasswordOperate
 
@@ -444,6 +456,18 @@ func PasswordExpire(c *gin.Context) {
 	}
 }
 
+// @Summary User Password Extension
+// @Description Extension user's password
+// @Tags users
+// @Accept multipart/form-data
+// @Produce application/json
+// @Param username formData string false "User Name"
+// @Success 200 {string} string "Success"
+// @Failure 400 {string} string "Bad request"
+// @Failure 401 {string} string "Unauthorized"
+// @Failure 403 {string} string "Forbidden"
+// @Failure 404 {string} string "Not found"
+// @Router /api/v1/user/password-extension [post]
 func PasswordExtension(c *gin.Context) {
 	var request userPasswordOperate
 
