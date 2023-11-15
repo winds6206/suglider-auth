@@ -8,7 +8,7 @@ import (
 func TotpHandler(router *gin.RouterGroup) {
 
 	router.POST("/generate", handlers.TotpGenerate)
-	router.POST("/verify", handlers.TotpVerify)
+	router.PATCH("/verify", handlers.TotpVerify)
 	router.POST("/validate", handlers.TotpValidate)
-	router.POST("/disable", handlers.TotpDisable)
+	router.PUT("/disable", handlers.TotpDisable)
 }

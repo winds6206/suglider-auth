@@ -8,11 +8,11 @@ import (
 func UserHandler(router *gin.RouterGroup) {
 
 	router.POST("/sign-up", handlers.UserSignUp)
-	router.POST("/delete", handlers.UserDelete)
+	router.DELETE("/delete", handlers.UserDelete)
 	router.POST("/login", handlers.UserLogin)
 	router.POST("/logout", handlers.UserLogout)
-	router.POST("/password-expire", handlers.PasswordExpire)
-	router.POST("/password-extension", handlers.PasswordExtension)
+	router.GET("/password-expire", handlers.PasswordExpire)
+	router.PATCH("/password-extension", handlers.PasswordExtension)
 	router.GET("/refresh", handlers.RefreshJWT)
 	router.POST("/verify-mail", handlers.VerifyEmailAddress)
 	router.GET("/verify-mail/resend", handlers.ResendVerifyEmail)

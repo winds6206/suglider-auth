@@ -35,7 +35,7 @@ type userLogin struct {
 	Password string `json:"password" binding:"required"`
 }
 
-type userPasswordOperate struct {
+type userPasswordExtension struct {
 	Username	string `json:"username" binding:"required"`
 }
 
@@ -410,16 +410,15 @@ func RefreshJWT(c *gin.Context) {
 // @Failure 404 {string} string "Not found"
 // @Router /api/v1/user/password-expire [post]
 func PasswordExpire(c *gin.Context) {
-	var request userPasswordOperate
 
-	// Check the parameter trasnfer from POST
-	err := c.ShouldBindJSON(&request)
-	if err != nil {
-		c.JSON(http.StatusBadRequest, utils.ErrorResponse(c, 1001, err))
+	username, ok := c.GetQuery("username");
+
+	if !ok {
+		c.JSON(http.StatusBadRequest, utils.ErrorResponse(c, 1038, nil))
 		return
 	}
 
-	resultData, err := mariadb.PasswordExpire(request.Username)
+	resultData, err := mariadb.PasswordExpire(username)
 
 	if err != nil {
 		if err != nil {
@@ -472,7 +471,7 @@ func PasswordExpire(c *gin.Context) {
 // @Failure 404 {string} string "Not found"
 // @Router /api/v1/user/password-extension [post]
 func PasswordExtension(c *gin.Context) {
-	var request userPasswordOperate
+	var request userPasswordExtension
 
 	// Check the parameter trasnfer from POST
 	err := c.ShouldBindJSON(&request)
