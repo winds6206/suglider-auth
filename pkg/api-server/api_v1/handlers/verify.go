@@ -52,7 +52,7 @@ func VerifyEmailAddress(c *gin.Context) {
 }
 
 // @Summary Resend Verify Email
-// @Description Resem a mail to verify email address for user
+// @Description Resend a mail to verify email address for user
 // @Tags users
 // @Accept application/json
 // @Produce application/json

@@ -105,7 +105,7 @@ func UserMailIsVerified(ctx context.Context, mail string) (bool, error) {
 }
 
 func UserResetPassword(ctx context.Context, mail, password string) error {
-	statmt := fmt.Sprintf("UPDATE %s SET password = ? WHERE %s = ?", "user_info", "mail")
+	statmt := fmt.Sprintf("UPDATE %s SET password = ?, password_expire_date = DATE_ADD(CURRENT_DATE, INTERVAL 90 DAY) WHERE %s = ?", "user_info", "mail")
 	if _, err := DataBase.ExecContext(ctx, statmt, password, mail); err != nil {
 		return err
 	}

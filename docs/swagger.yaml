@@ -886,6 +886,10 @@ paths:
         in: formData
         name: password
         type: string
+      - description: Comfirm Password
+        in: formData
+        name: comfirm_pwd
+        type: string
       - description: e-Mail
         in: formData
         name: mail
