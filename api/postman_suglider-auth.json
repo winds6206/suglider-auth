@@ -996,7 +996,7 @@
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "",
+									"raw": "{\n    \"username\": \"tony\"\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -1004,7 +1004,7 @@
 									}
 								},
 								"url": {
-									"raw": "http://localhost:9527/api/v1/user/password-expire?username=tony",
+									"raw": "http://localhost:9527/api/v1/user/password-expire",
 									"protocol": "http",
 									"host": [
 										"localhost"
@@ -1015,12 +1015,6 @@
 										"v1",
 										"user",
 										"password-expire"
-									],
-									"query": [
-										{
-											"key": "username",
-											"value": "tony"
-										}
 									]
 								}
 							},
