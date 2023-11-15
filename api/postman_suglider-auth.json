@@ -7,1066 +7,6 @@
 	},
 	"item": [
 		{
-			"name": "user",
-			"item": [
-				{
-					"name": "Sign Up User",
-					"request": {
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "http://localhost:9527/api/v1/user/sign-up",
-							"protocol": "http",
-							"host": [
-								"localhost"
-							],
-							"port": "9527",
-							"path": [
-								"api",
-								"v1",
-								"user",
-								"sign-up"
-							]
-						},
-						"description": "registry new user"
-					},
-					"response": [
-						{
-							"name": "/api/v1/user/sign-up",
-							"originalRequest": {
-								"method": "POST",
-								"header": [],
-								"body": {
-									"mode": "raw",
-									"raw": "{\n    \"username\": \"tony\",\n    \"password\": \"12345678\",\n    \"comfirm_pwd\": \"12345678\",\n    \"mail\": \"tony@example.com\",\n    \"address\": \"Taichung\"\n}",
-									"options": {
-										"raw": {
-											"language": "json"
-										}
-									}
-								},
-								"url": {
-									"raw": "http://localhost:9527/api/v1/user/sign-up",
-									"protocol": "http",
-									"host": [
-										"localhost"
-									],
-									"port": "9527",
-									"path": [
-										"api",
-										"v1",
-										"user",
-										"sign-up"
-									]
-								}
-							},
-							"_postman_previewlanguage": null,
-							"header": null,
-							"cookie": [],
-							"body": null
-						}
-					]
-				},
-				{
-					"name": "User Login",
-					"request": {
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "http://localhost:9527/api/v1/user/login",
-							"protocol": "http",
-							"host": [
-								"localhost"
-							],
-							"port": "9527",
-							"path": [
-								"api",
-								"v1",
-								"user",
-								"login"
-							]
-						},
-						"description": "user login"
-					},
-					"response": [
-						{
-							"name": "/api/v1/user/login",
-							"originalRequest": {
-								"method": "POST",
-								"header": [],
-								"body": {
-									"mode": "raw",
-									"raw": "{\n    \"username\": \"tony\",\n    \"password\": \"12345678\"\n}",
-									"options": {
-										"raw": {
-											"language": "json"
-										}
-									}
-								},
-								"url": {
-									"raw": "http://localhost:9527/api/v1/user/login",
-									"protocol": "http",
-									"host": [
-										"localhost"
-									],
-									"port": "9527",
-									"path": [
-										"api",
-										"v1",
-										"user",
-										"login"
-									]
-								}
-							},
-							"_postman_previewlanguage": null,
-							"header": null,
-							"cookie": [],
-							"body": null
-						}
-					]
-				},
-				{
-					"name": "Delete User",
-					"request": {
-						"method": "POST",
-						"header": [],
-						"url": {
-							"raw": "http://localhost:9527/api/v1/user/delete",
-							"protocol": "http",
-							"host": [
-								"localhost"
-							],
-							"port": "9527",
-							"path": [
-								"api",
-								"v1",
-								"user",
-								"delete"
-							]
-						},
-						"description": "delete an existing user"
-					},
-					"response": [
-						{
-							"name": "/api/v1/user/delete",
-							"originalRequest": {
-								"method": "POST",
-								"header": [
-									{
-										"key": "Content-Type",
-										"name": "Content-Type",
-										"value": "application/json",
-										"type": "text"
-									}
-								],
-								"body": {
-									"mode": "raw",
-									"raw": "{\n    \"username\": \"tony\",\n    \"mail\": \"tony@example.com\"\n}",
-									"options": {
-										"raw": {
-											"language": "json"
-										}
-									}
-								},
-								"url": {
-									"raw": "http://localhost:9527/api/v1/user/delete",
-									"protocol": "http",
-									"host": [
-										"localhost"
-									],
-									"port": "9527",
-									"path": [
-										"api",
-										"v1",
-										"user",
-										"delete"
-									]
-								}
-							},
-							"_postman_previewlanguage": null,
-							"header": null,
-							"cookie": [],
-							"body": null
-						}
-					]
-				},
-				{
-					"name": "User Refresh JWT",
-					"protocolProfileBehavior": {
-						"disableBodyPruning": true
-					},
-					"request": {
-						"method": "GET",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "http://localhost:9527/api/v1/user/refresh",
-							"protocol": "http",
-							"host": [
-								"localhost"
-							],
-							"port": "9527",
-							"path": [
-								"api",
-								"v1",
-								"user",
-								"refresh"
-							]
-						},
-						"description": "user refresh JWT"
-					},
-					"response": [
-						{
-							"name": "/api/v1/user/refresh",
-							"originalRequest": {
-								"method": "GET",
-								"header": [
-									{
-										"key": "Content-Type",
-										"name": "Content-Type",
-										"value": "application/json",
-										"type": "text"
-									}
-								],
-								"body": {
-									"mode": "raw",
-									"raw": "",
-									"options": {
-										"raw": {
-											"language": "json"
-										}
-									}
-								},
-								"url": {
-									"raw": "http://localhost:9527/api/v1/user/refresh",
-									"protocol": "http",
-									"host": [
-										"localhost"
-									],
-									"port": "9527",
-									"path": [
-										"api",
-										"v1",
-										"user",
-										"refresh"
-									]
-								}
-							},
-							"_postman_previewlanguage": null,
-							"header": null,
-							"cookie": [],
-							"body": null
-						}
-					]
-				},
-				{
-					"name": "User Logout",
-					"request": {
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "http://localhost:9527/api/v1/user/logout",
-							"protocol": "http",
-							"host": [
-								"localhost"
-							],
-							"port": "9527",
-							"path": [
-								"api",
-								"v1",
-								"user",
-								"logout"
-							]
-						},
-						"description": "user logout"
-					},
-					"response": [
-						{
-							"name": "/api/v1/user/logout",
-							"originalRequest": {
-								"method": "POST",
-								"header": [
-									{
-										"key": "Content-Type",
-										"name": "Content-Type",
-										"value": "application/json",
-										"type": "text"
-									}
-								],
-								"body": {
-									"mode": "raw",
-									"raw": "",
-									"options": {
-										"raw": {
-											"language": "json"
-										}
-									}
-								},
-								"url": {
-									"raw": "http://localhost:9527/api/v1/user/logout",
-									"protocol": "http",
-									"host": [
-										"localhost"
-									],
-									"port": "9527",
-									"path": [
-										"api",
-										"v1",
-										"user",
-										"logout"
-									]
-								}
-							},
-							"_postman_previewlanguage": null,
-							"header": null,
-							"cookie": [],
-							"body": null
-						}
-					]
-				},
-				{
-					"name": "User Password Expire Check",
-					"request": {
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "http://localhost:9527/api/v1/user/password-expire",
-							"protocol": "http",
-							"host": [
-								"localhost"
-							],
-							"port": "9527",
-							"path": [
-								"api",
-								"v1",
-								"user",
-								"password-expire"
-							]
-						},
-						"description": "Check whether a user's password has expired or not"
-					},
-					"response": [
-						{
-							"name": "/api/v1/user/password-expire",
-							"originalRequest": {
-								"method": "POST",
-								"header": [],
-								"body": {
-									"mode": "raw",
-									"raw": "{\n    \"username\": \"tony\"\n}",
-									"options": {
-										"raw": {
-											"language": "json"
-										}
-									}
-								},
-								"url": {
-									"raw": "http://localhost:9527/api/v1/user/password-expire",
-									"protocol": "http",
-									"host": [
-										"localhost"
-									],
-									"port": "9527",
-									"path": [
-										"api",
-										"v1",
-										"user",
-										"password-expire"
-									]
-								}
-							},
-							"_postman_previewlanguage": null,
-							"header": null,
-							"cookie": [],
-							"body": null
-						}
-					]
-				},
-				{
-					"name": "User Password Extension",
-					"request": {
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "http://localhost:9527/api/v1/user/password-extension",
-							"protocol": "http",
-							"host": [
-								"localhost"
-							],
-							"port": "9527",
-							"path": [
-								"api",
-								"v1",
-								"user",
-								"password-extension"
-							]
-						},
-						"description": "Extension user's password"
-					},
-					"response": [
-						{
-							"name": "/api/v1/user/password-extension",
-							"originalRequest": {
-								"method": "POST",
-								"header": [
-									{
-										"key": "Content-Type",
-										"name": "Content-Type",
-										"value": "application/json",
-										"type": "text"
-									}
-								],
-								"body": {
-									"mode": "raw",
-									"raw": "{\n    \"username\": \"tony\"\n}",
-									"options": {
-										"raw": {
-											"language": "json"
-										}
-									}
-								},
-								"url": {
-									"raw": "http://localhost:9527/api/v1/user/password-extension",
-									"protocol": "http",
-									"host": [
-										"localhost"
-									],
-									"port": "9527",
-									"path": [
-										"api",
-										"v1",
-										"user",
-										"password-extension"
-									]
-								}
-							},
-							"_postman_previewlanguage": null,
-							"header": null,
-							"cookie": [],
-							"body": null
-						}
-					]
-				},
-				{
-					"name": "Send Password Reset Email",
-					"protocolProfileBehavior": {
-						"disableBodyPruning": true
-					},
-					"request": {
-						"method": "GET",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "http://localhost:9527/api/v1/user/forgot-password",
-							"protocol": "http",
-							"host": [
-								"localhost"
-							],
-							"port": "9527",
-							"path": [
-								"api",
-								"v1",
-								"user",
-								"forgot-password"
-							]
-						},
-						"description": "Send a mail to reset password"
-					},
-					"response": [
-						{
-							"name": "/api/v1/user/forgot-password",
-							"originalRequest": {
-								"method": "GET",
-								"header": [],
-								"body": {
-									"mode": "raw",
-									"raw": "{\n    \"mail\": \"tony@example.com\"\n}",
-									"options": {
-										"raw": {
-											"language": "json"
-										}
-									}
-								},
-								"url": {
-									"raw": "http://localhost:9527/api/v1/user/forgot-password?mail=tony@example.com",
-									"protocol": "http",
-									"host": [
-										"localhost"
-									],
-									"port": "9527",
-									"path": [
-										"api",
-										"v1",
-										"user",
-										"forgot-password"
-									],
-									"query": [
-										{
-											"key": "mail",
-											"value": "tony@example.com"
-										}
-									]
-								}
-							},
-							"_postman_previewlanguage": null,
-							"header": null,
-							"cookie": [],
-							"body": null
-						}
-					]
-				},
-				{
-					"name": "Reset Password",
-					"request": {
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "http://localhost:9527/api/v1/user/reset-password",
-							"protocol": "http",
-							"host": [
-								"localhost"
-							],
-							"port": "9527",
-							"path": [
-								"api",
-								"v1",
-								"user",
-								"reset-password"
-							]
-						},
-						"description": "reset password for user"
-					},
-					"response": [
-						{
-							"name": "/api/v1/user/reset-password",
-							"originalRequest": {
-								"method": "POST",
-								"header": [],
-								"body": {
-									"mode": "raw",
-									"raw": "{\n    \"password\": \"1234567890\"\n}",
-									"options": {
-										"raw": {
-											"language": "json"
-										}
-									}
-								},
-								"url": {
-									"raw": "http://localhost:9527/api/v1/user/reset-password?mail=tony@example.com&reset-id=22dabc4503692e093f08a52a4287f3f085334595ebf89d48b7bc563fc90ca412&reset-code=0tdk0cstwANf",
-									"protocol": "http",
-									"host": [
-										"localhost"
-									],
-									"port": "9527",
-									"path": [
-										"api",
-										"v1",
-										"user",
-										"reset-password"
-									],
-									"query": [
-										{
-											"key": "mail",
-											"value": "tony@example.com"
-										},
-										{
-											"key": "reset-id",
-											"value": "22dabc4503692e093f08a52a4287f3f085334595ebf89d48b7bc563fc90ca412"
-										},
-										{
-											"key": "reset-code",
-											"value": "0tdk0cstwANf"
-										}
-									]
-								}
-							},
-							"_postman_previewlanguage": null,
-							"header": null,
-							"cookie": [],
-							"body": null
-						}
-					]
-				},
-				{
-					"name": "Verify Email Address",
-					"request": {
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"mail\": \"tony@example.com\",\n    \"verify-id\": \"\",\n    \"verify-code\": \"\"\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "http://localhost:9527/api/v1/user/verify-mail",
-							"protocol": "http",
-							"host": [
-								"localhost"
-							],
-							"port": "9527",
-							"path": [
-								"api",
-								"v1",
-								"user",
-								"verify-mail"
-							]
-						},
-						"description": "verify email address for user"
-					},
-					"response": [
-						{
-							"name": "/api/v1/user/verify-mail",
-							"originalRequest": {
-								"method": "POST",
-								"header": [],
-								"body": {
-									"mode": "raw",
-									"raw": "{\n    \"mail\": \"tony@example.com\",\n    \"verify-id\": \"22dabc4503692e093f08a52a4287f3f085334595ebf89d48b7bc563fc90ca412\",\n    \"verify-code\": \"0tdk0cstwANf\"\n}",
-									"options": {
-										"raw": {
-											"language": "json"
-										}
-									}
-								},
-								"url": {
-									"raw": "http://localhost:9527/api/v1/user/verify-mail",
-									"protocol": "http",
-									"host": [
-										"localhost"
-									],
-									"port": "9527",
-									"path": [
-										"api",
-										"v1",
-										"user",
-										"verify-mail"
-									]
-								}
-							},
-							"_postman_previewlanguage": null,
-							"header": null,
-							"cookie": [],
-							"body": null
-						}
-					]
-				},
-				{
-					"name": "/api/v1/user/verify-mail/resend",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "http://127.0.0.1:9527/api/v1/user/verify-mail/resend",
-							"protocol": "http",
-							"host": [
-								"127",
-								"0",
-								"0",
-								"1"
-							],
-							"port": "9527",
-							"path": [
-								"api",
-								"v1",
-								"user",
-								"verify-mail",
-								"resend"
-							]
-						},
-						"description": "Resend a mail to verify email address for user"
-					},
-					"response": [
-						{
-							"name": "/api/v1/user/verify-mail/resend",
-							"originalRequest": {
-								"method": "GET",
-								"header": [],
-								"url": {
-									"raw": "http://127.0.0.1:9527/api/v1/user/verify-mail/resend?username=tony&mail=tony@example.com",
-									"protocol": "http",
-									"host": [
-										"127",
-										"0",
-										"0",
-										"1"
-									],
-									"port": "9527",
-									"path": [
-										"api",
-										"v1",
-										"user",
-										"verify-mail",
-										"resend"
-									],
-									"query": [
-										{
-											"key": "username",
-											"value": "tony"
-										},
-										{
-											"key": "mail",
-											"value": "tony@example.com"
-										}
-									]
-								}
-							},
-							"_postman_previewlanguage": null,
-							"header": null,
-							"cookie": [],
-							"body": null
-						}
-					]
-				}
-			]
-		},
-		{
-			"name": "totp",
-			"item": [
-				{
-					"name": "Enable TOTP",
-					"request": {
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"username\": \"tony\"\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "http://localhost:9527/api/v1/totp/generate",
-							"protocol": "http",
-							"host": [
-								"localhost"
-							],
-							"port": "9527",
-							"path": [
-								"api",
-								"v1",
-								"totp",
-								"generate"
-							]
-						},
-						"description": "generate QRcode"
-					},
-					"response": [
-						{
-							"name": "/api/v1/totp/generate",
-							"originalRequest": {
-								"method": "POST",
-								"header": [],
-								"body": {
-									"mode": "raw",
-									"raw": "{\n    \"username\": \"tony\"\n}",
-									"options": {
-										"raw": {
-											"language": "json"
-										}
-									}
-								},
-								"url": {
-									"raw": "http://localhost:9527/api/v1/totp/generate",
-									"protocol": "http",
-									"host": [
-										"localhost"
-									],
-									"port": "9527",
-									"path": [
-										"api",
-										"v1",
-										"totp",
-										"generate"
-									]
-								}
-							},
-							"_postman_previewlanguage": null,
-							"header": null,
-							"cookie": [],
-							"body": null
-						}
-					]
-				},
-				{
-					"name": "Verify TOTP",
-					"request": {
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"username\": \"tony\",\n    \"totpcode\": \"116008\"\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "http://localhost:9527/api/v1/totp/verify",
-							"protocol": "http",
-							"host": [
-								"localhost"
-							],
-							"port": "9527",
-							"path": [
-								"api",
-								"v1",
-								"totp",
-								"verify"
-							]
-						},
-						"description": "The API uses the first enabled TOTP feature to verify the TOTP code."
-					},
-					"response": [
-						{
-							"name": "/api/v1/totp/verify",
-							"originalRequest": {
-								"method": "POST",
-								"header": [],
-								"body": {
-									"mode": "raw",
-									"raw": "{\n    \"username\": \"tony\",\n    \"totpcode\": \"123456\"\n}",
-									"options": {
-										"raw": {
-											"language": "json"
-										}
-									}
-								},
-								"url": {
-									"raw": "http://localhost:9527/api/v1/totp/verify",
-									"protocol": "http",
-									"host": [
-										"localhost"
-									],
-									"port": "9527",
-									"path": [
-										"api",
-										"v1",
-										"totp",
-										"verify"
-									]
-								}
-							},
-							"_postman_previewlanguage": null,
-							"header": null,
-							"cookie": [],
-							"body": null
-						}
-					]
-				},
-				{
-					"name": "Verify TOTP Validate",
-					"request": {
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"username\": \"tony\",\n    \"totpcode\": \"989614\"\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "http://localhost:9527/api/v1/totp/validate",
-							"protocol": "http",
-							"host": [
-								"localhost"
-							],
-							"port": "9527",
-							"path": [
-								"api",
-								"v1",
-								"totp",
-								"validate"
-							]
-						},
-						"description": "If a user has enabled TOTP, the API can be used during the login process to verify its validity."
-					},
-					"response": [
-						{
-							"name": "/api/v1/totp/validate",
-							"originalRequest": {
-								"method": "POST",
-								"header": [],
-								"body": {
-									"mode": "raw",
-									"raw": "{\n    \"username\": \"tony\",\n    \"totpcode\": \"123456\"\n}",
-									"options": {
-										"raw": {
-											"language": "json"
-										}
-									}
-								},
-								"url": {
-									"raw": "http://localhost:9527/api/v1/totp/validate",
-									"protocol": "http",
-									"host": [
-										"localhost"
-									],
-									"port": "9527",
-									"path": [
-										"api",
-										"v1",
-										"totp",
-										"validate"
-									]
-								}
-							},
-							"_postman_previewlanguage": null,
-							"header": null,
-							"cookie": [],
-							"body": null
-						}
-					]
-				},
-				{
-					"name": "Disable TOTP",
-					"request": {
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"username\": \"tony\"\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "http://localhost:9527/api/v1/totp/disable",
-							"protocol": "http",
-							"host": [
-								"localhost"
-							],
-							"port": "9527",
-							"path": [
-								"api",
-								"v1",
-								"totp",
-								"disable"
-							]
-						},
-						"description": "disable TOTP"
-					},
-					"response": [
-						{
-							"name": "/api/v1/totp/disable",
-							"originalRequest": {
-								"method": "POST",
-								"header": [],
-								"body": {
-									"mode": "raw",
-									"raw": "{\n    \"username\": \"tony\"\n}",
-									"options": {
-										"raw": {
-											"language": "json"
-										}
-									}
-								},
-								"url": {
-									"raw": "http://localhost:9527/api/v1/totp/disable",
-									"protocol": "http",
-									"host": [
-										"localhost"
-									],
-									"port": "9527",
-									"path": [
-										"api",
-										"v1",
-										"totp",
-										"disable"
-									]
-								}
-							},
-							"_postman_previewlanguage": null,
-							"header": null,
-							"cookie": [],
-							"body": null
-						}
-					]
-				}
-			]
-		},
-		{
 			"name": "privilege",
 			"item": [
 				{
@@ -1586,7 +526,7 @@
 									"variable": [
 										{
 											"key": "name",
-											"value": ""
+											"value": "develop"
 										}
 									]
 								}
@@ -1650,6 +590,1075 @@
 											"key": "name",
 											"value": ""
 										}
+									]
+								}
+							},
+							"_postman_previewlanguage": null,
+							"header": null,
+							"cookie": [],
+							"body": null
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "user",
+			"item": [
+				{
+					"name": "Sign Up User",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:9527/api/v1/user/sign-up",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "9527",
+							"path": [
+								"api",
+								"v1",
+								"user",
+								"sign-up"
+							]
+						},
+						"description": "registry new user"
+					},
+					"response": [
+						{
+							"name": "/api/v1/user/sign-up",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"username\": \"tony\",\n    \"password\": \"12345678\",\n    \"comfirm_pwd\": \"12345678\",\n    \"mail\": \"tony@example.com\",\n    \"address\": \"Taichung\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:9527/api/v1/user/sign-up",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "9527",
+									"path": [
+										"api",
+										"v1",
+										"user",
+										"sign-up"
+									]
+								}
+							},
+							"_postman_previewlanguage": null,
+							"header": null,
+							"cookie": [],
+							"body": null
+						}
+					]
+				},
+				{
+					"name": "User Login",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:9527/api/v1/user/login",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "9527",
+							"path": [
+								"api",
+								"v1",
+								"user",
+								"login"
+							]
+						},
+						"description": "user login"
+					},
+					"response": [
+						{
+							"name": "/api/v1/user/login",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"username\": \"tony\",\n    \"password\": \"12345678\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:9527/api/v1/user/login",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "9527",
+									"path": [
+										"api",
+										"v1",
+										"user",
+										"login"
+									]
+								}
+							},
+							"_postman_previewlanguage": null,
+							"header": null,
+							"cookie": [],
+							"body": null
+						}
+					]
+				},
+				{
+					"name": "Delete User",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:9527/api/v1/user/delete",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "9527",
+							"path": [
+								"api",
+								"v1",
+								"user",
+								"delete"
+							]
+						},
+						"description": "delete an existing user"
+					},
+					"response": [
+						{
+							"name": "/api/v1/user/delete",
+							"originalRequest": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"username\": \"tony\",\n    \"mail\": \"tony@example.com\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:9527/api/v1/user/delete",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "9527",
+									"path": [
+										"api",
+										"v1",
+										"user",
+										"delete"
+									]
+								}
+							},
+							"_postman_previewlanguage": null,
+							"header": null,
+							"cookie": [],
+							"body": null
+						}
+					]
+				},
+				{
+					"name": "User Refresh JWT",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:9527/api/v1/user/refresh",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "9527",
+							"path": [
+								"api",
+								"v1",
+								"user",
+								"refresh"
+							]
+						},
+						"description": "user refresh JWT"
+					},
+					"response": [
+						{
+							"name": "/api/v1/user/refresh",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:9527/api/v1/user/refresh",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "9527",
+									"path": [
+										"api",
+										"v1",
+										"user",
+										"refresh"
+									]
+								}
+							},
+							"_postman_previewlanguage": null,
+							"header": null,
+							"cookie": [],
+							"body": null
+						}
+					]
+				},
+				{
+					"name": "User Logout",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:9527/api/v1/user/logout",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "9527",
+							"path": [
+								"api",
+								"v1",
+								"user",
+								"logout"
+							]
+						},
+						"description": "user logout"
+					},
+					"response": [
+						{
+							"name": "/api/v1/user/logout",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:9527/api/v1/user/logout",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "9527",
+									"path": [
+										"api",
+										"v1",
+										"user",
+										"logout"
+									]
+								}
+							},
+							"_postman_previewlanguage": null,
+							"header": null,
+							"cookie": [],
+							"body": null
+						}
+					]
+				},
+				{
+					"name": "User Password Expire Check",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:9527/api/v1/user/password-expire",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "9527",
+							"path": [
+								"api",
+								"v1",
+								"user",
+								"password-expire"
+							]
+						},
+						"description": "Check whether a user's password has expired or not"
+					},
+					"response": [
+						{
+							"name": "/api/v1/user/password-expire",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:9527/api/v1/user/password-expire?username=tony",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "9527",
+									"path": [
+										"api",
+										"v1",
+										"user",
+										"password-expire"
+									],
+									"query": [
+										{
+											"key": "username",
+											"value": "tony"
+										}
+									]
+								}
+							},
+							"_postman_previewlanguage": null,
+							"header": null,
+							"cookie": [],
+							"body": null
+						}
+					]
+				},
+				{
+					"name": "User Password Extension",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:9527/api/v1/user/password-extension",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "9527",
+							"path": [
+								"api",
+								"v1",
+								"user",
+								"password-extension"
+							]
+						},
+						"description": "Extension user's password"
+					},
+					"response": [
+						{
+							"name": "/api/v1/user/password-extension",
+							"originalRequest": {
+								"method": "PATCH",
+								"header": [
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"username\": \"tony\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:9527/api/v1/user/password-extension",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "9527",
+									"path": [
+										"api",
+										"v1",
+										"user",
+										"password-extension"
+									]
+								}
+							},
+							"_postman_previewlanguage": null,
+							"header": null,
+							"cookie": [],
+							"body": null
+						}
+					]
+				},
+				{
+					"name": "Send Password Reset Email",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:9527/api/v1/user/forgot-password",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "9527",
+							"path": [
+								"api",
+								"v1",
+								"user",
+								"forgot-password"
+							]
+						},
+						"description": "Send a mail to reset password"
+					},
+					"response": [
+						{
+							"name": "/api/v1/user/forgot-password",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"mail\": \"tony@example.com\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:9527/api/v1/user/forgot-password?mail=tony@example.com",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "9527",
+									"path": [
+										"api",
+										"v1",
+										"user",
+										"forgot-password"
+									],
+									"query": [
+										{
+											"key": "mail",
+											"value": "tony@example.com"
+										}
+									]
+								}
+							},
+							"_postman_previewlanguage": null,
+							"header": null,
+							"cookie": [],
+							"body": null
+						}
+					]
+				},
+				{
+					"name": "Reset Password",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:9527/api/v1/user/reset-password",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "9527",
+							"path": [
+								"api",
+								"v1",
+								"user",
+								"reset-password"
+							]
+						},
+						"description": "reset password for user"
+					},
+					"response": [
+						{
+							"name": "/api/v1/user/reset-password",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"password\": \"1234567890\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:9527/api/v1/user/reset-password?mail=tony@example.com&reset-id=22dabc4503692e093f08a52a4287f3f085334595ebf89d48b7bc563fc90ca412&reset-code=0tdk0cstwANf",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "9527",
+									"path": [
+										"api",
+										"v1",
+										"user",
+										"reset-password"
+									],
+									"query": [
+										{
+											"key": "mail",
+											"value": "tony@example.com"
+										},
+										{
+											"key": "reset-id",
+											"value": "22dabc4503692e093f08a52a4287f3f085334595ebf89d48b7bc563fc90ca412"
+										},
+										{
+											"key": "reset-code",
+											"value": "0tdk0cstwANf"
+										}
+									]
+								}
+							},
+							"_postman_previewlanguage": null,
+							"header": null,
+							"cookie": [],
+							"body": null
+						}
+					]
+				},
+				{
+					"name": "Verify Email Address",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"mail\": \"tony@example.com\",\n    \"verify-id\": \"\",\n    \"verify-code\": \"\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:9527/api/v1/user/verify-mail",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "9527",
+							"path": [
+								"api",
+								"v1",
+								"user",
+								"verify-mail"
+							]
+						},
+						"description": "verify email address for user"
+					},
+					"response": [
+						{
+							"name": "/api/v1/user/verify-mail",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"mail\": \"tony@example.com\",\n    \"verify-id\": \"22dabc4503692e093f08a52a4287f3f085334595ebf89d48b7bc563fc90ca412\",\n    \"verify-code\": \"0tdk0cstwANf\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:9527/api/v1/user/verify-mail",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "9527",
+									"path": [
+										"api",
+										"v1",
+										"user",
+										"verify-mail"
+									]
+								}
+							},
+							"_postman_previewlanguage": null,
+							"header": null,
+							"cookie": [],
+							"body": null
+						}
+					]
+				},
+				{
+					"name": "Resend Verify Email",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://127.0.0.1:9527/api/v1/user/verify-mail/resend",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "9527",
+							"path": [
+								"api",
+								"v1",
+								"user",
+								"verify-mail",
+								"resend"
+							]
+						},
+						"description": "Resend a mail to verify email address for user"
+					},
+					"response": [
+						{
+							"name": "/api/v1/user/verify-mail/resend",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://127.0.0.1:9527/api/v1/user/verify-mail/resend?username=tony&mail=tony@example.com",
+									"protocol": "http",
+									"host": [
+										"127",
+										"0",
+										"0",
+										"1"
+									],
+									"port": "9527",
+									"path": [
+										"api",
+										"v1",
+										"user",
+										"verify-mail",
+										"resend"
+									],
+									"query": [
+										{
+											"key": "username",
+											"value": "tony"
+										},
+										{
+											"key": "mail",
+											"value": "tony@example.com"
+										}
+									]
+								}
+							},
+							"_postman_previewlanguage": null,
+							"header": null,
+							"cookie": [],
+							"body": null
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "totp",
+			"item": [
+				{
+					"name": "Enable TOTP",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"username\": \"tony\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:9527/api/v1/totp/generate",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "9527",
+							"path": [
+								"api",
+								"v1",
+								"totp",
+								"generate"
+							]
+						},
+						"description": "generate QRcode"
+					},
+					"response": [
+						{
+							"name": "/api/v1/totp/generate",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"username\": \"tony\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:9527/api/v1/totp/generate",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "9527",
+									"path": [
+										"api",
+										"v1",
+										"totp",
+										"generate"
+									]
+								}
+							},
+							"_postman_previewlanguage": null,
+							"header": null,
+							"cookie": [],
+							"body": null
+						}
+					]
+				},
+				{
+					"name": "Verify TOTP",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"username\": \"tony\",\n    \"totpcode\": \"116008\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:9527/api/v1/totp/verify",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "9527",
+							"path": [
+								"api",
+								"v1",
+								"totp",
+								"verify"
+							]
+						},
+						"description": "The API uses the first enabled TOTP feature to verify the TOTP code."
+					},
+					"response": [
+						{
+							"name": "/api/v1/totp/verify",
+							"originalRequest": {
+								"method": "PATCH",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"username\": \"tony\",\n    \"totpcode\": \"123456\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:9527/api/v1/totp/verify",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "9527",
+									"path": [
+										"api",
+										"v1",
+										"totp",
+										"verify"
+									]
+								}
+							},
+							"_postman_previewlanguage": null,
+							"header": null,
+							"cookie": [],
+							"body": null
+						}
+					]
+				},
+				{
+					"name": "Verify TOTP Validate",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"username\": \"tony\",\n    \"totpcode\": \"989614\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:9527/api/v1/totp/validate",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "9527",
+							"path": [
+								"api",
+								"v1",
+								"totp",
+								"validate"
+							]
+						},
+						"description": "If a user has enabled TOTP, the API can be used during the login process to verify its validity."
+					},
+					"response": [
+						{
+							"name": "/api/v1/totp/validate",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"username\": \"tony\",\n    \"totpcode\": \"123456\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:9527/api/v1/totp/validate",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "9527",
+									"path": [
+										"api",
+										"v1",
+										"totp",
+										"validate"
+									]
+								}
+							},
+							"_postman_previewlanguage": null,
+							"header": null,
+							"cookie": [],
+							"body": null
+						}
+					]
+				},
+				{
+					"name": "Disable TOTP",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"username\": \"tony\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:9527/api/v1/totp/disable",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "9527",
+							"path": [
+								"api",
+								"v1",
+								"totp",
+								"disable"
+							]
+						},
+						"description": "disable TOTP"
+					},
+					"response": [
+						{
+							"name": "/api/v1/totp/disable",
+							"originalRequest": {
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"username\": \"tony\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:9527/api/v1/totp/disable",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "9527",
+									"path": [
+										"api",
+										"v1",
+										"totp",
+										"disable"
 									]
 								}
 							},
