@@ -46,6 +46,7 @@ type userPasswordOperate struct {
 // @Produce application/json
 // @Param username formData string false "User Name"
 // @Param password formData string false "Password"
+// @Param comfirm_pwd formData string false "Comfirm Password"
 // @Param mail formData string false "e-Mail"
 // @Param address formData string false "Address"
 // @Success 200 {string} string "Success"
@@ -74,6 +75,8 @@ func UserSignUp(c *gin.Context) {
 	// Encode user password
 	passwordEncode, _ := encrypt.SaltedPasswordHash(request.Password)
 	comfirmPwdEncode, _ := encrypt.SaltedPasswordHash(request.ComfirmPwd)
+
+	fmt.Println(passwordEncode)
 
 	err = mariadb.UserSignUp(request.Username, passwordEncode, comfirmPwdEncode, request.Mail, request.Address)
 	if err != nil {

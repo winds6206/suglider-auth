@@ -1358,6 +1358,12 @@ const docTemplate = `{
                     },
                     {
                         "type": "string",
+                        "description": "Comfirm Password",
+                        "name": "comfirm_pwd",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
                         "description": "e-Mail",
                         "name": "mail",
                         "in": "formData"

@@ -420,7 +420,7 @@ func CasbinDeletePolicy(csbn *CasbinEnforcerConfig) gin.HandlerFunc {
 }
 
 // @Summary Delete RBAC Grouping Policy (Member)
-// @Description delete a grouping policy (member)
+// @Description Delete all roles associated with a specified member
 // @Tags privilege
 // @Accept application/json
 // @Produce application/json
