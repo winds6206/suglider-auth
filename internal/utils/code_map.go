@@ -46,6 +46,7 @@ func ResponseStatusCode() {
 		1035: "Delete RBAC member error",
 		1036: "Parse date failed.",
 		1037: "Update user_info table failed.",
+		1038: "Query string should be include username key.",
 		1101: "Fail to parse POST form data.",
 		1102: "Fail to bind POST form data.",
 		1103: "Fail to parse path parameters.",
