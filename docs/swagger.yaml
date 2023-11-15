@@ -15,7 +15,7 @@ paths:
     delete:
       consumes:
       - application/json
-      description: delete a grouping policy (member)
+      description: Delete all roles associated with a specified member
       parameters:
       - description: Member Name
         in: path
@@ -421,7 +421,7 @@ paths:
       tags:
       - privilege
   /api/v1/totp/disable:
-    post:
+    put:
       consumes:
       - multipart/form-data
       description: disable TOTP
@@ -534,7 +534,7 @@ paths:
       tags:
       - totp
   /api/v1/totp/verify:
-    post:
+    patch:
       consumes:
       - multipart/form-data
       description: The API uses the first enabled TOTP feature to verify the TOTP
@@ -575,7 +575,7 @@ paths:
       tags:
       - totp
   /api/v1/user/delete:
-    post:
+    delete:
       consumes:
       - multipart/form-data
       description: delete an existing user
@@ -722,7 +722,7 @@ paths:
       tags:
       - users
   /api/v1/user/password-expire:
-    post:
+    get:
       consumes:
       - multipart/form-data
       description: Check whether a user's password has expired or not
@@ -758,7 +758,7 @@ paths:
       tags:
       - users
   /api/v1/user/password-extension:
-    post:
+    patch:
       consumes:
       - multipart/form-data
       description: Extension user's password
@@ -794,7 +794,7 @@ paths:
       tags:
       - users
   /api/v1/user/refresh:
-    post:
+    get:
       consumes:
       - multipart/form-data
       description: user refresh JWT
@@ -972,7 +972,7 @@ paths:
     get:
       consumes:
       - application/json
-      description: Resem a mail to verify email address for user
+      description: Resend a mail to verify email address for user
       parameters:
       - description: Username
         in: query
