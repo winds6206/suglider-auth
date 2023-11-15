@@ -147,7 +147,7 @@ const docTemplate = `{
         },
         "/api/v1/rbac/grouping/{name}/delete": {
             "delete": {
-                "description": "delete a grouping policy (member)",
+                "description": "Delete all roles associated with a specified member",
                 "consumes": [
                     "application/json"
                 ],
@@ -645,7 +645,7 @@ const docTemplate = `{
             }
         },
         "/api/v1/totp/disable": {
-            "post": {
+            "put": {
                 "description": "disable TOTP",
                 "consumes": [
                     "multipart/form-data"
@@ -816,7 +816,7 @@ const docTemplate = `{
             }
         },
         "/api/v1/totp/verify": {
-            "post": {
+            "patch": {
                 "description": "The API uses the first enabled TOTP feature to verify the TOTP code.",
                 "consumes": [
                     "multipart/form-data"
@@ -877,7 +877,7 @@ const docTemplate = `{
             }
         },
         "/api/v1/user/delete": {
-            "post": {
+            "delete": {
                 "description": "delete an existing user",
                 "consumes": [
                     "multipart/form-data"
@@ -1101,7 +1101,7 @@ const docTemplate = `{
             }
         },
         "/api/v1/user/password-expire": {
-            "post": {
+            "get": {
                 "description": "Check whether a user's password has expired or not",
                 "consumes": [
                     "multipart/form-data"
@@ -1156,7 +1156,7 @@ const docTemplate = `{
             }
         },
         "/api/v1/user/password-extension": {
-            "post": {
+            "patch": {
                 "description": "Extension user's password",
                 "consumes": [
                     "multipart/form-data"
@@ -1211,7 +1211,7 @@ const docTemplate = `{
             }
         },
         "/api/v1/user/refresh": {
-            "post": {
+            "get": {
                 "description": "user refresh JWT",
                 "consumes": [
                     "multipart/form-data"
@@ -1478,7 +1478,7 @@ const docTemplate = `{
         },
         "/api/v1/user/verify-mail/resend": {
             "get": {
-                "description": "Resem a mail to verify email address for user",
+                "description": "Resend a mail to verify email address for user",
                 "consumes": [
                     "application/json"
                 ],

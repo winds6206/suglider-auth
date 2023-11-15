@@ -35,7 +35,7 @@ type userLogin struct {
 	Password string `json:"password" binding:"required"`
 }
 
-type userPasswordExtension struct {
+type userPasswordOperate struct {
 	Username	string `json:"username" binding:"required"`
 }
 
@@ -106,7 +106,7 @@ func UserSignUp(c *gin.Context) {
 // @Failure 401 {string} string "Unauthorized"
 // @Failure 403 {string} string "Forbidden"
 // @Failure 404 {string} string "Not found"
-// @Router /api/v1/user/delete [post]
+// @Router /api/v1/user/delete [delete]
 func UserDelete(c *gin.Context) {
 	var request userDelete
 
@@ -352,7 +352,7 @@ func UserLogout(c *gin.Context) {
 // @Failure 401 {string} string "Unauthorized"
 // @Failure 403 {string} string "Forbidden"
 // @Failure 404 {string} string "Not found"
-// @Router /api/v1/user/refresh [post]
+// @Router /api/v1/user/refresh [get]
 func RefreshJWT(c *gin.Context) {
 
 	cookie, err := c.Cookie("token")
@@ -408,17 +408,19 @@ func RefreshJWT(c *gin.Context) {
 // @Failure 401 {string} string "Unauthorized"
 // @Failure 403 {string} string "Forbidden"
 // @Failure 404 {string} string "Not found"
-// @Router /api/v1/user/password-expire [post]
+// @Router /api/v1/user/password-expire [get]
 func PasswordExpire(c *gin.Context) {
 
-	username, ok := c.GetQuery("username");
+	var request userPasswordOperate
 
-	if !ok {
-		c.JSON(http.StatusBadRequest, utils.ErrorResponse(c, 1038, nil))
+	// Check the parameter trasnfer from POST
+	err := c.ShouldBindJSON(&request)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, utils.ErrorResponse(c, 1001, err))
 		return
 	}
 
-	resultData, err := mariadb.PasswordExpire(username)
+	resultData, err := mariadb.PasswordExpire(request.Username)
 
 	if err != nil {
 		if err != nil {
@@ -469,9 +471,9 @@ func PasswordExpire(c *gin.Context) {
 // @Failure 401 {string} string "Unauthorized"
 // @Failure 403 {string} string "Forbidden"
 // @Failure 404 {string} string "Not found"
-// @Router /api/v1/user/password-extension [post]
+// @Router /api/v1/user/password-extension [patch]
 func PasswordExtension(c *gin.Context) {
-	var request userPasswordExtension
+	var request userPasswordOperate
 
 	// Check the parameter trasnfer from POST
 	err := c.ShouldBindJSON(&request)

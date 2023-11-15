@@ -70,7 +70,7 @@ func TotpGenerate(c *gin.Context) {
 // @Failure 401 {string} string "Unauthorized"
 // @Failure 403 {string} string "Forbidden"
 // @Failure 404 {string} string "Not found"
-// @Router /api/v1/totp/verify [post]
+// @Router /api/v1/totp/verify [patch]
 func TotpVerify(c *gin.Context) {
 // The API uses the first enabled TOTP feature to verify the TOTP code.
 
@@ -190,7 +190,7 @@ func TotpValidate(c *gin.Context) {
 // @Failure 401 {string} string "Unauthorized"
 // @Failure 403 {string} string "Forbidden"
 // @Failure 404 {string} string "Not found"
-// @Router /api/v1/totp/disable [post]
+// @Router /api/v1/totp/disable [put]
 func TotpDisable(c *gin.Context) {
 	var request totpInput
 
