@@ -68,6 +68,10 @@ func UserSignUp(c *gin.Context) {
 
 	errPwdValidator := pwd_validator.PwdValidator(request.Username, request.Password, request.Mail)
 	if errPwdValidator != nil {
+
+		errorMessage := fmt.Sprintf("%v", errPwdValidator)
+		slog.Error(errorMessage)
+		
 		c.JSON(http.StatusBadRequest, utils.ErrorResponse(c, 1021, errPwdValidator))
 		return
 	}
@@ -374,12 +378,15 @@ func RefreshJWT(c *gin.Context) {
 
 		  case 1015:
 			c.JSON(http.StatusUnauthorized, utils.ErrorResponse(c, errCode, err))
+			return
 	  
 		  case 1016:
 			c.JSON(http.StatusBadRequest, utils.ErrorResponse(c, errCode, err))
+			return
 	  
 		  case 1017:
 			c.JSON(http.StatusUnauthorized, utils.ErrorResponse(c, errCode, err))
+			return
 		}
 	}
 
