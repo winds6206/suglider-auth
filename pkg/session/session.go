@@ -15,7 +15,10 @@ type sessionData struct {
 	Username	string	`json:"username"`
 }
 
-func AddSession(c *gin.Context, user string) (string, error) {
+func AddSession(c *gin.Context, user string) (string, int64, error) {
+
+	var errCode int64
+	errCode = 0
 
 	sessionValue := sessionData{
 		Username: user,
@@ -23,9 +26,8 @@ func AddSession(c *gin.Context, user string) (string, error) {
 
 	jsonSessionValue, err := json.Marshal(sessionValue)
 	if err != nil {
-		errorMessage := fmt.Sprintf("Failed to create session value JSON data: %v", err)
-		slog.Error(errorMessage)
-		return "", err
+		errCode = 1041
+		return "", errCode, err
 	}
 
 	// Genertate session ID with no Dash
@@ -40,12 +42,16 @@ func AddSession(c *gin.Context, user string) (string, error) {
 	redisValue := string(jsonSessionValue)
 
 	// time_convert.RedisTTL is a global variable from time_convert.go
-	redis.Set(redisKey, redisValue, time_convert.RedisTTL)
+	err = redis.Set(redisKey, redisValue, time_convert.RedisTTL)
+	if err != nil {
+		errCode = 1042
+		return "", errCode, err
+	}
 	
-	return sessionID, nil
+	return sessionID, errCode, nil
 }
 
-func CheckSession(c *gin.Context) bool {
+func CheckSession(c *gin.Context) (bool, error) {
 	session := sessions.Default(c)
 	sid := session.Get("sid")
 
@@ -53,13 +59,25 @@ func CheckSession(c *gin.Context) bool {
 	sessionKey := fmt.Sprintf("sid:%s", sid)
 	
 	// Exists() function will return bool
-	return redis.Exists(sessionKey)
+	isExists, err := redis.Exists(sessionKey)
+	if err != nil {
+		errorMessage := fmt.Sprintf("Checking whether key exist or not happen something wrong: %v", err)
+		slog.Error(errorMessage)
+		return false, err
+	}
+
+	return isExists, nil
 }
 
-func DeleteSession(sid string) {
+func DeleteSession(sid string) error {
 	// Process key format
 	sessionKey := fmt.Sprintf("sid:%s", sid)
-	redis.Delete(sessionKey)
+	err := redis.Delete(sessionKey)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func ReadSession(c *gin.Context) string {
