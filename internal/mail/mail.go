@@ -36,7 +36,10 @@ func (umv *UserMailVerification) Register(ctx context.Context, ttl int64) string
 	if ttl <= 0 {
 		ttl = 24
 	}
-	rds.Set(key, umv.Code, time.Duration(ttl) * time.Hour)
+	err := rds.Set(key, umv.Code, time.Duration(ttl) * time.Hour)
+	if err != nil {
+		// TODO
+	}
 
 	params := url.Values{}
 	params.Add("mail", umv.Mail)
@@ -48,7 +51,10 @@ func (umv *UserMailVerification) Register(ctx context.Context, ttl int64) string
 
 func (umv *UserMailVerification) Unregister(ctx context.Context) {
 	key := fmt.Sprintf("%s/%s", umv.Mail, umv.Id)
-	rds.Delete(key)
+	err := rds.Delete(key)
+	if err != nil {
+		// TODO
+	}
 }
 
 func (umv *UserMailVerification) IsVerified(ctx context.Context) bool {
@@ -63,7 +69,7 @@ func (umv *UserMailVerification) Verify(ctx context.Context) (bool, error) {
 		return true, fmt.Errorf("This mail already verified.")
 	}
 	key := fmt.Sprintf("%s/%s", umv.Mail, umv.Id)
-	code := rds.Get(key)
+	code, _, _ := rds.Get(key)
 	switch code {
 	case "":
 		return false, fmt.Errorf("The verification has been expired or invalid, resend mail and try again.")
@@ -159,7 +165,10 @@ func (urp *UserResetPassword) Register(ctx context.Context, ttl int64) string {
 	if ttl <= 0 {
 		ttl = 24
 	}
-	rds.Set(key, urp.Code, time.Duration(ttl) * time.Hour)
+	err := rds.Set(key, urp.Code, time.Duration(ttl) * time.Hour)
+	if err != nil {
+		// TODO
+	}
 
 	params := url.Values{}
 	params.Add("mail", urp.Mail)
@@ -171,12 +180,16 @@ func (urp *UserResetPassword) Register(ctx context.Context, ttl int64) string {
 
 func (urp *UserResetPassword) Unregister(ctx context.Context) {
 	key := fmt.Sprintf("%s/%s", urp.Mail, urp.Id)
-	rds.Delete(key)
+	err := rds.Delete(key)
+	if err != nil {
+		// TODO
+	}
+
 }
 
 func (urp *UserResetPassword) Verify(ctx context.Context) (bool, error) {
 	key := fmt.Sprintf("%s/%s", urp.Mail, urp.Id)
-	code := rds.Get(key)
+	code, _, _ := rds.Get(key)
 	switch code {
 	case "":
 		return false, fmt.Errorf("The verification has been expired or invalid, resend mail and try again.")

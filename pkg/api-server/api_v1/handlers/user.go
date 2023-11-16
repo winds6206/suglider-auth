@@ -212,18 +212,50 @@ func UserLogin(c *gin.Context) {
 					sid := session.ReadSession(c)
 
 					// Check session exist or not
-					ok := session.CheckSession(c)
+					ok, err := session.CheckSession(c)
+					if err != nil {
+						errorMessage := fmt.Sprintf("Checking whether key exist or not happen something wrong: %v", err)
+						slog.Error(errorMessage)
+				
+						c.JSON(http.StatusInternalServerError, utils.ErrorResponse(c, 1039, err))
+						return
+					}				
 					if !ok {
-						_, err := session.AddSession(c, request.Username)
-						if err != nil {
-							c.JSON(http.StatusInternalServerError, utils.ErrorResponse(c, 1005, err))
+						_, errCode, err := session.AddSession(c, request.Username)
+						switch errCode {
+						case 1041:
+							errorMessage := fmt.Sprintf("Failed to create session value JSON data: %v", err)
+							slog.Error(errorMessage)
+							c.JSON(http.StatusInternalServerError, utils.ErrorResponse(c, errCode, err))
+							return
+
+						case 1042:
+							errorMessage := fmt.Sprintf("Redis SET data failed: %v", err)
+							slog.Error(errorMessage)
+							c.JSON(http.StatusInternalServerError, utils.ErrorResponse(c, errCode, err))
 							return
 						}
 					} else {
-						session.DeleteSession(sid)
-						_, err := session.AddSession(c, request.Username)
+						err = session.DeleteSession(sid)
 						if err != nil {
-							c.JSON(http.StatusInternalServerError, utils.ErrorResponse(c, 1005, err))
+							errorMessage := fmt.Sprintf("Delete key(sid:%s) failed: %v", sid, err)
+							slog.Error(errorMessage)
+					
+							c.JSON(http.StatusInternalServerError, utils.ErrorResponse(c, 1040, err))
+							return
+						}					
+						_, errCode, err := session.AddSession(c, request.Username)
+						switch errCode {
+						case 1041:
+							errorMessage := fmt.Sprintf("Failed to create session value JSON data: %v", err)
+							slog.Error(errorMessage)
+							c.JSON(http.StatusInternalServerError, utils.ErrorResponse(c, errCode, err))
+							return
+
+						case 1042:
+							errorMessage := fmt.Sprintf("Redis SET data failed: %v", err)
+							slog.Error(errorMessage)
+							c.JSON(http.StatusInternalServerError, utils.ErrorResponse(c, errCode, err))
 							return
 						}
 					}
@@ -264,21 +296,53 @@ func UserLogin(c *gin.Context) {
 				sid := session.ReadSession(c)
 
 				// Check session exist or not
-				ok := session.CheckSession(c)
+				ok, err := session.CheckSession(c)
+				if err != nil {
+					errorMessage := fmt.Sprintf("Checking whether key exist or not happen something wrong: %v", err)
+					slog.Error(errorMessage)
+			
+					c.JSON(http.StatusInternalServerError, utils.ErrorResponse(c, 1039, err))
+					return
+				}			
 				if !ok {
-					_, err := session.AddSession(c, request.Username)
-					if err != nil {
-						c.JSON(http.StatusInternalServerError, utils.ErrorResponse(c, 1005, err))
+					_, errCode, err := session.AddSession(c, request.Username)
+					switch errCode {
+					case 1041:
+						errorMessage := fmt.Sprintf("Failed to create session value JSON data: %v", err)
+						slog.Error(errorMessage)
+						c.JSON(http.StatusInternalServerError, utils.ErrorResponse(c, errCode, err))
+						return
+
+					case 1042:
+						errorMessage := fmt.Sprintf("Redis SET data failed: %v", err)
+						slog.Error(errorMessage)
+						c.JSON(http.StatusInternalServerError, utils.ErrorResponse(c, errCode, err))
 						return
 					}
-				} else {
-					session.DeleteSession(sid)
-					_, err := session.AddSession(c, request.Username)
+			} else {
+					err = session.DeleteSession(sid)
 					if err != nil {
-						c.JSON(http.StatusInternalServerError, utils.ErrorResponse(c, 1005, err))
+						errorMessage := fmt.Sprintf("Delete key(sid:%s) failed: %v", sid, err)
+						slog.Error(errorMessage)
+				
+						c.JSON(http.StatusInternalServerError, utils.ErrorResponse(c, 1040, err))
+						return
+					}				
+					_, errCode, err := session.AddSession(c, request.Username)
+					switch errCode {
+					case 1041:
+						errorMessage := fmt.Sprintf("Failed to create session value JSON data: %v", err)
+						slog.Error(errorMessage)
+						c.JSON(http.StatusInternalServerError, utils.ErrorResponse(c, errCode, err))
+						return
+
+					case 1042:
+						errorMessage := fmt.Sprintf("Redis SET data failed: %v", err)
+						slog.Error(errorMessage)
+						c.JSON(http.StatusInternalServerError, utils.ErrorResponse(c, errCode, err))
 						return
 					}
-				}
+			}
 
 				token, expireTimeSec, err := jwt.GenerateJWT(request.Username)
 
@@ -337,13 +401,27 @@ func UserLogout(c *gin.Context) {
 	sid := session.ReadSession(c)
 
 	// Check session exist or not
-	ok := session.CheckSession(c)
+	ok, err := session.CheckSession(c)
+	if err != nil {
+		errorMessage := fmt.Sprintf("Checking whether key exist or not happen something wrong: %v", err)
+		slog.Error(errorMessage)
+
+		c.JSON(http.StatusInternalServerError, utils.ErrorResponse(c, 1039, err))
+		return
+	}
 	if !ok {
 		slog.Info(fmt.Sprintf("session ID %s doesn't exsit in redis", sid))
 		return
 	}
 
-	session.DeleteSession(sid)
+	err = session.DeleteSession(sid)
+	if err != nil {
+		errorMessage := fmt.Sprintf("Delete key(sid:%s) failed: %v", sid, err)
+		slog.Error(errorMessage)
+
+		c.JSON(http.StatusInternalServerError, utils.ErrorResponse(c, 1040, err))
+		return
+	}
 }
 
 // @Summary User Refresh JWT

@@ -32,66 +32,67 @@ func init() {
 }
 
 // Redis SET
-func Set(key, value string, ttl time.Duration) {
+func Set(key, value string, ttl time.Duration) error {
 
 	err := rdb.Set(ctx, key, value, ttl).Err()
 	if err != nil {
-		errorMessage := fmt.Sprintf("Redis SET data have something problem: %v", err)
-		slog.Error(errorMessage)
-
-		return
+		return err
 	}
+
+	return nil
 }
 
 // Redis GET
-func Get(key string) string {
+func Get(key string) (string, int64, error) {
+
+	var errCode int64
+	errCode = 0
 
 	value, err := rdb.Get(ctx, key).Result()
 
 	// Check whether key exist or not
 	if err == redis.Nil {
-		slog.Info(fmt.Sprintf("Key '%s' does not exist.", key))
-		return ""
+		errCode = 1043
+		return "", errCode, err
+
 	} else if err != nil {
-		errorMessage := fmt.Sprintf("Redis GET data failed: %v", err)
-		slog.Error(errorMessage)
-		return ""
+		errCode = 1044
+		return "", errCode, err
+
 	} else {
 		slog.Info(fmt.Sprintf("key: %s", value))
-		return value
+		return value, errCode, nil
     }
 }
 
 // Redis EXISTS
-func Exists(key string) bool {
+func Exists(key string) (bool, error) {
 
-	exists, err := rdb.Exists(ctx, key).Result()
+	isExists, err := rdb.Exists(ctx, key).Result()
 
 	if err != nil {
-		errorMessage := fmt.Sprintf("Checking whether key exist or not happen something wrong: %v", err)
-		slog.Error(errorMessage)
+		return false, err
 	}
 
 	// Check whether key exist or not
-	if exists == 1 {
-		return true
+	if isExists == 1 {
+		return true, nil
 	} else {
-		return false
+		return false, nil
 	}
 }
 
 // Redis DELETE
-func Delete(key string) {
+func Delete(key string) error {
 
 	err := rdb.Del(ctx, key).Err()
 	if err != nil {
-		errorMessage := fmt.Sprintf("Delete key(%s) failed: %v", key, err)
-		slog.Error(errorMessage)
-		
-		return
+		return err
 	}
 
 	slog.Info(fmt.Sprintf("Delete key(%s) successfully.", key))
+
+	return nil
 }
 
 // Close redis connection
