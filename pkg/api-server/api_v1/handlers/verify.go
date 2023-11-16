@@ -3,6 +3,7 @@ package handlers
 import (
 	"log/slog"
 	"net/http"
+	"fmt"
 	"github.com/gin-gonic/gin"
 
 	smtp "suglider-auth/internal/mail"
@@ -131,6 +132,10 @@ func RestUserPassword(c *gin.Context) {
 
 	errPwdValidator := pwv.PwdValidator("ignoreThis", postData.Password, "this@ignore.here")
 	if errPwdValidator != nil {
+
+		errorMessage := fmt.Sprintf("%v", errPwdValidator)
+		slog.Error(errorMessage)
+		
 		c.JSON(http.StatusBadRequest, utils.ErrorResponse(c, 1021, errPwdValidator))
 		return
 	}
