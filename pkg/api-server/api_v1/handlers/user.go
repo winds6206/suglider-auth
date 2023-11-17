@@ -35,8 +35,12 @@ type userLogin struct {
 	Password string `json:"password" binding:"required"`
 }
 
-type userPasswordOperate struct {
+type UsernameOperate struct {
 	Username	string `json:"username" binding:"required"`
+}
+
+type MailOperate struct {
+	Mail	string `json:"mail" binding:"required"`
 }
 
 // @Summary Sign Up User
@@ -496,7 +500,7 @@ func RefreshJWT(c *gin.Context) {
 // @Router /api/v1/user/password-expire [get]
 func PasswordExpire(c *gin.Context) {
 
-	var request userPasswordOperate
+	var request UsernameOperate
 
 	// Check the parameter trasnfer from POST
 	err := c.ShouldBindJSON(&request)
@@ -558,7 +562,7 @@ func PasswordExpire(c *gin.Context) {
 // @Failure 404 {string} string "Not found"
 // @Router /api/v1/user/password-extension [patch]
 func PasswordExtension(c *gin.Context) {
-	var request userPasswordOperate
+	var request UsernameOperate
 
 	// Check the parameter trasnfer from POST
 	err := c.ShouldBindJSON(&request)
@@ -577,6 +581,95 @@ func PasswordExtension(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, utils.SuccessResponse(c, 200, nil))
+}
+
+// @Summary Username Check
+// @Description Check whether the username exists or not
+// @Tags users
+// @Accept multipart/form-data
+// @Produce application/json
+// @Param username formData string false "User Name"
+// @Success 200 {string} string "Success"
+// @Failure 400 {string} string "Bad request"
+// @Failure 401 {string} string "Unauthorized"
+// @Failure 403 {string} string "Forbidden"
+// @Failure 404 {string} string "Not found"
+// @Router /api/v1/user/check-username [get]
+func CheckUsername(c *gin.Context) {
+	var request UsernameOperate
+
+	// Check the parameter trasnfer from POST
+	err := c.ShouldBindJSON(&request)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, utils.ErrorResponse(c, 1001, err))
+		return
+	}
+
+	count, err := mariadb.CheckUsername(request.Username)
+
+	if err != nil {
+		errorMessage := fmt.Sprintf("Check whether the username exists or not failed: %v", err)
+		slog.Error(errorMessage)
+		c.JSON(http.StatusInternalServerError, utils.ErrorResponse(c, 1045, err))
+    }
+
+	if count == 1 {
+		c.JSON(http.StatusOK, utils.SuccessResponse(c, 200, map[string]interface{}{
+			"username": request.Username,
+			"exist": true,
+		}))
+	} else {
+		c.JSON(http.StatusOK, utils.SuccessResponse(c, 200, map[string]interface{}{
+			"username": request.Username,
+			"exist": false,
+		}))
+	}
+
+}
+
+// @Summary Mail Check
+// @Description Check whether the mail exists or not
+// @Tags users
+// @Accept multipart/form-data
+// @Produce application/json
+// @Param mail formData string false "Mail"
+// @Success 200 {string} string "Success"
+// @Failure 400 {string} string "Bad request"
+// @Failure 401 {string} string "Unauthorized"
+// @Failure 403 {string} string "Forbidden"
+// @Failure 404 {string} string "Not found"
+// @Router /api/v1/user/check-mail [get]
+func CheckMail(c *gin.Context) {
+
+	var request MailOperate
+
+	// Check the parameter trasnfer from POST
+	err := c.ShouldBindJSON(&request)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, utils.ErrorResponse(c, 1001, err))
+		return
+	}
+
+	count, err := mariadb.CheckMail(request.Mail)
+
+	if err != nil {
+		errorMessage := fmt.Sprintf("Check whether the mail exists or not failed: %v", err)
+		slog.Error(errorMessage)
+		c.JSON(http.StatusInternalServerError, utils.ErrorResponse(c, 1046, err))
+    }
+
+	if count == 1 {
+		c.JSON(http.StatusOK, utils.SuccessResponse(c, 200, map[string]interface{}{
+			"username": request.Mail,
+			"exist": true,
+		}))
+	} else {
+		c.JSON(http.StatusOK, utils.SuccessResponse(c, 200, map[string]interface{}{
+			"username": request.Mail,
+			"exist": false,
+		}))
+	}
+
 }
 
 // Test Function

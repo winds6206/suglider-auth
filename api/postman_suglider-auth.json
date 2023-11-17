@@ -1389,6 +1389,144 @@
 							"body": null
 						}
 					]
+				},
+				{
+					"name": "Username Check",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:9527/api/v1/user/check-username",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "9527",
+							"path": [
+								"api",
+								"v1",
+								"user",
+								"check-username"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "/api/v1/user/check-username",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"username\": \"tony\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:9527/api/v1/user/check-username",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "9527",
+									"path": [
+										"api",
+										"v1",
+										"user",
+										"check-username"
+									]
+								}
+							},
+							"_postman_previewlanguage": null,
+							"header": null,
+							"cookie": [],
+							"body": null
+						}
+					]
+				},
+				{
+					"name": "Mail Check",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:9527/api/v1/user/check-mail",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "9527",
+							"path": [
+								"api",
+								"v1",
+								"user",
+								"check-mail"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "/api/v1/user/check-mail",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"mail\": \"tony@example.com\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:9527/api/v1/user/check-mail",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "9527",
+									"path": [
+										"api",
+										"v1",
+										"user",
+										"check-mail"
+									]
+								}
+							},
+							"_postman_previewlanguage": null,
+							"header": null,
+							"cookie": [],
+							"body": null
+						}
+					]
 				}
 			]
 		},
