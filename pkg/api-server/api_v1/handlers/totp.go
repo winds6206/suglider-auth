@@ -30,7 +30,7 @@ type totpInput struct {
 // @Failure 404 {string} string "Not found"
 // @Router /api/v1/totp/generate [post]
 func TotpGenerate(c *gin.Context) {
-	var request *totpInput
+	var request totpInput
 
 	// Check the parameter trasnfer from POST
 	err := c.ShouldBindJSON(&request)
