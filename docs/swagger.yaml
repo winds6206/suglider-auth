@@ -574,6 +574,78 @@ paths:
       summary: Verify TOTP
       tags:
       - totp
+  /api/v1/user/check-mail:
+    get:
+      consumes:
+      - multipart/form-data
+      description: Check whether the mail exists or not
+      parameters:
+      - description: Mail
+        in: formData
+        name: mail
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            type: string
+        "400":
+          description: Bad request
+          schema:
+            type: string
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+        "403":
+          description: Forbidden
+          schema:
+            type: string
+        "404":
+          description: Not found
+          schema:
+            type: string
+      summary: Mail Check
+      tags:
+      - users
+  /api/v1/user/check-username:
+    get:
+      consumes:
+      - multipart/form-data
+      description: Check whether the username exists or not
+      parameters:
+      - description: User Name
+        in: formData
+        name: username
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            type: string
+        "400":
+          description: Bad request
+          schema:
+            type: string
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+        "403":
+          description: Forbidden
+          schema:
+            type: string
+        "404":
+          description: Not found
+          schema:
+            type: string
+      summary: Username Check
+      tags:
+      - users
   /api/v1/user/delete:
     delete:
       consumes:

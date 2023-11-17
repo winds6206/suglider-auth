@@ -53,6 +53,8 @@ func ResponseStatusCode() {
 		1042: "Redis SET data failed.",
 		1043: "Redis key does not exist.",
 		1044: "Redis GET data failed.",
+		1045: "Check whether the username exists or not failed.",
+		1046: "Check whether the mail exists or not failed.",
 		1101: "Fail to parse POST form data.",
 		1102: "Fail to bind POST form data.",
 		1103: "Fail to parse path parameters.",

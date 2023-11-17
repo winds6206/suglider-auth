@@ -198,3 +198,23 @@ func LookupUserID(username string) (userIDInfo UserIDInfo ,err error){
 	err = DataBase.GetContext(ctx, &userIDInfo, "SELECT LOWER(HEX(user_id)) AS user_id FROM suglider.user_info WHERE username=?", username)
 	return userIDInfo, err
 }
+
+func CheckUsername(username string) (rowCount int, err error) {
+	var count int
+	ctx, cancel := context.WithTimeout(context.Background(), dbTimeOut)
+	defer cancel()
+
+	sqlStr := "SELECT COUNT(*) FROM suglider.user_info WHERE username=?"
+	err = DataBase.GetContext(ctx, &count, sqlStr, username)
+	return count, err
+}
+
+func CheckMail(mail string) (rowCount int, err error) {
+	var count int
+	ctx, cancel := context.WithTimeout(context.Background(), dbTimeOut)
+	defer cancel()
+
+	sqlStr := "SELECT COUNT(*) FROM suglider.user_info WHERE mail=?"
+	err = DataBase.GetContext(ctx, &count, sqlStr, mail)
+	return count, err
+}
