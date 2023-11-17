@@ -16,7 +16,7 @@ import (
 	pwd_validator "suglider-auth/pkg/pwd-validator"
 )
 
-type userInfo struct {
+type userSignUp struct {
 	Username	string `json:"username" binding:"required"`
 	Password	string `json:"password" binding:"required"`
 	ComfirmPwd	string `json:"comfirm_pwd" binding:"required"`
@@ -56,7 +56,7 @@ type userPasswordOperate struct {
 // @Failure 404 {string} string "Not found"
 // @Router /api/v1/user/sign-up [post]
 func UserSignUp(c *gin.Context) {
-	var request userInfo
+	var request userSignUp
 	var err error
 
 	// Check the parameter trasnfer from POST
