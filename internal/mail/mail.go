@@ -31,14 +31,14 @@ func NewUserMailVerification(mail string) *UserMailVerification {
 	return &mailVerify
 }
 
-func (umv *UserMailVerification) Register(ctx context.Context, ttl int64) string {
+func (umv *UserMailVerification) Register(ctx context.Context, ttl int64) (string, error) {
 	key := fmt.Sprintf("%s/%s", umv.Mail, umv.Id)
 	if ttl <= 0 {
 		ttl = 24
 	}
 	err := rds.Set(key, umv.Code, time.Duration(ttl) * time.Hour)
 	if err != nil {
-		// TODO
+		return "", err
 	}
 
 	params := url.Values{}
@@ -46,15 +46,16 @@ func (umv *UserMailVerification) Register(ctx context.Context, ttl int64) string
 	params.Add("verify-id", umv.Id)
 	params.Add("verify-code", umv.Code)
 
-	return params.Encode()
+	return params.Encode(), nil
 }
 
-func (umv *UserMailVerification) Unregister(ctx context.Context) {
+func (umv *UserMailVerification) Unregister(ctx context.Context) error {
 	key := fmt.Sprintf("%s/%s", umv.Mail, umv.Id)
 	err := rds.Delete(key)
 	if err != nil {
-		// TODO
+		return err
 	}
+	return nil
 }
 
 func (umv *UserMailVerification) IsVerified(ctx context.Context) bool {
@@ -69,7 +70,10 @@ func (umv *UserMailVerification) Verify(ctx context.Context) (bool, error) {
 		return true, fmt.Errorf("This mail already verified.")
 	}
 	key := fmt.Sprintf("%s/%s", umv.Mail, umv.Id)
-	code, _, _ := rds.Get(key)
+	code, _, err := rds.Get(key)
+	if err != nil {
+		return false, err
+	}
 	switch code {
 	case "":
 		return false, fmt.Errorf("The verification has been expired or invalid, resend mail and try again.")
@@ -121,7 +125,10 @@ func SendVerifyMail(ctx context.Context, user, email string) error {
 	if isVerified {
 		return fmt.Errorf("This mail already verified.")
 	}
-	params := umv.Register(ctx, htmlMail.TTL)
+	params, err := umv.Register(ctx, htmlMail.TTL)
+	if err != nil {
+		return err
+	}
 	tempFile := fmt.Sprintf("%s/mail-verification.tmpl", htmlMail.TemplatePath)
 	cont, err := htmlMail.GenerateVerifyMail(ctx, tempFile, user, params)
 	if err != nil {
@@ -142,7 +149,7 @@ func VerifyUserMailAddress(ctx context.Context, email, id, code string) (bool, e
 	}
 	ok, err := umv.Verify(ctx)
 	if ok && err == nil {
-		umv.Unregister(ctx)
+		err = umv.Unregister(ctx)
 	}
 	return ok, err
 }
@@ -160,14 +167,14 @@ func NewUserResetPassword(mail string) *UserResetPassword {
 	return &pwdReset
 }
 
-func (urp *UserResetPassword) Register(ctx context.Context, ttl int64) string {
+func (urp *UserResetPassword) Register(ctx context.Context, ttl int64) (string, error) {
 	key := fmt.Sprintf("%s/%s", urp.Mail, urp.Id)
 	if ttl <= 0 {
 		ttl = 24
 	}
 	err := rds.Set(key, urp.Code, time.Duration(ttl) * time.Hour)
 	if err != nil {
-		// TODO
+		return "", err
 	}
 
 	params := url.Values{}
@@ -175,16 +182,16 @@ func (urp *UserResetPassword) Register(ctx context.Context, ttl int64) string {
 	params.Add("reset-id", urp.Id)
 	params.Add("reset-code", urp.Code)
 
-	return params.Encode()
+	return params.Encode(), nil
 }
 
-func (urp *UserResetPassword) Unregister(ctx context.Context) {
+func (urp *UserResetPassword) Unregister(ctx context.Context) error {
 	key := fmt.Sprintf("%s/%s", urp.Mail, urp.Id)
 	err := rds.Delete(key)
 	if err != nil {
-		// TODO
+		return err
 	}
-
+	return nil
 }
 
 func (urp *UserResetPassword) Verify(ctx context.Context) (bool, error) {
@@ -205,7 +212,10 @@ func SendPasswordResetMail(ctx context.Context, email string) error {
 	if err != nil {
 		return err
 	}
-	params := urp.Register(ctx, htmlMail.TTL)
+	params, err := urp.Register(ctx, htmlMail.TTL)
+	if err != nil {
+		return err
+	}
 	tempFile := fmt.Sprintf("%s/forgot-password.tmpl", htmlMail.TemplatePath)
 	cont, err := htmlMail.GenerateForgotPasswordMail(ctx, tempFile, user, params)
 	if err != nil {
@@ -226,7 +236,7 @@ func CheckPasswordResetCode(ctx context.Context, email, id, code string) (bool, 
 	}
 	ok, err := urp.Verify(ctx)
 	if ok && err == nil {
-		urp.Unregister(ctx)
+		err = urp.Unregister(ctx)
 	}
 	return ok, err
 }
