@@ -1,27 +1,28 @@
 package handlers
 
 import (
+	"database/sql"
+	"fmt"
 	"log/slog"
 	"net/http"
-	"fmt"
-	"time"
-	"github.com/gin-gonic/gin"
 	mariadb "suglider-auth/internal/database"
 	smtp "suglider-auth/internal/mail"
-	"suglider-auth/pkg/encrypt"
-	"database/sql"
-	"suglider-auth/pkg/session"
 	"suglider-auth/internal/utils"
+	"suglider-auth/pkg/encrypt"
 	"suglider-auth/pkg/jwt"
 	pwd_validator "suglider-auth/pkg/pwd-validator"
+	"suglider-auth/pkg/session"
+	"time"
+
+	"github.com/gin-gonic/gin"
 )
 
 type userSignUp struct {
-	Username	string `json:"username" binding:"required"`
-	Password	string `json:"password" binding:"required"`
-	ComfirmPwd	string `json:"comfirm_pwd" binding:"required"`
-	Mail		string `json:"mail" binding:"required"`
-	Address		string `json:"address" binding:"required"`
+	Username   string `json:"username" binding:"required"`
+	Password   string `json:"password" binding:"required"`
+	ComfirmPwd string `json:"comfirm_pwd" binding:"required"`
+	Mail       string `json:"mail" binding:"required"`
+	Address    string `json:"address" binding:"required"`
 }
 
 type userDelete struct {
@@ -35,12 +36,12 @@ type userLogin struct {
 	Password string `json:"password" binding:"required"`
 }
 
-type UsernameOperate struct {
-	Username	string `json:"username" binding:"required"`
+type userNameOperate struct {
+	UserName string `json:"username" binding:"required"`
 }
 
 type MailOperate struct {
-	Mail	string `json:"mail" binding:"required"`
+	Mail string `json:"mail" binding:"required"`
 }
 
 // @Summary Sign Up User
@@ -75,7 +76,7 @@ func UserSignUp(c *gin.Context) {
 
 		errorMessage := fmt.Sprintf("%v", errPwdValidator)
 		slog.Error(errorMessage)
-		
+
 		c.JSON(http.StatusBadRequest, utils.ErrorResponse(c, 1021, errPwdValidator))
 		return
 	}
@@ -135,7 +136,7 @@ func UserDelete(c *gin.Context) {
 
 			c.JSON(http.StatusInternalServerError, utils.ErrorResponse(c, 1002, err))
 			return
-		} 
+		}
 
 		// Second, get affected row
 		rowsAffected, _ := result.RowsAffected()
@@ -156,7 +157,7 @@ func UserDelete(c *gin.Context) {
 
 			c.JSON(http.StatusInternalServerError, utils.ErrorResponse(c, 1002, err))
 			return
-		} 
+		}
 
 		// Second, get affected row
 		rowsAffected, _ := result.RowsAffected()
@@ -203,7 +204,7 @@ func UserLogin(c *gin.Context) {
 
 		// Check password true or false
 		if pwdVerify {
-			
+
 			// Check whether user enable TOTP or not.
 			totpUserData, errTotpUserData := mariadb.TotpUserData(userInfo.Username)
 
@@ -212,7 +213,7 @@ func UserLogin(c *gin.Context) {
 
 				// ErrNoRows means user never enable TOTP feature
 				if errTotpUserData == sql.ErrNoRows {
-					
+
 					sid := session.ReadSession(c)
 
 					// Check session exist or not
@@ -220,10 +221,10 @@ func UserLogin(c *gin.Context) {
 					if err != nil {
 						errorMessage := fmt.Sprintf("Checking whether key exist or not happen something wrong: %v", err)
 						slog.Error(errorMessage)
-				
+
 						c.JSON(http.StatusInternalServerError, utils.ErrorResponse(c, 1039, err))
 						return
-					}				
+					}
 					if !ok {
 						_, errCode, err := session.AddSession(c, request.Username)
 						switch errCode {
@@ -244,10 +245,10 @@ func UserLogin(c *gin.Context) {
 						if err != nil {
 							errorMessage := fmt.Sprintf("Delete key(sid:%s) failed: %v", sid, err)
 							slog.Error(errorMessage)
-					
+
 							c.JSON(http.StatusInternalServerError, utils.ErrorResponse(c, 1040, err))
 							return
-						}					
+						}
 						_, errCode, err := session.AddSession(c, request.Username)
 						switch errCode {
 						case 1041:
@@ -270,14 +271,14 @@ func UserLogin(c *gin.Context) {
 						errorMessage := fmt.Sprintf("Generate the JWT string failed: %v", err)
 						slog.Error(errorMessage)
 						c.JSON(http.StatusBadRequest, utils.ErrorResponse(c, 1014, err))
-				
+
 						return
 					}
-				
+
 					c.SetCookie("token", token, expireTimeSec, "/", "localhost", false, true)
-				
+
 					c.JSON(http.StatusOK, utils.SuccessResponse(c, 200, map[string]interface{}{
-						"username": request.Username,
+						"username":     request.Username,
 						"totp_enabled": totpUserData.TotpEnabled,
 					}))
 
@@ -285,16 +286,16 @@ func UserLogin(c *gin.Context) {
 					c.JSON(http.StatusInternalServerError, utils.ErrorResponse(c, 1002, err))
 					return
 				}
-			
-			// No error means user had ever enabled TOTP and data is in the database.
-			// his block means totpUserData.TotpEnabled = true
+
+				// No error means user had ever enabled TOTP and data is in the database.
+				// This block means totpUserData.TotpEnabled = true
 			} else if totpUserData.TotpEnabled {
 				c.JSON(http.StatusOK, utils.SuccessResponse(c, 200, map[string]interface{}{
-					"username": request.Username,
+					"username":     request.Username,
 					"totp_enabled": totpUserData.TotpEnabled,
 				}))
-			
-			// This block means totpUserData.TotpEnabled = false
+
+				// This block means totpUserData.TotpEnabled = false
 			} else {
 
 				sid := session.ReadSession(c)
@@ -304,10 +305,10 @@ func UserLogin(c *gin.Context) {
 				if err != nil {
 					errorMessage := fmt.Sprintf("Checking whether key exist or not happen something wrong: %v", err)
 					slog.Error(errorMessage)
-			
+
 					c.JSON(http.StatusInternalServerError, utils.ErrorResponse(c, 1039, err))
 					return
-				}			
+				}
 				if !ok {
 					_, errCode, err := session.AddSession(c, request.Username)
 					switch errCode {
@@ -323,15 +324,15 @@ func UserLogin(c *gin.Context) {
 						c.JSON(http.StatusInternalServerError, utils.ErrorResponse(c, errCode, err))
 						return
 					}
-			} else {
+				} else {
 					err = session.DeleteSession(sid)
 					if err != nil {
 						errorMessage := fmt.Sprintf("Delete key(sid:%s) failed: %v", sid, err)
 						slog.Error(errorMessage)
-				
+
 						c.JSON(http.StatusInternalServerError, utils.ErrorResponse(c, 1040, err))
 						return
-					}				
+					}
 					_, errCode, err := session.AddSession(c, request.Username)
 					switch errCode {
 					case 1041:
@@ -346,7 +347,7 @@ func UserLogin(c *gin.Context) {
 						c.JSON(http.StatusInternalServerError, utils.ErrorResponse(c, errCode, err))
 						return
 					}
-			}
+				}
 
 				token, expireTimeSec, err := jwt.GenerateJWT(request.Username)
 
@@ -354,14 +355,14 @@ func UserLogin(c *gin.Context) {
 					errorMessage := fmt.Sprintf("Generate the JWT string failed: %v", err)
 					slog.Error(errorMessage)
 					c.JSON(http.StatusBadRequest, utils.ErrorResponse(c, 1014, err))
-			
+
 					return
 				}
-			
+
 				c.SetCookie("token", token, expireTimeSec, "/", "localhost", false, true)
-			
+
 				c.JSON(http.StatusOK, utils.SuccessResponse(c, 200, map[string]interface{}{
-					"username": request.Username,
+					"username":     request.Username,
 					"totp_enabled": totpUserData.TotpEnabled,
 				}))
 			}
@@ -458,15 +459,15 @@ func RefreshJWT(c *gin.Context) {
 
 		switch errCode {
 
-		  case 1015:
+		case 1015:
 			c.JSON(http.StatusUnauthorized, utils.ErrorResponse(c, errCode, err))
 			return
-	  
-		  case 1016:
+
+		case 1016:
 			c.JSON(http.StatusBadRequest, utils.ErrorResponse(c, errCode, err))
 			return
-	  
-		  case 1017:
+
+		case 1017:
 			c.JSON(http.StatusUnauthorized, utils.ErrorResponse(c, errCode, err))
 			return
 		}
@@ -500,7 +501,7 @@ func RefreshJWT(c *gin.Context) {
 // @Router /api/v1/user/password-expire [get]
 func PasswordExpire(c *gin.Context) {
 
-	var request UsernameOperate
+	var request userNameOperate
 
 	// Check the parameter trasnfer from POST
 	err := c.ShouldBindJSON(&request)
@@ -509,7 +510,7 @@ func PasswordExpire(c *gin.Context) {
 		return
 	}
 
-	resultData, err := mariadb.PasswordExpire(request.Username)
+	resultData, err := mariadb.PasswordExpire(request.UserName)
 
 	if err != nil {
 		if err != nil {
@@ -528,7 +529,7 @@ func PasswordExpire(c *gin.Context) {
 		errorMessage := fmt.Sprintf("Parse date failed: %v", err)
 		slog.Error(errorMessage)
 		c.JSON(http.StatusInternalServerError, utils.ErrorResponse(c, 1036, err))
-		
+
 		return
 	}
 
@@ -536,15 +537,15 @@ func PasswordExpire(c *gin.Context) {
 
 	if todayDate.After(parsedDate) {
 		c.JSON(http.StatusOK, utils.SuccessResponse(c, 200, map[string]interface{}{
-			"username": resultData.Username,
+			"username":             resultData.Username,
 			"password_expire_date": resultData.PasswordExpireDate,
-			"expired": true,
+			"expired":              true,
 		}))
 	} else {
 		c.JSON(http.StatusOK, utils.SuccessResponse(c, 200, map[string]interface{}{
-			"username": resultData.Username,
+			"username":             resultData.Username,
 			"password_expire_date": resultData.PasswordExpireDate,
-			"expired": false,
+			"expired":              false,
 		}))
 	}
 }
@@ -562,7 +563,7 @@ func PasswordExpire(c *gin.Context) {
 // @Failure 404 {string} string "Not found"
 // @Router /api/v1/user/password-extension [patch]
 func PasswordExtension(c *gin.Context) {
-	var request UsernameOperate
+	var request userNameOperate
 
 	// Check the parameter trasnfer from POST
 	err := c.ShouldBindJSON(&request)
@@ -571,7 +572,7 @@ func PasswordExtension(c *gin.Context) {
 		return
 	}
 
-	errPasswordExtension := mariadb.PasswordExtension(request.Username)
+	errPasswordExtension := mariadb.PasswordExtension(request.UserName)
 
 	if errPasswordExtension != nil {
 		errorMessage := fmt.Sprintf("Update user_info table failed: %v", err)
@@ -596,7 +597,7 @@ func PasswordExtension(c *gin.Context) {
 // @Failure 404 {string} string "Not found"
 // @Router /api/v1/user/check-username [get]
 func CheckUsername(c *gin.Context) {
-	var request UsernameOperate
+	var request userNameOperate
 
 	// Check the parameter trasnfer from POST
 	err := c.ShouldBindJSON(&request)
@@ -605,23 +606,23 @@ func CheckUsername(c *gin.Context) {
 		return
 	}
 
-	count, err := mariadb.CheckUsername(request.Username)
+	count, err := mariadb.CheckUsername(request.UserName)
 
 	if err != nil {
 		errorMessage := fmt.Sprintf("Check whether the username exists or not failed: %v", err)
 		slog.Error(errorMessage)
 		c.JSON(http.StatusInternalServerError, utils.ErrorResponse(c, 1045, err))
-    }
+	}
 
 	if count == 1 {
 		c.JSON(http.StatusOK, utils.SuccessResponse(c, 200, map[string]interface{}{
-			"username": request.Username,
-			"exist": true,
+			"username": request.UserName,
+			"exist":    true,
 		}))
 	} else {
 		c.JSON(http.StatusOK, utils.SuccessResponse(c, 200, map[string]interface{}{
-			"username": request.Username,
-			"exist": false,
+			"username": request.UserName,
+			"exist":    false,
 		}))
 	}
 
@@ -656,113 +657,18 @@ func CheckMail(c *gin.Context) {
 		errorMessage := fmt.Sprintf("Check whether the mail exists or not failed: %v", err)
 		slog.Error(errorMessage)
 		c.JSON(http.StatusInternalServerError, utils.ErrorResponse(c, 1046, err))
-    }
+	}
 
 	if count == 1 {
 		c.JSON(http.StatusOK, utils.SuccessResponse(c, 200, map[string]interface{}{
 			"username": request.Mail,
-			"exist": true,
+			"exist":    true,
 		}))
 	} else {
 		c.JSON(http.StatusOK, utils.SuccessResponse(c, 200, map[string]interface{}{
 			"username": request.Mail,
-			"exist": false,
+			"exist":    false,
 		}))
 	}
 
-}
-
-// Test Function
-func TestLogout(c *gin.Context) {
-	// immediately clear the token cookie
-	c.SetCookie("token", "", -1, "/", "localhost", false, true)
-}
-
-// Test Function
-func TestLogin(c *gin.Context) {
-
-	var request userLogin
-
-	// Check the parameter trasnfer from POST
-	err := c.ShouldBindJSON(&request)
-	if err != nil {
-		c.JSON(http.StatusBadRequest, utils.ErrorResponse(c, 1001, err))
-		return
-	}
-
-	token, expireTimeSec, err := jwt.GenerateJWT(request.Username)
-
-	if err != nil {
-		errorMessage := fmt.Sprintf("Create the JWT string failed: %v", err)
-		slog.Error(errorMessage)
-		c.JSON(http.StatusBadRequest, utils.ErrorResponse(c, 1014, err))
-
-		return
-	}
-
-	c.SetCookie("token", token, expireTimeSec, "/", "localhost", false, true)
-}
-
-func TestWelcome(c *gin.Context) {
-
-	cookie, err := c.Cookie("token")
-	if err != nil {
-		if err == http.ErrNoCookie {
-			c.JSON(http.StatusUnauthorized, utils.ErrorResponse(c, 1019, err))
-			return
-		}
-		c.JSON(http.StatusInternalServerError, utils.ErrorResponse(c, 1020, err))
-		return
-	}
-
-	parseData , _, _ := jwt.ParseJWT(cookie)
-
-	c.JSON(http.StatusOK, gin.H{
-		"username": parseData,
-	})
-}
-
-func TestRefresh(c *gin.Context) {
-
-	cookie, err := c.Cookie("token")
-
-	if err != nil {
-		if err == http.ErrNoCookie {
-			c.JSON(http.StatusUnauthorized, utils.ErrorResponse(c, 1019, err))
-			return
-		}
-		c.JSON(http.StatusInternalServerError, utils.ErrorResponse(c, 1020, err))
-		return
-	}
-
-	_, errCode, errParseJWT := jwt.ParseJWT(cookie)
-
-	if errParseJWT != nil {
-
-		switch errCode {
-
-		  case 1015:
-			c.JSON(http.StatusUnauthorized, utils.ErrorResponse(c, errCode, err))
-	  
-		  case 1016:
-			c.JSON(http.StatusBadRequest, utils.ErrorResponse(c, errCode, err))
-	  
-		  case 1017:
-			c.JSON(http.StatusUnauthorized, utils.ErrorResponse(c, errCode, err))
-		}
-	  
-	}
-
-	token, expireTimeSec, err := jwt.RefreshJWT(cookie)
-
-	if err != nil {
-		errorMessage := fmt.Sprintf("Generate new JWT failed: %v", err)
-		slog.Error(errorMessage)
-		c.JSON(http.StatusInternalServerError, utils.ErrorResponse(c, 1018, err))
-
-		return
-	}
-
-	// Set the new token as the users `token` cookie
-	c.SetCookie("token", token, expireTimeSec, "/", "localhost", false, true)
 }

@@ -9,6 +9,8 @@ CREATE TABLE IF NOT EXISTS user_info (
     comfirm_pwd VARCHAR(256) NOT NULL,
     mail VARCHAR(256) NOT NULL,
     address VARCHAR(256) NOT NULL,
+    mail_otp_enabled BOOL DEFAULT false,
+    sms_otp_enabled BOOL DEFAULT false,
     password_expire_date DATE NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,

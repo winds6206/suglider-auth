@@ -1,12 +1,12 @@
 package database
 
 import (
-	"database/sql"
 	"context"
-	"time"
+	"database/sql"
 	"fmt"
 	"log/slog"
 	"suglider-auth/configs"
+	"time"
 )
 
 var dbTimeOut time.Duration
@@ -25,60 +25,60 @@ func init() {
 	}
 }
 
-func UserSignUp(username, password, comfirm_pwd, mail, address string) (err error) {
+func UserSignUp(userName, password, comfirmPassword, mail, address string) (err error) {
 	ctx, cancel := context.WithTimeout(context.Background(), dbTimeOut)
 	defer cancel()
 
 	sqlStr := "INSERT INTO suglider.user_info(user_id, username, password, comfirm_pwd, mail, address, password_expire_date) VALUES (UNHEX(REPLACE(UUID(), '-', '')),?,?,?,?,?,DATE_ADD(CURRENT_DATE, INTERVAL 90 DAY))"
-	_, err = DataBase.ExecContext(ctx, sqlStr, username, password, comfirm_pwd, mail, address)
+	_, err = DataBase.ExecContext(ctx, sqlStr, userName, password, comfirmPassword, mail, address)
 	return err
 }
 
-func UserDelete(username, mail string) (result sql.Result, err error) {
+func UserDelete(userName, mail string) (result sql.Result, err error) {
 	ctx, cancel := context.WithTimeout(context.Background(), dbTimeOut)
 	defer cancel()
 
 	sqlStr := "DELETE FROM suglider.user_info WHERE username=? AND mail=?"
-	result, err = DataBase.ExecContext(ctx, sqlStr, username, mail)
+	result, err = DataBase.ExecContext(ctx, sqlStr, userName, mail)
 	return result, err
 }
 
-func UserDeleteByUUID(user_id, username, mail string) (result sql.Result, err error) {
+func UserDeleteByUUID(userID, userName, mail string) (result sql.Result, err error) {
 	ctx, cancel := context.WithTimeout(context.Background(), dbTimeOut)
 	defer cancel()
 
 	// UNHEX(?) can convert user_id to binary(16)
 	sqlStr := "DELETE FROM suglider.user_info WHERE user_id=UNHEX(?) AND username=? AND mail=?"
-	result, err = DataBase.ExecContext(ctx, sqlStr,user_id ,username, mail)
+	result, err = DataBase.ExecContext(ctx, sqlStr, userID, userName, mail)
 	return result, err
 }
 
-func UserLogin(username string) (userInfo UserDBInfo ,err error) {
+func UserLogin(userName string) (userInfo UserDBInfo, err error) {
 	ctx, cancel := context.WithTimeout(context.Background(), dbTimeOut)
 	defer cancel()
 
-	err = DataBase.GetContext(ctx, &userInfo, "SELECT username, password, LOWER(HEX(user_id)) AS user_id FROM suglider.user_info WHERE username=?", username)
+	err = DataBase.GetContext(ctx, &userInfo, "SELECT username, password, LOWER(HEX(user_id)) AS user_id FROM suglider.user_info WHERE username=?", userName)
 
 	return userInfo, err
 }
 
-func PasswordExpire(username string) (userInfo UserDBInfo ,err error) {
+func PasswordExpire(userName string) (userInfo UserDBInfo, err error) {
 	ctx, cancel := context.WithTimeout(context.Background(), dbTimeOut)
 	defer cancel()
 
-	err = DataBase.GetContext(ctx, &userInfo, "SELECT username, password_expire_date FROM suglider.user_info WHERE username=?", username)
+	err = DataBase.GetContext(ctx, &userInfo, "SELECT username, password_expire_date FROM suglider.user_info WHERE username=?", userName)
 
 	return userInfo, err
 }
 
-func PasswordExtension(username string) (err error) {
+func PasswordExtension(userName string) (err error) {
 	ctx, cancel := context.WithTimeout(context.Background(), dbTimeOut)
 	defer cancel()
 
-	sqlStr := "UPDATE suglider.user_info " + 
-			"SET password_expire_date = DATE_ADD(CURRENT_DATE, INTERVAL 90 DAY)" +
-			"WHERE user_info.username = ?"
-	_, err = DataBase.ExecContext(ctx, sqlStr, username)
+	sqlStr := "UPDATE suglider.user_info " +
+		"SET password_expire_date = DATE_ADD(CURRENT_DATE, INTERVAL 90 DAY)" +
+		"WHERE user_info.username = ?"
+	_, err = DataBase.ExecContext(ctx, sqlStr, userName)
 	return err
 }
 
@@ -124,88 +124,88 @@ func UserGetNameByMail(ctx context.Context, mail string) (string, error) {
 	return name, nil
 }
 
-func TotpStoreSecret(user_id, totp_secret, totp_url string) (err error) {
+func TotpStoreSecret(userID, totpSecret, totpURL string) (err error) {
 	ctx, cancel := context.WithTimeout(context.Background(), dbTimeOut)
 	defer cancel()
 
 	sqlStr := "INSERT INTO suglider.totp(user_id, totp_secret, totp_url) VALUES (UNHEX(?),?,?)"
-	_, err = DataBase.ExecContext(ctx, sqlStr, user_id, totp_secret, totp_url)
+	_, err = DataBase.ExecContext(ctx, sqlStr, userID, totpSecret, totpURL)
 	return err
 }
 
-func TotpUpdateSecret(username, totp_secret, totp_url string) (err error) {
+func TotpUpdateSecret(userName, totpSecret, totpURL string) (err error) {
 	ctx, cancel := context.WithTimeout(context.Background(), dbTimeOut)
 	defer cancel()
 
-	sqlStr := "UPDATE suglider.totp " + 
-			"JOIN suglider.user_info ON user_info.user_id = totp.user_id " +
-			"SET totp_secret = ?, totp_url = ? " +
-			"WHERE user_info.username = ?"
-	_, err = DataBase.ExecContext(ctx, sqlStr, totp_secret, totp_url, username)
+	sqlStr := "UPDATE suglider.totp " +
+		"JOIN suglider.user_info ON user_info.user_id = totp.user_id " +
+		"SET totp_secret = ?, totp_url = ? " +
+		"WHERE user_info.username = ?"
+	_, err = DataBase.ExecContext(ctx, sqlStr, totpSecret, totpURL, userName)
 	return err
 }
 
-func TotpUserCheck(user_id string) (rowCount int, err error) {
+func TotpUserCheck(userID string) (rowCount int, err error) {
 	var count int
 	ctx, cancel := context.WithTimeout(context.Background(), dbTimeOut)
 	defer cancel()
 
 	sqlStr := "SELECT COUNT(*) FROM suglider.totp WHERE user_id=UNHEX(?)"
-	err = DataBase.GetContext(ctx, &count, sqlStr, user_id)
+	err = DataBase.GetContext(ctx, &count, sqlStr, userID)
 	return count, err
 }
 
-func TotpUserData(username string) (totpUserInfo TotpUserInfo, err error) {
+func TotpUserData(userName string) (totpUserInfo TotpUserInfo, err error) {
 	ctx, cancel := context.WithTimeout(context.Background(), dbTimeOut)
 	defer cancel()
 
-	sqlStr := "SELECT totp.user_id, totp.totp_enabled, totp_verified, totp.totp_secret, totp_url " + 
-			"FROM suglider.user_info " + 
-			"INNER JOIN suglider.totp ON user_info.user_id = totp.user_id " +
-			"WHERE user_info.username=?"
-	err = DataBase.GetContext(ctx, &totpUserInfo, sqlStr, username)
+	sqlStr := "SELECT totp.user_id, totp.totp_enabled, totp_verified, totp.totp_secret, totp_url " +
+		"FROM suglider.user_info " +
+		"INNER JOIN suglider.totp ON user_info.user_id = totp.user_id " +
+		"WHERE user_info.username=?"
+	err = DataBase.GetContext(ctx, &totpUserInfo, sqlStr, userName)
 	return totpUserInfo, err
 }
 
-func TotpUpdateVerify(username string, totp_enabled, totp_verified bool) (err error) {
+func TotpUpdateVerify(userName string, totpEnabled, totpVerified bool) (err error) {
 	ctx, cancel := context.WithTimeout(context.Background(), dbTimeOut)
 	defer cancel()
 
-	sqlStr := "UPDATE suglider.totp " + 
-			"JOIN suglider.user_info ON user_info.user_id = totp.user_id " +
-			"SET totp_enabled = ?, totp_verified = ? " +
-			"WHERE username = ?"
-	_, err = DataBase.ExecContext(ctx, sqlStr, totp_enabled, totp_verified, username)
+	sqlStr := "UPDATE suglider.totp " +
+		"JOIN suglider.user_info ON user_info.user_id = totp.user_id " +
+		"SET totp_enabled = ?, totp_verified = ? " +
+		"WHERE username = ?"
+	_, err = DataBase.ExecContext(ctx, sqlStr, totpEnabled, totpVerified, userName)
 	return err
 }
 
-func TotpUpdateEnabled(username string, totp_enabled bool) (err error) {
+func TotpUpdateEnabled(userName string, totpEnabled bool) (err error) {
 	ctx, cancel := context.WithTimeout(context.Background(), dbTimeOut)
 	defer cancel()
 
-	sqlStr := "UPDATE suglider.totp " + 
-			"JOIN suglider.user_info ON user_info.user_id = totp.user_id " + 
-			"SET totp_enabled = ? " +
-			"WHERE username = ?"
-	_, err = DataBase.ExecContext(ctx, sqlStr, totp_enabled, username)
+	sqlStr := "UPDATE suglider.totp " +
+		"JOIN suglider.user_info ON user_info.user_id = totp.user_id " +
+		"SET totp_enabled = ? " +
+		"WHERE username = ?"
+	_, err = DataBase.ExecContext(ctx, sqlStr, totpEnabled, userName)
 	return err
 }
 
-func LookupUserID(username string) (userIDInfo UserIDInfo ,err error){
+func LookupUserID(userName string) (userIDInfo UserIDInfo, err error) {
 	ctx, cancel := context.WithTimeout(context.Background(), dbTimeOut)
 	defer cancel()
 
-	err = DataBase.GetContext(ctx, &userIDInfo, "SELECT LOWER(HEX(user_id)) AS user_id FROM suglider.user_info WHERE username=?", username)
+	err = DataBase.GetContext(ctx, &userIDInfo, "SELECT LOWER(HEX(user_id)) AS user_id FROM suglider.user_info WHERE username=?", userName)
 	return userIDInfo, err
 }
 
-func CheckUsername(username string) (rowCount int, err error) {
+func CheckUsername(userName string) (rowCount int, err error) {
 	var count int
 	ctx, cancel := context.WithTimeout(context.Background(), dbTimeOut)
 	defer cancel()
 
 	sqlStr := "SELECT COUNT(*) FROM suglider.user_info WHERE username=?"
-	err = DataBase.GetContext(ctx, &count, sqlStr, username)
+	err = DataBase.GetContext(ctx, &count, sqlStr, userName)
 	return count, err
 }
 
@@ -217,4 +217,40 @@ func CheckMail(mail string) (rowCount int, err error) {
 	sqlStr := "SELECT COUNT(*) FROM suglider.user_info WHERE mail=?"
 	err = DataBase.GetContext(ctx, &count, sqlStr, mail)
 	return count, err
+}
+
+func MailOTPupdateEnabled(userName string, mailOTPenabled bool) (int64, int64, error) {
+	var errCode int64
+	errCode = 0
+
+	ctx, cancel := context.WithTimeout(context.Background(), dbTimeOut)
+	defer cancel()
+
+	sqlStr := "UPDATE suglider.user_info " +
+		"SET mail_otp_enabled = ? " +
+		"WHERE username = ?"
+	result, err := DataBase.ExecContext(ctx, sqlStr, mailOTPenabled, userName)
+	if err != nil {
+		errCode = 1002
+		return 0, errCode, err
+	}
+
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		errCode = 1049
+		return 0, errCode, err
+	}
+
+	return rowsAffected, errCode, err
+}
+
+func GetUserMail(userName string) (userMail UserMail, err error) {
+	ctx, cancel := context.WithTimeout(context.Background(), dbTimeOut)
+	defer cancel()
+
+	sqlStr := "SELECT mail " +
+		"FROM suglider.user_info " +
+		"WHERE user_info.username=?"
+	err = DataBase.GetContext(ctx, &userMail, sqlStr, userName)
+	return userMail, err
 }

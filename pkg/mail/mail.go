@@ -8,16 +8,17 @@ import (
 	"io/ioutil"
 	"net/smtp"
 	"text/template"
+
 	"gopkg.in/gomail.v2"
 )
 
 type SmtpMail struct {
-	Username  string // same as From if use gmail smtp
-	Password  string
-	From      string
-	SmtpHost  string
-	SmtpPort  int
-	Insecure  bool
+	Username string // same as From if use gmail smtp
+	Password string
+	From     string
+	SmtpHost string
+	SmtpPort int
+	Insecure bool
 }
 
 func (sm *SmtpMail) Send(ctx context.Context, sub, cont, file string, to ...string) error {
@@ -31,7 +32,7 @@ func (sm *SmtpMail) Send(ctx context.Context, sub, cont, file string, to ...stri
 	}
 
 	d := gomail.NewDialer(sm.SmtpHost, sm.SmtpPort, sm.Username, sm.Password)
-	d.TLSConfig = &tls.Config {
+	d.TLSConfig = &tls.Config{
 		InsecureSkipVerify: sm.Insecure,
 		ServerName:         sm.SmtpHost,
 	}
@@ -55,14 +56,14 @@ func (sm *SmtpMail) SendX(ctx context.Context, sub, cont string, to ...string) e
 }
 
 type RequestUrl struct {
-	Url   string
-	Path  string
+	Url  string
+	Path string
 }
 
 type HtmlMail struct {
-	TemplatePath  string
-	RequestUrl    *RequestUrl
-	TTL           int64
+	TemplatePath string
+	RequestUrl   *RequestUrl
+	TTL          int64
 }
 
 type MailVerifyReplace struct {
@@ -70,6 +71,11 @@ type MailVerifyReplace struct {
 	Url         string
 	Uri         string
 	QueryParams string
+}
+
+type OTPmailReplace struct {
+	Name    string
+	OTPcode string
 }
 
 func (hm *HtmlMail) GenerateVerifyMail(ctx context.Context, tempFile, userName, queryParams string) (string, error) {
@@ -81,7 +87,7 @@ func (hm *HtmlMail) GenerateVerifyMail(ctx context.Context, tempFile, userName, 
 	if err != nil {
 		return "", err
 	}
-	replaceContent := MailVerifyReplace {
+	replaceContent := MailVerifyReplace{
 		Name:        userName,
 		Url:         hm.RequestUrl.Url,
 		Uri:         fmt.Sprintf("%s%s", hm.RequestUrl.Path, "/user/verify-mail"),
@@ -103,7 +109,7 @@ func (hm *HtmlMail) GenerateForgotPasswordMail(ctx context.Context, tempFile, us
 	if err != nil {
 		return "", err
 	}
-	replaceContent := MailVerifyReplace {
+	replaceContent := MailVerifyReplace{
 		Name:        userName,
 		Url:         hm.RequestUrl.Url,
 		Uri:         fmt.Sprintf("%s%s", hm.RequestUrl.Path, "/user/forgot-password"),
@@ -114,4 +120,29 @@ func (hm *HtmlMail) GenerateForgotPasswordMail(ctx context.Context, tempFile, us
 		return "", err
 	}
 	return buf.String(), nil
+}
+
+func (hm *HtmlMail) GenerateOTPmail(ctx context.Context, code, userName, tempFile string) (string, error) {
+
+	tmplFile, err := ioutil.ReadFile(tempFile)
+	if err != nil {
+		return "", err
+	}
+
+	tmpl, err := template.New("htmlMail").Parse(string(tmplFile))
+	if err != nil {
+		return "", err
+	}
+	replaceContent := OTPmailReplace{
+		Name:    userName,
+		OTPcode: code,
+	}
+
+	buf := new(bytes.Buffer)
+	if err = tmpl.Execute(buf, replaceContent); err != nil {
+		return "", err
+	}
+	return buf.String(), nil
+
+	// return string(tmplFile), nil
 }

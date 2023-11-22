@@ -64,9 +64,9 @@ func (aa * AuthApiSettings) SetupRouter(swag gin.HandlerFunc) *gin.Engine {
 	router.Use(sessions.Sessions("session-key", cookieStore))
 
 	// Set session expire time
-	// time_convert.CookieMaxAge is a global variable from time_convert.go
+	_, cookieMaxAge, _  := time_convert.ConvertTimeFormat(configs.ApplicationConfig.Session.Timeout)
 	cookieStore.Options(sessions.Options{
-		MaxAge:   time_convert.CookieMaxAge,  // unit second
+		MaxAge:   cookieMaxAge,  // unit second
 		HttpOnly: aa.SessionsHttpOnly,
 		Path:     aa.SessionsPath,
 	})
