@@ -2,14 +2,9 @@ package time_convert
 
 import (
 	"time"
-	"fmt"
-	"log/slog"
 )
 
-var CookieMaxAge int
-var RedisTTL time.Duration
-
-func ConvertTimeFormat(ttl string) {
+func ConvertTimeFormat(ttl string) (time.Duration, int, error) {
 
 	var (
 		err error
@@ -18,11 +13,10 @@ func ConvertTimeFormat(ttl string) {
 
 	ttlDuration, err = time.ParseDuration(ttl)
 	if err != nil {
-		errorMessage := fmt.Sprintf("TTL string convert to duration failed: %v", err)
-		slog.Error(errorMessage)
-		panic(err)
+		return 0, 0, err
 	}
 
-	CookieMaxAge = int(ttlDuration.Seconds())
-	RedisTTL = ttlDuration
+	convertSecond := int(ttlDuration.Seconds())
+
+	return ttlDuration, convertSecond, nil
 }

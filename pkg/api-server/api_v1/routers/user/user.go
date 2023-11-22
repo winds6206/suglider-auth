@@ -1,8 +1,9 @@
 package user
 
 import (
-	"github.com/gin-gonic/gin"
 	"suglider-auth/pkg/api-server/api_v1/handlers"
+
+	"github.com/gin-gonic/gin"
 )
 
 func UserHandler(router *gin.RouterGroup) {
@@ -22,8 +23,4 @@ func UserHandler(router *gin.RouterGroup) {
 	router.GET("/check-mail", handlers.CheckMail)
 
 	// Test
-	router.GET("/test-logout", handlers.TestLogout)
-	router.POST("/test-login", handlers.TestLogin)
-	router.GET("/test-welcome", handlers.TestWelcome)
-	router.GET("/test-refresh", handlers.TestRefresh)
 }

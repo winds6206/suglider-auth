@@ -8,6 +8,7 @@ import (
 	"encoding/json"
 	"log/slog"
 	"suglider-auth/pkg/time_convert"
+	"suglider-auth/configs"
 	"fmt"
   )
 
@@ -41,8 +42,8 @@ func AddSession(c *gin.Context, user string) (string, int64, error) {
 	redisKey := "sid:" + sessionID
 	redisValue := string(jsonSessionValue)
 
-	// time_convert.RedisTTL is a global variable from time_convert.go
-	err = redis.Set(redisKey, redisValue, time_convert.RedisTTL)
+	redisTTL, _, _ := time_convert.ConvertTimeFormat(configs.ApplicationConfig.Session.Timeout)
+	err = redis.Set(redisKey, redisValue, redisTTL)
 	if err != nil {
 		errCode = 1042
 		return "", errCode, err

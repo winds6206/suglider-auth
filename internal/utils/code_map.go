@@ -8,7 +8,7 @@ func init() {
 
 func ResponseStatusCode() {
 	CodeMap = map[int64]string{
-		200: "Successfully.",
+		200:  "Successfully.",
 		1001: "Wrong with the data format trasnfer from POST.",
 		1002: "Failed to execute SQL syntax.",
 		1003: "No search this user.",
@@ -55,6 +55,9 @@ func ResponseStatusCode() {
 		1044: "Redis GET data failed.",
 		1045: "Check whether the username exists or not failed.",
 		1046: "Check whether the mail exists or not failed.",
+		1047: "OTP code is not correct.",
+		1048: "Username not found.",
+		1049: "Get rowsAffected failed.",
 		1101: "Fail to parse POST form data.",
 		1102: "Fail to bind POST form data.",
 		1103: "Fail to parse path parameters.",

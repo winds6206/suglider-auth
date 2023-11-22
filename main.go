@@ -46,7 +46,12 @@ var (
 func init() {
 	logger.SlogMultiWriter(ServiceName)
 	sqltable.SugliderTableInit()
-	time_convert.ConvertTimeFormat(configs.ApplicationConfig.Session.Timeout)
+	_, _, err := time_convert.ConvertTimeFormat(configs.ApplicationConfig.Session.Timeout)
+	if err != nil {
+		errorMessage := fmt.Sprintf("TTL string convert to duration failed: %v", err)
+		slog.Error(errorMessage)
+		panic(err)
+	}
 }
 
 func main() {
