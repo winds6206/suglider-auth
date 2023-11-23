@@ -1,6 +1,7 @@
 package api_server
 
 import (
+	"fmt"
 	"log/slog"
 	"net/http"
 	"suglider-auth/internal/utils"
@@ -86,11 +87,12 @@ func CheckUserJWT() gin.HandlerFunc {
 
 		if err != nil {
 			if err == http.ErrNoCookie {
+				fmt.Println("123456")
 				c.JSON(http.StatusUnauthorized, utils.ErrorResponse(c, 1019, err))
-				c.Abort()
+				return
 			}
 			c.JSON(http.StatusInternalServerError, utils.ErrorResponse(c, 1020, err))
-			c.Abort()
+			return
 		}
 
 		claims, errCode, errParseJWT := jwt.ParseJWT(cookie)
@@ -101,21 +103,21 @@ func CheckUserJWT() gin.HandlerFunc {
 
 			case 1015:
 				c.JSON(http.StatusUnauthorized, utils.ErrorResponse(c, errCode, err))
-				c.Abort()
+				return
 
 			case 1016:
 				c.JSON(http.StatusBadRequest, utils.ErrorResponse(c, errCode, err))
-				c.Abort()
+				return
 
 			case 1017:
 				c.JSON(http.StatusUnauthorized, utils.ErrorResponse(c, errCode, err))
-				c.Abort()
+				return
 			}
 		}
 
 		if time.Now().Unix() > claims.ExpiresAt.Unix() {
 			c.JSON(http.StatusUnauthorized, utils.ErrorResponse(c, 1050, err))
-			c.Abort()
+			return
 		} else {
 			c.Next()
 		}
