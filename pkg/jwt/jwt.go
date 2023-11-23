@@ -1,16 +1,17 @@
 package jwt
 
 import (
-	"github.com/golang-jwt/jwt/v5"
 	"fmt"
-	"time"
 	"log/slog"
+	"time"
+
+	"github.com/golang-jwt/jwt/v5"
 )
 
 var jwtKey = []byte("suglider")
 
 type jwtData struct {
-	Username	string	`json:"username"`
+	Username string `json:"username"`
 	jwt.RegisteredClaims
 }
 
@@ -44,7 +45,7 @@ func GenerateJWT(username string) (string, int, error) {
 	return tokenString, expireTimeSec, nil
 }
 
-func ParseJWT(token string) (string, int64, error) {
+func ParseJWT(token string) (*jwtData, int64, error) {
 
 	var errCode int64
 	errCode = 0
@@ -61,25 +62,23 @@ func ParseJWT(token string) (string, int64, error) {
 			slog.Error(errorMessage)
 			errCode = 1015
 
-			return "", errCode, err
+			return nil, errCode, err
 		}
 		errorMessage := fmt.Sprintf("Parse JWT claim data failed: %v", err)
 		slog.Error(errorMessage)
 		errCode = 1016
 
-		return "", errCode, err
+		return nil, errCode, err
 	}
 	if !tkn.Valid {
 		errorMessage := fmt.Sprintf("Token is invalid: %v", err)
 		slog.Error(errorMessage)
 		errCode = 1017
 
-		return "", errCode, err
+		return nil, errCode, err
 	}
 
-	fmt.Println(claims.Username)
-
-	return claims.Username, errCode, nil
+	return claims, errCode, nil
 
 }
 
@@ -96,7 +95,7 @@ func RefreshJWT(token string) (string, int, error) {
 	expirationTime := time.Now().Add(expireTime)
 	claims.ExpiresAt = jwt.NewNumericDate(expirationTime)
 	newToken := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	
+
 	tokenString, err := newToken.SignedString(jwtKey)
 	if err != nil {
 		return "", 0, err
@@ -106,5 +105,5 @@ func RefreshJWT(token string) (string, int, error) {
 	expireTimeSec := int(expireTime.Seconds())
 
 	return tokenString, expireTimeSec, nil
-	
+
 }
