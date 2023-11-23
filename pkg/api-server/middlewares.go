@@ -69,6 +69,9 @@ func userPrivilege(csbn *rbac.CasbinEnforcerConfig) gin.HandlerFunc {
 var apiWhileList = []string{
 	"/api/v1/user/sign-up",
 	"/api/v1/user/login",
+	"/api/v1/user/forgot-password",
+	"/api/v1/user/verify-mail",
+	"/api/v1/user/verify-mail/resend",
 }
 
 func CheckUserJWT() gin.HandlerFunc {
