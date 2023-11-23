@@ -109,7 +109,7 @@ func (aa *AuthApiSettings) SetupRouter(swag gin.HandlerFunc) *gin.Engine {
 		slog.Error(err.Error())
 	}
 
-	router.Use(CheckUserJWT())
+	// router.Use(CheckUserJWT())
 
 	if aa.EnableRbac {
 		router.Use(userPrivilege(csbn))
