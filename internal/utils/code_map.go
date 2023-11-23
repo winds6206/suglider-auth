@@ -58,6 +58,7 @@ func ResponseStatusCode() {
 		1047: "OTP code is not correct.",
 		1048: "Username not found.",
 		1049: "Get rowsAffected failed.",
+		1050: "Token has expired.",
 		1101: "Fail to parse POST form data.",
 		1102: "Fail to bind POST form data.",
 		1103: "Fail to parse path parameters.",

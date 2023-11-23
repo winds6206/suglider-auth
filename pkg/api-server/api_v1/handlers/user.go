@@ -485,6 +485,8 @@ func RefreshJWT(c *gin.Context) {
 
 	// Set the new token as the users `token` cookie
 	c.SetCookie("token", token, expireTimeSec, "/", "localhost", false, true)
+
+	c.JSON(http.StatusOK, utils.SuccessResponse(c, 200, nil))
 }
 
 // @Summary User Password Expire Check
