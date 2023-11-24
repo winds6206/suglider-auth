@@ -446,7 +446,9 @@ func RefreshJWT(c *gin.Context) {
 
 	if err != nil {
 		if err == http.ErrNoCookie {
-			c.JSON(http.StatusUnauthorized, utils.ErrorResponse(c, 1019, err))
+			c.JSON(http.StatusUnauthorized, utils.ErrorResponse(c, 1019, map[string]interface{}{
+				"msg": "JWT can't found.",
+			}))
 			return
 		}
 		c.JSON(http.StatusInternalServerError, utils.ErrorResponse(c, 1020, err))
