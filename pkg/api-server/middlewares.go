@@ -1,12 +1,12 @@
 package api_server
 
 import (
-	"fmt"
 	"log/slog"
 	"net/http"
 	"suglider-auth/internal/utils"
 	"suglider-auth/pkg/jwt"
 	"suglider-auth/pkg/rbac"
+	"suglider-auth/pkg/session"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -74,25 +74,49 @@ var apiWhileList = []string{
 	"/api/v1/user/verify-mail/resend",
 }
 
+func checkAPIWhileList(c *gin.Context) bool {
+	urlPath := c.Request.URL.Path
+	for _, listPath := range apiWhileList {
+		if listPath == urlPath {
+			return true
+		}
+	}
+	return false
+}
+
+func checkSessionID(c *gin.Context) bool {
+	isExists, _ := session.CheckSession(c)
+
+	if isExists {
+		return true
+	} else {
+		return false
+	}
+}
+
 func CheckUserJWT() gin.HandlerFunc {
 
 	return func(c *gin.Context) {
 
-		urlPath := c.Request.URL.Path
-		for _, listPath := range apiWhileList {
-			if listPath == urlPath {
-				c.Next()
-				return
-			}
+		if checkAPIWhileList(c) {
+			c.Next()
+			return
 		}
 
 		cookie, err := c.Cookie("token")
 
 		if err != nil {
 			if err == http.ErrNoCookie {
-				fmt.Println("123456")
-				c.JSON(http.StatusUnauthorized, utils.ErrorResponse(c, 1019, err))
-				return
+				isExists := checkSessionID(c)
+				if isExists {
+					c.Next()
+					return
+				} else {
+					c.JSON(http.StatusUnauthorized, utils.ErrorResponse(c, 1019, map[string]interface{}{
+						"msg": "Both of JWT and sessionID can't found.",
+					}))
+					return
+				}
 			}
 			c.JSON(http.StatusInternalServerError, utils.ErrorResponse(c, 1020, err))
 			return
