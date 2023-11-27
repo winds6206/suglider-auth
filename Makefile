@@ -50,6 +50,9 @@ test:
 mailer:
 	go build -o bin/mailer ./cmd/mailer
 
+sms_sender:
+	go build -o bin/sms_sender ./cmd/sms_sender
+
 help:
 	@echo "make build VERSION=1.0.0 - compile the binary file with golang codes"
 	@echo "make docker VERSION=1.0.0 GO_VERSION=1.21 - compile the docker image from build/Dockerfile"
@@ -59,4 +62,5 @@ help:
 	@echo "make test - run test with -race parameter"
 	@echo "make run CONFIG_FILE=path/to/config.toml - run the service with specific config file"
 	@echo "make mailer - build a simple tool for sending mail by smtp"
+	@echo "make sms_sender - build a simple tool for sending message by sms"
 
