@@ -916,7 +916,7 @@
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n    \"username\": \"tony\",\n    \"password\": \"12345678\",\n    \"comfirm_pwd\": \"12345678\",\n    \"mail\": \"tony@example.com\",\n    \"address\": \"Taichung\"\n}",
+									"raw": "{\n    \"username\": \"tony\",\n    \"password\": \"Qaz@1234\",\n    \"comfirm_pwd\": \"Qaz@1234\",\n    \"first_name\": \"Tony\",\n    \"last_name\": \"Jhang\",\n    \"phone_number\": \"0975827064\",\n    \"mail\": \"tony@example.com\",\n    \"address\": \"Taichung\"\n}",
 									"options": {
 										"raw": {
 											"language": "json"
