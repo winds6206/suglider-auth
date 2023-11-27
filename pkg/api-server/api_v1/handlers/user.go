@@ -21,11 +21,11 @@ type userSignUp struct {
 	UserName    string `json:"username" binding:"required"`
 	Password    string `json:"password" binding:"required"`
 	ComfirmPwd  string `json:"comfirm_pwd" binding:"required"`
-	FirstName   string `json:"first_name" binding:"required"`
-	LastName    string `json:"last_name" binding:"required"`
-	PhoneNumber string `json:"phone_number" binding:"required"`
+	FirstName   string `json:"first_name"`
+	LastName    string `json:"last_name"`
+	PhoneNumber string `json:"phone_number"`
 	Mail        string `json:"mail" binding:"required"`
-	Address     string `json:"address" binding:"required"`
+	Address     string `json:"address"`
 }
 
 type userDelete struct {

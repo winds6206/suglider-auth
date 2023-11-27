@@ -10,7 +10,7 @@ import (
 type signUpPayload struct {
 	Username    string `validate:"required,max=20"`
 	Password    string `validate:"required,min=8,max=30,passwordComplexity"`
-	PhoneNumber string `validate:"required,max=10,phoneNumberCheck"`
+	PhoneNumber string `validate:"max=10,phoneNumberCheck"`
 	Mail        string `validate:"required,email"`
 }
 
@@ -40,6 +40,10 @@ func passwordComplexity(fl validator.FieldLevel) bool {
 
 func phoneNumberCheck(fl validator.FieldLevel) bool {
 	phoneNumber := fl.Field().String()
+
+	if phoneNumber == "" {
+		return true
+	}
 
 	matched, _ := regexp.MatchString(`^\d+$`, phoneNumber)
 
