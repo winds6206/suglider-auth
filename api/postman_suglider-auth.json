@@ -7,6 +7,279 @@
 	},
 	"item": [
 		{
+			"name": "totp",
+			"item": [
+				{
+					"name": "Enable TOTP",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"username\": \"tony\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:9527/api/v1/totp/generate",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "9527",
+							"path": [
+								"api",
+								"v1",
+								"totp",
+								"generate"
+							]
+						},
+						"description": "generate QRcode"
+					},
+					"response": [
+						{
+							"name": "/api/v1/totp/generate",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"username\": \"tony\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:9527/api/v1/totp/generate",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "9527",
+									"path": [
+										"api",
+										"v1",
+										"totp",
+										"generate"
+									]
+								}
+							},
+							"_postman_previewlanguage": null,
+							"header": null,
+							"cookie": [],
+							"body": null
+						}
+					]
+				},
+				{
+					"name": "Verify TOTP",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"username\": \"tony\",\n    \"totpcode\": \"116008\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:9527/api/v1/totp/verify",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "9527",
+							"path": [
+								"api",
+								"v1",
+								"totp",
+								"verify"
+							]
+						},
+						"description": "The API uses the first enabled TOTP feature to verify the TOTP code."
+					},
+					"response": [
+						{
+							"name": "/api/v1/totp/verify",
+							"originalRequest": {
+								"method": "PATCH",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"username\": \"tony\",\n    \"otp_code\": \"123456\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:9527/api/v1/totp/verify",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "9527",
+									"path": [
+										"api",
+										"v1",
+										"totp",
+										"verify"
+									]
+								}
+							},
+							"_postman_previewlanguage": null,
+							"header": null,
+							"cookie": [],
+							"body": null
+						}
+					]
+				},
+				{
+					"name": "Verify TOTP Validate",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:9527/api/v1/totp/validate",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "9527",
+							"path": [
+								"api",
+								"v1",
+								"totp",
+								"validate"
+							]
+						},
+						"description": "If a user has enabled TOTP, the API can be used during the login process to verify its validity."
+					},
+					"response": [
+						{
+							"name": "/api/v1/totp/validate",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"username\": \"tony\",\n    \"otp_code\": \"559479\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:9527/api/v1/totp/validate",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "9527",
+									"path": [
+										"api",
+										"v1",
+										"totp",
+										"validate"
+									]
+								}
+							},
+							"_postman_previewlanguage": null,
+							"header": null,
+							"cookie": [],
+							"body": null
+						}
+					]
+				},
+				{
+					"name": "Disable TOTP",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"username\": \"tony\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:9527/api/v1/totp/disable",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "9527",
+							"path": [
+								"api",
+								"v1",
+								"totp",
+								"disable"
+							]
+						},
+						"description": "disable TOTP"
+					},
+					"response": [
+						{
+							"name": "/api/v1/totp/disable",
+							"originalRequest": {
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"username\": \"tony\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:9527/api/v1/totp/disable",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "9527",
+									"path": [
+										"api",
+										"v1",
+										"totp",
+										"disable"
+									]
+								}
+							},
+							"_postman_previewlanguage": null,
+							"header": null,
+							"cookie": [],
+							"body": null
+						}
+					]
+				}
+			]
+		},
+		{
 			"name": "privilege",
 			"item": [
 				{
@@ -526,7 +799,7 @@
 									"variable": [
 										{
 											"key": "name",
-											"value": "develop"
+											"value": ""
 										}
 									]
 								}
@@ -643,7 +916,7 @@
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n    \"username\": \"tony\",\n    \"password\": \"12345678\",\n    \"comfirm_pwd\": \"12345678\",\n    \"mail\": \"tony@example.com\",\n    \"address\": \"Taichung\"\n}",
+									"raw": "{\n    \"username\": \"tony\",\n    \"password\": \"Qaz@1234\",\n    \"comfirm_pwd\": \"Qaz@1234\",\n    \"first_name\": \"Tony\",\n    \"last_name\": \"Jhang\",\n    \"phone_number\": \"0975827064\",\n    \"mail\": \"tony@example.com\",\n    \"address\": \"Taichung\"\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -744,6 +1017,15 @@
 					"request": {
 						"method": "DELETE",
 						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
 						"url": {
 							"raw": "http://localhost:9527/api/v1/user/delete",
 							"protocol": "http",
@@ -1527,28 +1809,18 @@
 							"body": null
 						}
 					]
-				}
-			]
-		},
-		{
-			"name": "totp",
-			"item": [
+				},
 				{
-					"name": "Enable TOTP",
+					"name": "Mail OTP Enable",
 					"request": {
-						"method": "POST",
+						"method": "PUT",
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"username\": \"tony\"\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
+							"raw": ""
 						},
 						"url": {
-							"raw": "http://localhost:9527/api/v1/totp/generate",
+							"raw": "http://localhost:9527/api/v1/otp/mail-enable",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -1557,18 +1829,24 @@
 							"path": [
 								"api",
 								"v1",
-								"totp",
-								"generate"
+								"otp",
+								"mail-enable"
 							]
-						},
-						"description": "generate QRcode"
+						}
 					},
 					"response": [
 						{
-							"name": "/api/v1/totp/generate",
+							"name": "/api/v1/otp/mail-enable",
 							"originalRequest": {
-								"method": "POST",
-								"header": [],
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
 								"body": {
 									"mode": "raw",
 									"raw": "{\n    \"username\": \"tony\"\n}",
@@ -1579,7 +1857,7 @@
 									}
 								},
 								"url": {
-									"raw": "http://localhost:9527/api/v1/totp/generate",
+									"raw": "http://localhost:9527/api/v1/otp/mail-enable",
 									"protocol": "http",
 									"host": [
 										"localhost"
@@ -1588,8 +1866,8 @@
 									"path": [
 										"api",
 										"v1",
-										"totp",
-										"generate"
+										"otp",
+										"mail-enable"
 									]
 								}
 							},
@@ -1601,147 +1879,13 @@
 					]
 				},
 				{
-					"name": "Verify TOTP",
-					"request": {
-						"method": "PATCH",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"username\": \"tony\",\n    \"totpcode\": \"116008\"\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "http://localhost:9527/api/v1/totp/verify",
-							"protocol": "http",
-							"host": [
-								"localhost"
-							],
-							"port": "9527",
-							"path": [
-								"api",
-								"v1",
-								"totp",
-								"verify"
-							]
-						},
-						"description": "The API uses the first enabled TOTP feature to verify the TOTP code."
-					},
-					"response": [
-						{
-							"name": "/api/v1/totp/verify",
-							"originalRequest": {
-								"method": "PATCH",
-								"header": [],
-								"body": {
-									"mode": "raw",
-									"raw": "{\n    \"username\": \"tony\",\n    \"totpcode\": \"123456\"\n}",
-									"options": {
-										"raw": {
-											"language": "json"
-										}
-									}
-								},
-								"url": {
-									"raw": "http://localhost:9527/api/v1/totp/verify",
-									"protocol": "http",
-									"host": [
-										"localhost"
-									],
-									"port": "9527",
-									"path": [
-										"api",
-										"v1",
-										"totp",
-										"verify"
-									]
-								}
-							},
-							"_postman_previewlanguage": null,
-							"header": null,
-							"cookie": [],
-							"body": null
-						}
-					]
-				},
-				{
-					"name": "Verify TOTP Validate",
-					"request": {
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"username\": \"tony\",\n    \"totpcode\": \"989614\"\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "http://localhost:9527/api/v1/totp/validate",
-							"protocol": "http",
-							"host": [
-								"localhost"
-							],
-							"port": "9527",
-							"path": [
-								"api",
-								"v1",
-								"totp",
-								"validate"
-							]
-						},
-						"description": "If a user has enabled TOTP, the API can be used during the login process to verify its validity."
-					},
-					"response": [
-						{
-							"name": "/api/v1/totp/validate",
-							"originalRequest": {
-								"method": "POST",
-								"header": [],
-								"body": {
-									"mode": "raw",
-									"raw": "{\n    \"username\": \"tony\",\n    \"totpcode\": \"123456\"\n}",
-									"options": {
-										"raw": {
-											"language": "json"
-										}
-									}
-								},
-								"url": {
-									"raw": "http://localhost:9527/api/v1/totp/validate",
-									"protocol": "http",
-									"host": [
-										"localhost"
-									],
-									"port": "9527",
-									"path": [
-										"api",
-										"v1",
-										"totp",
-										"validate"
-									]
-								}
-							},
-							"_postman_previewlanguage": null,
-							"header": null,
-							"cookie": [],
-							"body": null
-						}
-					]
-				},
-				{
-					"name": "Disable TOTP",
+					"name": "Mail OTP Disable",
 					"request": {
 						"method": "PUT",
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"username\": \"tony\"\n}",
+							"raw": "",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -1749,7 +1893,7 @@
 							}
 						},
 						"url": {
-							"raw": "http://localhost:9527/api/v1/totp/disable",
+							"raw": "http://localhost:9527/api/v1/otp/mail-disable",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -1758,15 +1902,14 @@
 							"path": [
 								"api",
 								"v1",
-								"totp",
-								"disable"
+								"otp",
+								"mail-disable"
 							]
-						},
-						"description": "disable TOTP"
+						}
 					},
 					"response": [
 						{
-							"name": "/api/v1/totp/disable",
+							"name": "/api/v1/otp/mail-disable",
 							"originalRequest": {
 								"method": "PUT",
 								"header": [],
@@ -1780,7 +1923,7 @@
 									}
 								},
 								"url": {
-									"raw": "http://localhost:9527/api/v1/totp/disable",
+									"raw": "http://localhost:9527/api/v1/otp/mail-disable",
 									"protocol": "http",
 									"host": [
 										"localhost"
@@ -1789,8 +1932,143 @@
 									"path": [
 										"api",
 										"v1",
-										"totp",
-										"disable"
+										"otp",
+										"mail-disable"
+									]
+								}
+							},
+							"_postman_previewlanguage": null,
+							"header": null,
+							"cookie": [],
+							"body": null
+						}
+					]
+				},
+				{
+					"name": "Mail OTP Send",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:9527/api/v1/otp/mail-send",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "9527",
+							"path": [
+								"api",
+								"v1",
+								"otp",
+								"mail-send"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "/api/v1/otp/mail-send",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"username\": \"tony\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:9527/api/v1/otp/mail-send",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "9527",
+									"path": [
+										"api",
+										"v1",
+										"otp",
+										"mail-send"
+									]
+								}
+							},
+							"_postman_previewlanguage": null,
+							"header": null,
+							"cookie": [],
+							"body": null
+						}
+					]
+				},
+				{
+					"name": "Mail OTP Verify",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:9527/api/v1/otp/mail-verify",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "9527",
+							"path": [
+								"api",
+								"v1",
+								"otp",
+								"mail-verify"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "/api/v1/otp/mail-verify",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"username\": \"tony\",\n    \"otp_code\": \"682620\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:9527/api/v1/otp/mail-verify",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "9527",
+									"path": [
+										"api",
+										"v1",
+										"otp",
+										"mail-verify"
 									]
 								}
 							},

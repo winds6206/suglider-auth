@@ -503,9 +503,9 @@ paths:
         in: formData
         name: username
         type: string
-      - description: TOTP Code
+      - description: OTP Code
         in: formData
-        name: totpCode
+        name: otp_code
         type: string
       produces:
       - application/json
@@ -544,9 +544,9 @@ paths:
         in: formData
         name: username
         type: string
-      - description: TOTP Code
+      - description: OTP Code
         in: formData
-        name: totpCode
+        name: otp_ode
         type: string
       produces:
       - application/json
@@ -791,6 +791,155 @@ paths:
           schema:
             type: string
       summary: User Logout
+      tags:
+      - users
+  /api/v1/user/mail-disable:
+    put:
+      consumes:
+      - multipart/form-data
+      description: Disable Mail OTP feature
+      parameters:
+      - description: User Name
+        in: formData
+        name: username
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            type: string
+        "400":
+          description: Bad request
+          schema:
+            type: string
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+        "403":
+          description: Forbidden
+          schema:
+            type: string
+        "404":
+          description: Not found
+          schema:
+            type: string
+      summary: Mail OTP Disable
+      tags:
+      - users
+  /api/v1/user/mail-enable:
+    put:
+      consumes:
+      - multipart/form-data
+      description: Enable Mail OTP feature
+      parameters:
+      - description: User Name
+        in: formData
+        name: username
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            type: string
+        "400":
+          description: Bad request
+          schema:
+            type: string
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+        "403":
+          description: Forbidden
+          schema:
+            type: string
+        "404":
+          description: Not found
+          schema:
+            type: string
+      summary: Mail OTP Enable
+      tags:
+      - users
+  /api/v1/user/mail-send:
+    post:
+      consumes:
+      - multipart/form-data
+      description: To send an OTP using email.
+      parameters:
+      - description: User Name
+        in: formData
+        name: username
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            type: string
+        "400":
+          description: Bad request
+          schema:
+            type: string
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+        "403":
+          description: Forbidden
+          schema:
+            type: string
+        "404":
+          description: Not found
+          schema:
+            type: string
+      summary: Mail OTP Send
+      tags:
+      - users
+  /api/v1/user/mail-verify:
+    get:
+      consumes:
+      - multipart/form-data
+      description: If a user has enabled Mail OTP, the API can be used during the
+        login process to verify its validity.
+      parameters:
+      - description: User Name
+        in: formData
+        name: username
+        type: string
+      - description: OTP Code
+        in: formData
+        name: otpCode
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            type: string
+        "400":
+          description: Bad request
+          schema:
+            type: string
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+        "403":
+          description: Forbidden
+          schema:
+            type: string
+        "404":
+          description: Not found
+          schema:
+            type: string
+      summary: Mail OTP Verify
       tags:
       - users
   /api/v1/user/password-expire:

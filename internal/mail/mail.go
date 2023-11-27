@@ -239,9 +239,9 @@ func CheckPasswordResetCode(ctx context.Context, email, id, code string) (bool, 
 	return ok, err
 }
 
-func SendMailOTP(ctx context.Context, username, email, code string) error {
+func SendMailOTP(ctx context.Context, firstName, email, code string) error {
 	tempFile := fmt.Sprintf("%s/mail-otp.tmpl", htmlMail.TemplatePath)
-	cont, err := htmlMail.GenerateOTPmail(ctx, code, username, tempFile)
+	cont, err := htmlMail.GenerateOTPMail(ctx, code, firstName, tempFile)
 	if err != nil {
 		return err
 	}

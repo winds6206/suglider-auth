@@ -12,29 +12,6 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func AuthenticationMiddleware(mode int) gin.HandlerFunc {
-	return func(c *gin.Context) {
-		switch mode {
-		case 1:
-
-			// TODO
-
-		case 2:
-
-			// TODO
-
-		case 3:
-
-			// TODO
-
-		default:
-			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid authentication mode"})
-			c.Abort()
-			return
-		}
-	}
-}
-
 func userPrivilege(csbn *rbac.CasbinEnforcerConfig) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		sub, exist := c.Get("Username")
@@ -72,6 +49,9 @@ var apiWhileList = []string{
 	"/api/v1/user/forgot-password",
 	"/api/v1/user/verify-mail",
 	"/api/v1/user/verify-mail/resend",
+	"/api/v1/totp/validate",
+	"/api/v1/otp/mail-verify",
+	"/api/v1/otp/mail-send",
 }
 
 func checkAPIWhileList(c *gin.Context) bool {
