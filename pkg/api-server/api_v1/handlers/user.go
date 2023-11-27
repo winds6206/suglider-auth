@@ -9,8 +9,8 @@ import (
 	smtp "suglider-auth/internal/mail"
 	"suglider-auth/internal/utils"
 	"suglider-auth/pkg/encrypt"
+	fmtv "suglider-auth/pkg/fmt_validator"
 	"suglider-auth/pkg/jwt"
-	pwd_validator "suglider-auth/pkg/pwd-validator"
 	"suglider-auth/pkg/session"
 	"time"
 
@@ -18,11 +18,14 @@ import (
 )
 
 type userSignUp struct {
-	Username   string `json:"username" binding:"required"`
-	Password   string `json:"password" binding:"required"`
-	ComfirmPwd string `json:"comfirm_pwd" binding:"required"`
-	Mail       string `json:"mail" binding:"required"`
-	Address    string `json:"address" binding:"required"`
+	UserName    string `json:"username" binding:"required"`
+	Password    string `json:"password" binding:"required"`
+	ComfirmPwd  string `json:"comfirm_pwd" binding:"required"`
+	FirstName   string `json:"first_name" binding:"required"`
+	LastName    string `json:"last_name" binding:"required"`
+	PhoneNumber string `json:"phone_number" binding:"required"`
+	Mail        string `json:"mail" binding:"required"`
+	Address     string `json:"address" binding:"required"`
 }
 
 type userDelete struct {
@@ -53,6 +56,9 @@ type MailOperate struct {
 // @Param password formData string false "Password"
 // @Param comfirm_pwd formData string false "Comfirm Password"
 // @Param mail formData string false "e-Mail"
+// @Param first_name formData string false "First Name"
+// @Param last_name formData string false "Last Name"
+// @Param phone_number formData string false "Phone Number"
 // @Param address formData string false "Address"
 // @Success 200 {string} string "Success"
 // @Failure 400 {string} string "Bad request"
@@ -71,7 +77,7 @@ func UserSignUp(c *gin.Context) {
 		return
 	}
 
-	errPwdValidator := pwd_validator.PwdValidator(request.Username, request.Password, request.Mail)
+	errPwdValidator := fmtv.FmtValidator(request.UserName, request.Password, request.PhoneNumber, request.Mail)
 	if errPwdValidator != nil {
 
 		errorMessage := fmt.Sprintf("%v", errPwdValidator)
@@ -87,7 +93,7 @@ func UserSignUp(c *gin.Context) {
 
 	fmt.Println(passwordEncode)
 
-	err = mariadb.UserSignUp(request.Username, passwordEncode, comfirmPwdEncode, request.Mail, request.Address)
+	err = mariadb.UserSignUp(request.UserName, passwordEncode, comfirmPwdEncode, request.FirstName, request.LastName, request.PhoneNumber, request.Mail, request.Address)
 	if err != nil {
 		errorMessage := fmt.Sprintf("Insert user_info table failed: %v", err)
 		slog.Error(errorMessage)
@@ -96,7 +102,7 @@ func UserSignUp(c *gin.Context) {
 		return
 	} else {
 		// mail verification
-		if err = smtp.SendVerifyMail(c, request.Username, request.Mail); err != nil {
+		if err = smtp.SendVerifyMail(c, request.UserName, request.Mail); err != nil {
 			slog.Error(err.Error())
 		}
 		c.JSON(http.StatusOK, utils.SuccessResponse(c, 200, nil))
@@ -205,182 +211,48 @@ func UserLogin(c *gin.Context) {
 		// Check password true or false
 		if pwdVerify {
 
-			// Check whether user enable TOTP or not.
-			totpUserData, errTotpUserData := mariadb.TotpUserData(userInfo.Username)
+			// Check whether user enable 2FA or not.
+			userTwoFactorAuthData, err := mariadb.UserTwoFactorAuth(userInfo.Username)
 
-			// Check error type
-			if errTotpUserData != nil {
+			if err != nil {
+				c.JSON(http.StatusInternalServerError, utils.ErrorResponse(c, 1002, err))
+				return
+			}
 
-				// ErrNoRows means user never enable TOTP feature
-				if errTotpUserData == sql.ErrNoRows {
+			// These conditions indicate that the user hasn't enabled the 2FA feature.
+			if !userTwoFactorAuthData.TotpEnabled.Valid ||
+				(userTwoFactorAuthData.TotpEnabled.Bool &&
+					userTwoFactorAuthData.SmsOTPenabled &&
+					userTwoFactorAuthData.MailOTPenabled) {
 
-					sid := session.ReadSession(c)
+				setSession(c, request.Username)
+				setJWT(c, request.Username)
 
-					// Check session exist or not
-					ok, err := session.CheckSession(c)
-					if err != nil {
-						errorMessage := fmt.Sprintf("Checking whether key exist or not happen something wrong: %v", err)
-						slog.Error(errorMessage)
-
-						c.JSON(http.StatusInternalServerError, utils.ErrorResponse(c, 1039, err))
-						return
-					}
-					if !ok {
-						_, errCode, err := session.AddSession(c, request.Username)
-						switch errCode {
-						case 1041:
-							errorMessage := fmt.Sprintf("Failed to create session value JSON data: %v", err)
-							slog.Error(errorMessage)
-							c.JSON(http.StatusInternalServerError, utils.ErrorResponse(c, errCode, err))
-							return
-
-						case 1042:
-							errorMessage := fmt.Sprintf("Redis SET data failed: %v", err)
-							slog.Error(errorMessage)
-							c.JSON(http.StatusInternalServerError, utils.ErrorResponse(c, errCode, err))
-							return
-						}
-					} else {
-						err = session.DeleteSession(sid)
-						if err != nil {
-							errorMessage := fmt.Sprintf("Delete key(sid:%s) failed: %v", sid, err)
-							slog.Error(errorMessage)
-
-							c.JSON(http.StatusInternalServerError, utils.ErrorResponse(c, 1040, err))
-							return
-						}
-						_, errCode, err := session.AddSession(c, request.Username)
-						switch errCode {
-						case 1041:
-							errorMessage := fmt.Sprintf("Failed to create session value JSON data: %v", err)
-							slog.Error(errorMessage)
-							c.JSON(http.StatusInternalServerError, utils.ErrorResponse(c, errCode, err))
-							return
-
-						case 1042:
-							errorMessage := fmt.Sprintf("Redis SET data failed: %v", err)
-							slog.Error(errorMessage)
-							c.JSON(http.StatusInternalServerError, utils.ErrorResponse(c, errCode, err))
-							return
-						}
-					}
-
-					token, expireTimeSec, err := jwt.GenerateJWT(request.Username)
-
-					if err != nil {
-						errorMessage := fmt.Sprintf("Generate the JWT string failed: %v", err)
-						slog.Error(errorMessage)
-						c.JSON(http.StatusBadRequest, utils.ErrorResponse(c, 1014, err))
-
-						return
-					}
-
-					c.SetCookie("token", token, expireTimeSec, "/", "localhost", false, true)
-
-					c.JSON(http.StatusOK, utils.SuccessResponse(c, 200, map[string]interface{}{
-						"username":     request.Username,
-						"totp_enabled": totpUserData.TotpEnabled,
-					}))
-
-				} else {
-					c.JSON(http.StatusInternalServerError, utils.ErrorResponse(c, 1002, err))
-					return
-				}
-
-				// No error means user had ever enabled TOTP and data is in the database.
-				// This block means totpUserData.TotpEnabled = true
-			} else if totpUserData.TotpEnabled {
-				c.JSON(http.StatusOK, utils.SuccessResponse(c, 200, map[string]interface{}{
-					"username":     request.Username,
-					"totp_enabled": totpUserData.TotpEnabled,
-				}))
-
-				// This block means totpUserData.TotpEnabled = false
+				c.JSON(http.StatusOK, utils.SuccessResponse(c, 200, nil))
 			} else {
-
-				sid := session.ReadSession(c)
-
-				// Check session exist or not
-				ok, err := session.CheckSession(c)
-				if err != nil {
-					errorMessage := fmt.Sprintf("Checking whether key exist or not happen something wrong: %v", err)
-					slog.Error(errorMessage)
-
-					c.JSON(http.StatusInternalServerError, utils.ErrorResponse(c, 1039, err))
-					return
-				}
-				if !ok {
-					_, errCode, err := session.AddSession(c, request.Username)
-					switch errCode {
-					case 1041:
-						errorMessage := fmt.Sprintf("Failed to create session value JSON data: %v", err)
-						slog.Error(errorMessage)
-						c.JSON(http.StatusInternalServerError, utils.ErrorResponse(c, errCode, err))
-						return
-
-					case 1042:
-						errorMessage := fmt.Sprintf("Redis SET data failed: %v", err)
-						slog.Error(errorMessage)
-						c.JSON(http.StatusInternalServerError, utils.ErrorResponse(c, errCode, err))
-						return
-					}
-				} else {
-					err = session.DeleteSession(sid)
-					if err != nil {
-						errorMessage := fmt.Sprintf("Delete key(sid:%s) failed: %v", sid, err)
-						slog.Error(errorMessage)
-
-						c.JSON(http.StatusInternalServerError, utils.ErrorResponse(c, 1040, err))
-						return
-					}
-					_, errCode, err := session.AddSession(c, request.Username)
-					switch errCode {
-					case 1041:
-						errorMessage := fmt.Sprintf("Failed to create session value JSON data: %v", err)
-						slog.Error(errorMessage)
-						c.JSON(http.StatusInternalServerError, utils.ErrorResponse(c, errCode, err))
-						return
-
-					case 1042:
-						errorMessage := fmt.Sprintf("Redis SET data failed: %v", err)
-						slog.Error(errorMessage)
-						c.JSON(http.StatusInternalServerError, utils.ErrorResponse(c, errCode, err))
-						return
-					}
-				}
-
-				token, expireTimeSec, err := jwt.GenerateJWT(request.Username)
-
-				if err != nil {
-					errorMessage := fmt.Sprintf("Generate the JWT string failed: %v", err)
-					slog.Error(errorMessage)
-					c.JSON(http.StatusBadRequest, utils.ErrorResponse(c, 1014, err))
-
-					return
-				}
-
-				c.SetCookie("token", token, expireTimeSec, "/", "localhost", false, true)
-
 				c.JSON(http.StatusOK, utils.SuccessResponse(c, 200, map[string]interface{}{
-					"username":     request.Username,
-					"totp_enabled": totpUserData.TotpEnabled,
+					"username":         request.Username,
+					"totp_enabled":     userTwoFactorAuthData.TotpEnabled.Bool,
+					"mail_otp_enabled": userTwoFactorAuthData.MailOTPenabled,
+					"sms_otp_enabled":  userTwoFactorAuthData.SmsOTPenabled,
 				}))
 			}
+
 		} else {
 			c.JSON(http.StatusUnauthorized, utils.ErrorResponse(c, 1004))
 			return
 		}
 
+		// sql.ErrNoRows indicates that there were no results found for the username provided.
 	} else if err == sql.ErrNoRows {
 		errorMessage := fmt.Sprintf("User Login failed: %v", err)
 		slog.Error(errorMessage)
-
 		c.JSON(http.StatusNotFound, utils.ErrorResponse(c, 1003, err))
 		return
+
 	} else if err != nil {
 		errorMessage := fmt.Sprintf("Login failed: %v", err)
 		slog.Error(errorMessage)
-
 		c.JSON(http.StatusInternalServerError, utils.ErrorResponse(c, 1002, err))
 		return
 	}
