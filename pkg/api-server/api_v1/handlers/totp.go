@@ -2,14 +2,13 @@ package handlers
 
 import (
 	"database/sql"
-	"net/http"
 	"log/slog"
-	"fmt"
-	"github.com/gin-gonic/gin"
+	"net/http"
 	mariadb "suglider-auth/internal/database"
 	"suglider-auth/internal/utils"
 	"suglider-auth/pkg/totp"
-	"suglider-auth/pkg/session"
+
+	"github.com/gin-gonic/gin"
 )
 
 type totpInput struct {
@@ -42,13 +41,13 @@ func TotpGenerate(c *gin.Context) {
 	// Look up user ID
 	userIDInfo, err := mariadb.LookupUserID(request.Username)
 	if err != nil {
-        if err == sql.ErrNoRows {
+		if err == sql.ErrNoRows {
 			c.JSON(http.StatusBadRequest, utils.ErrorResponse(c, 1006, err))
 			return
 		}
 		c.JSON(http.StatusInternalServerError, utils.ErrorResponse(c, 1002, err))
 		return
-    }
+	}
 
 	// Generate TOTP QRcode
 	totpInfo, imageData, errCode, err := totp.TotpGernate(request.Username, userIDInfo.UserID)
@@ -66,7 +65,7 @@ func TotpGenerate(c *gin.Context) {
 // @Accept multipart/form-data
 // @Produce application/json
 // @Param username formData string false "User Name"
-// @Param totpCode formData string false "TOTP Code"
+// @Param otp_ode formData string false "OTP Code"
 // @Success 200 {string} string "Success"
 // @Failure 400 {string} string "Bad request"
 // @Failure 401 {string} string "Unauthorized"
@@ -74,7 +73,7 @@ func TotpGenerate(c *gin.Context) {
 // @Failure 404 {string} string "Not found"
 // @Router /api/v1/totp/verify [patch]
 func TotpVerify(c *gin.Context) {
-// The API uses the first enabled TOTP feature to verify the TOTP code.
+	// The API uses the first enabled TOTP feature to verify the TOTP code.
 
 	var request totpInput
 
@@ -88,13 +87,13 @@ func TotpVerify(c *gin.Context) {
 	// To get TOTP secret
 	totpData, err := mariadb.TotpUserData(request.Username)
 	if err != nil {
-        if err == sql.ErrNoRows {
+		if err == sql.ErrNoRows {
 			c.JSON(http.StatusBadRequest, utils.ErrorResponse(c, 1006, err))
 			return
 		}
 		c.JSON(http.StatusInternalServerError, utils.ErrorResponse(c, 1002, err))
 		return
-    }
+	}
 
 	// Verify TOTP Code from user input
 	valid := totp.TotpValidate(request.TotpCode, totpData.TotpSecret)
@@ -120,7 +119,7 @@ func TotpVerify(c *gin.Context) {
 // @Accept multipart/form-data
 // @Produce application/json
 // @Param username formData string false "User Name"
-// @Param totpCode formData string false "TOTP Code"
+// @Param otp_code formData string false "OTP Code"
 // @Success 200 {string} string "Success"
 // @Failure 400 {string} string "Bad request"
 // @Failure 401 {string} string "Unauthorized"
@@ -128,90 +127,34 @@ func TotpVerify(c *gin.Context) {
 // @Failure 404 {string} string "Not found"
 // @Router /api/v1/totp/validate [post]
 func TotpValidate(c *gin.Context) {
-// If a user has enabled TOTP, the API can be used during the login process to verify its validity.
 
-	var request totpInput
+	userName, isUserNameExists := c.Get("username")
+	Result, isTOTPVerifyExists := c.Get("totp_verify")
 
-	// Check the parameter trasnfer from POST
-	err := c.ShouldBindJSON(&request)
-	if err != nil {
-		c.JSON(http.StatusBadRequest, utils.ErrorResponse(c, 1001, err))
+	if !isUserNameExists || !isTOTPVerifyExists {
+		slog.Error("username and totp_verify are not exists.")
+		c.JSON(http.StatusInternalServerError, utils.ErrorResponse(c, 1052, nil))
 		return
 	}
 
-	// To get TOTP secret
-	totpData, err := mariadb.TotpUserData(request.Username)
-	if err != nil {
-        if err == sql.ErrNoRows {
-			c.JSON(http.StatusBadRequest, utils.ErrorResponse(c, 1006, err))
-			return
-		}
-		c.JSON(http.StatusInternalServerError, utils.ErrorResponse(c, 1002, err))
-		return
-    }
-
-	// Verify TOTP Code from user input
-	valid := totp.TotpValidate(request.TotpCode, totpData.TotpSecret)
-
-	if !valid {
-		c.JSON(http.StatusBadRequest, utils.ErrorResponse(c, 1007))
-		return
-	}
-
-	sid := session.ReadSession(c)
-
-	// Check session exist or not
-	ok, err := session.CheckSession(c)
-
-	if err != nil {
-		errorMessage := fmt.Sprintf("Checking whether key exist or not happen something wrong: %v", err)
-		slog.Error(errorMessage)
-
-		c.JSON(http.StatusInternalServerError, utils.ErrorResponse(c, 1039, err))
-		return
-	}				
-
+	verifyResult, ok := Result.(bool)
 	if !ok {
-		_, errCode, err := session.AddSession(c, request.Username)
-		switch errCode {
-		case 1041:
-			errorMessage := fmt.Sprintf("Failed to create session value JSON data: %v", err)
-			slog.Error(errorMessage)
-			c.JSON(http.StatusInternalServerError, utils.ErrorResponse(c, errCode, err))
-			return
-
-		case 1042:
-			errorMessage := fmt.Sprintf("Redis SET data failed: %v", err)
-			slog.Error(errorMessage)
-			c.JSON(http.StatusInternalServerError, utils.ErrorResponse(c, errCode, err))
-			return
-		}
-	} else {
-		err = session.DeleteSession(sid)
-		if err != nil {
-			errorMessage := fmt.Sprintf("Delete key(sid:%s) failed: %v", sid, err)
-			slog.Error(errorMessage)
-	
-			c.JSON(http.StatusInternalServerError, utils.ErrorResponse(c, 1040, err))
-			return
-		}					
-		_, errCode, err := session.AddSession(c, request.Username)
-		switch errCode {
-		case 1041:
-			errorMessage := fmt.Sprintf("Failed to create session value JSON data: %v", err)
-			slog.Error(errorMessage)
-			c.JSON(http.StatusInternalServerError, utils.ErrorResponse(c, errCode, err))
-			return
-
-		case 1042:
-			errorMessage := fmt.Sprintf("Redis SET data failed: %v", err)
-			slog.Error(errorMessage)
-			c.JSON(http.StatusInternalServerError, utils.ErrorResponse(c, errCode, err))
-			return
-		}
+		slog.Error("OTP verify result value is not bool.")
+		c.JSON(http.StatusInternalServerError, utils.ErrorResponse(c, 1051, nil))
+		return
 	}
-c.JSON(http.StatusOK, utils.SuccessResponse(c, 200, nil))
 
+	if verifyResult {
+		c.JSON(http.StatusOK, utils.SuccessResponse(c, 200, map[string]interface{}{
+			"username":    userName,
+			"totp_verify": true,
+		}))
+	} else {
+		c.JSON(http.StatusUnauthorized, utils.ErrorResponse(c, 1047, map[string]interface{}{
+			"username":    userName,
+			"totp_verify": false,
+		}))
+	}
 }
 
 // @Summary Disable TOTP
@@ -239,13 +182,13 @@ func TotpDisable(c *gin.Context) {
 	// Update TOTP enabled column status in database
 	errTotpUpdateEnabled := mariadb.TotpUpdateEnabled(request.Username, false)
 	if errTotpUpdateEnabled != nil {
-        if errTotpUpdateEnabled == sql.ErrNoRows {
+		if errTotpUpdateEnabled == sql.ErrNoRows {
 			c.JSON(http.StatusBadRequest, utils.ErrorResponse(c, 1006, errTotpUpdateEnabled))
 			return
 		}
 		c.JSON(http.StatusInternalServerError, utils.ErrorResponse(c, 1002, errTotpUpdateEnabled))
 		return
-    }
+	}
 
 	c.JSON(http.StatusOK, utils.SuccessResponse(c, 200, nil))
 

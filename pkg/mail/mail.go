@@ -122,7 +122,7 @@ func (hm *HtmlMail) GenerateForgotPasswordMail(ctx context.Context, tempFile, us
 	return buf.String(), nil
 }
 
-func (hm *HtmlMail) GenerateOTPmail(ctx context.Context, code, userName, tempFile string) (string, error) {
+func (hm *HtmlMail) GenerateOTPMail(ctx context.Context, code, firstName, tempFile string) (string, error) {
 
 	tmplFile, err := ioutil.ReadFile(tempFile)
 	if err != nil {
@@ -134,7 +134,7 @@ func (hm *HtmlMail) GenerateOTPmail(ctx context.Context, code, userName, tempFil
 		return "", err
 	}
 	replaceContent := OTPmailReplace{
-		Name:    userName,
+		Name:    firstName,
 		OTPcode: code,
 	}
 
@@ -143,6 +143,4 @@ func (hm *HtmlMail) GenerateOTPmail(ctx context.Context, code, userName, tempFil
 		return "", err
 	}
 	return buf.String(), nil
-
-	// return string(tmplFile), nil
 }

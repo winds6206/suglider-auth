@@ -53,7 +53,7 @@ func UserDeleteByUUID(userID, userName, mail string) (result sql.Result, err err
 	return result, err
 }
 
-func UserLogin(userName string) (userInfo UserDBInfo, err error) {
+func UserLogin(userName string) (userInfo UserInfo, err error) {
 	ctx, cancel := context.WithTimeout(context.Background(), dbTimeOut)
 	defer cancel()
 
@@ -62,7 +62,7 @@ func UserLogin(userName string) (userInfo UserDBInfo, err error) {
 	return userInfo, err
 }
 
-func PasswordExpire(userName string) (userInfo UserDBInfo, err error) {
+func PasswordExpire(userName string) (userInfo UserInfo, err error) {
 	ctx, cancel := context.WithTimeout(context.Background(), dbTimeOut)
 	defer cancel()
 
@@ -191,12 +191,12 @@ func TotpUpdateEnabled(userName string, totpEnabled bool) (err error) {
 	return err
 }
 
-func LookupUserID(userName string) (userIDInfo UserIDInfo, err error) {
+func LookupUserID(userName string) (userInfo UserInfo, err error) {
 	ctx, cancel := context.WithTimeout(context.Background(), dbTimeOut)
 	defer cancel()
 
-	err = DataBase.GetContext(ctx, &userIDInfo, "SELECT LOWER(HEX(user_id)) AS user_id FROM suglider.user_info WHERE username=?", userName)
-	return userIDInfo, err
+	err = DataBase.GetContext(ctx, &userInfo, "SELECT LOWER(HEX(user_id)) AS user_id FROM suglider.user_info WHERE username=?", userName)
+	return userInfo, err
 }
 
 func CheckUsername(userName string) (rowCount int, err error) {
@@ -244,13 +244,25 @@ func MailOTPupdateEnabled(userName string, mailOTPenabled bool) (int64, int64, e
 	return rowsAffected, errCode, err
 }
 
-func GetUserMail(userName string) (userMail UserMail, err error) {
+func GetUserInfo(userName string) (userInfo UserInfo, err error) {
 	ctx, cancel := context.WithTimeout(context.Background(), dbTimeOut)
 	defer cancel()
 
-	sqlStr := "SELECT mail " +
+	sqlStr := "SELECT first_name, mail " +
 		"FROM suglider.user_info " +
 		"WHERE user_info.username=?"
-	err = DataBase.GetContext(ctx, &userMail, sqlStr, userName)
-	return userMail, err
+	err = DataBase.GetContext(ctx, &userInfo, sqlStr, userName)
+	return userInfo, err
+}
+
+func UserTwoFactorAuth(userName string) (userTwoFactorAuthInfo UserTwoFactorAuthInfo, err error) {
+	ctx, cancel := context.WithTimeout(context.Background(), dbTimeOut)
+	defer cancel()
+
+	sqlStr := "SELECT totp.user_id, user_info.username, totp.totp_enabled, user_info.mail_otp_enabled, user_info.sms_otp_enabled " +
+		"FROM suglider.user_info " +
+		"LEFT JOIN suglider.totp ON user_info.user_id = totp.user_id " +
+		"WHERE user_info.username=?"
+	err = DataBase.GetContext(ctx, &userTwoFactorAuthInfo, sqlStr, userName)
+	return userTwoFactorAuthInfo, err
 }

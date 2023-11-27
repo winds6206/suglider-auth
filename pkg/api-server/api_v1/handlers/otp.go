@@ -15,11 +15,6 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type mailOTPverifyData struct {
-	UserName string `json:"username" binding:"required"`
-	OTPcode  string `json:"otp_code" binding:"required"`
-}
-
 // @Summary Mail OTP Enable
 // @Description Enable Mail OTP feature
 // @Tags users
@@ -32,7 +27,7 @@ type mailOTPverifyData struct {
 // @Failure 403 {string} string "Forbidden"
 // @Failure 404 {string} string "Not found"
 // @Router /api/v1/user/mail-enable [put]
-func MailOTPenable(c *gin.Context) {
+func MailOTPEnable(c *gin.Context) {
 	var request userNameOperate
 
 	// Check the parameter trasnfer from POST
@@ -86,7 +81,7 @@ func MailOTPenable(c *gin.Context) {
 // @Failure 403 {string} string "Forbidden"
 // @Failure 404 {string} string "Not found"
 // @Router /api/v1/user/mail-disable [put]
-func MailOTPdisable(c *gin.Context) {
+func MailOTPDisable(c *gin.Context) {
 	var request userNameOperate
 
 	// Check the parameter trasnfer from POST
@@ -141,7 +136,7 @@ func MailOTPdisable(c *gin.Context) {
 // @Failure 403 {string} string "Forbidden"
 // @Failure 404 {string} string "Not found"
 // @Router /api/v1/user/mail-send [post]
-func MailOTP(c *gin.Context) {
+func MailOTPSend(c *gin.Context) {
 	var request userNameOperate
 
 	// Check the parameter trasnfer from POST
@@ -151,7 +146,7 @@ func MailOTP(c *gin.Context) {
 		return
 	}
 
-	userMail, err := mariadb.GetUserMail(request.UserName)
+	userInfo, err := mariadb.GetUserInfo(request.UserName)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			c.JSON(http.StatusBadRequest, utils.ErrorResponse(c, 1048, err))
@@ -160,9 +155,6 @@ func MailOTP(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, utils.ErrorResponse(c, 1002, err))
 		return
 	}
-
-	//TODO
-	fmt.Println(userMail.Mail)
 
 	code := encrypt.RandomNumber(6)
 
@@ -178,9 +170,8 @@ func MailOTP(c *gin.Context) {
 	redisKey := encrypt.HashWithSHA(request.UserName, "sha1")
 
 	redis.Set("mail_otp:"+redisKey, code, redisTTL)
-	fmt.Println(code)
 
-	errSendMailOTP := smtp.SendMailOTP(c, request.UserName, "winds6206@gmail.com", code)
+	errSendMailOTP := smtp.SendMailOTP(c, userInfo.FirstName, userInfo.Mail, code)
 	if errSendMailOTP != nil {
 		slog.Error(errSendMailOTP.Error())
 	}
@@ -201,44 +192,33 @@ func MailOTP(c *gin.Context) {
 // @Failure 403 {string} string "Forbidden"
 // @Failure 404 {string} string "Not found"
 // @Router /api/v1/user/mail-verify [get]
-func MailOTPverify(c *gin.Context) {
-	var request mailOTPverifyData
+func MailOTPVerify(c *gin.Context) {
+	userName, isUserNameExists := c.Get("username")
+	Result, isMailOTPVerifyExists := c.Get("mail_otp_verify")
 
-	// Check the parameter trasnfer from POST
-	err := c.ShouldBindJSON(&request)
-	if err != nil {
-		c.JSON(http.StatusBadRequest, utils.ErrorResponse(c, 1001, err))
+	if !isUserNameExists || !isMailOTPVerifyExists {
+		slog.Error("username and mail_otp_verify are not exists.")
+		c.JSON(http.StatusInternalServerError, utils.ErrorResponse(c, 1052, nil))
 		return
 	}
 
-	redisKey := encrypt.HashWithSHA(request.UserName, "sha1")
-
-	value, errCode, err := redis.Get("mail_otp:" + redisKey)
-
-	switch errCode {
-	case 1043:
-		errorMessage := fmt.Sprintf("Redis key does not exist: %v", err)
-		slog.Error(errorMessage)
-		c.JSON(http.StatusInternalServerError, utils.ErrorResponse(c, errCode, err))
-		return
-
-	case 1044:
-		errorMessage := fmt.Sprintf("Redis GET data failed: %v", err)
-		slog.Error(errorMessage)
-		c.JSON(http.StatusInternalServerError, utils.ErrorResponse(c, errCode, err))
+	verifyResult, ok := Result.(bool)
+	if !ok {
+		slog.Error("OTP verify result value is not bool.")
+		c.JSON(http.StatusInternalServerError, utils.ErrorResponse(c, 1051, nil))
 		return
 	}
 
-	if value == request.OTPcode {
+	if verifyResult {
 		c.JSON(http.StatusOK, utils.SuccessResponse(c, 200, map[string]interface{}{
-			"username":   request.UserName,
-			"otp_verify": true,
+			"username":        userName,
+			"mail_otp_verify": true,
 		}))
-
 	} else {
 		c.JSON(http.StatusUnauthorized, utils.ErrorResponse(c, 1047, map[string]interface{}{
-			"username":   request.UserName,
-			"otp_verify": false,
+			"username":        userName,
+			"mail_otp_verify": false,
 		}))
 	}
+
 }
