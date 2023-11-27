@@ -1,20 +1,21 @@
 package handlers
 
 import (
+	"fmt"
 	"log/slog"
 	"net/http"
-	"fmt"
+
 	"github.com/gin-gonic/gin"
 
-	smtp "suglider-auth/internal/mail"
 	db "suglider-auth/internal/database"
-	pwv "suglider-auth/pkg/pwd-validator"
+	smtp "suglider-auth/internal/mail"
 	"suglider-auth/internal/utils"
 	"suglider-auth/pkg/encrypt"
+	fmtv "suglider-auth/pkg/fmt_validator"
 )
 
 type passwordReset struct {
-	Password  string   `json:"password"`
+	Password string `json:"password"`
 }
 
 // @Summary Verify Email Address
@@ -40,7 +41,7 @@ func VerifyEmailAddress(c *gin.Context) {
 	if pass && err == nil {
 		c.JSON(
 			http.StatusOK,
-			utils.SuccessResponse(c, 200, map[string]interface{} {
+			utils.SuccessResponse(c, 200, map[string]interface{}{
 				"mail": mail,
 			}),
 		)
@@ -130,12 +131,12 @@ func RestUserPassword(c *gin.Context) {
 	resetId := c.Query("reset-id")
 	resetCode := c.Query("reset-code")
 
-	errPwdValidator := pwv.PwdValidator("ignoreThis", postData.Password, "this@ignore.here")
+	errPwdValidator := fmtv.PwdValidator("ignoreThis", postData.Password, "this@ignore.here")
 	if errPwdValidator != nil {
 
 		errorMessage := fmt.Sprintf("%v", errPwdValidator)
 		slog.Error(errorMessage)
-		
+
 		c.JSON(http.StatusBadRequest, utils.ErrorResponse(c, 1021, errPwdValidator))
 		return
 	}
@@ -156,7 +157,7 @@ func RestUserPassword(c *gin.Context) {
 
 	c.JSON(
 		http.StatusOK,
-		utils.SuccessResponse(c, 200, map[string]interface{} {
+		utils.SuccessResponse(c, 200, map[string]interface{}{
 			"mail": mail,
 		}),
 	)

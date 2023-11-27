@@ -9,8 +9,8 @@ import (
 	smtp "suglider-auth/internal/mail"
 	"suglider-auth/internal/utils"
 	"suglider-auth/pkg/encrypt"
+	fmtv "suglider-auth/pkg/fmt_validator"
 	"suglider-auth/pkg/jwt"
-	pwd_validator "suglider-auth/pkg/pwd-validator"
 	"suglider-auth/pkg/session"
 	"time"
 
@@ -18,11 +18,14 @@ import (
 )
 
 type userSignUp struct {
-	Username   string `json:"username" binding:"required"`
-	Password   string `json:"password" binding:"required"`
-	ComfirmPwd string `json:"comfirm_pwd" binding:"required"`
-	Mail       string `json:"mail" binding:"required"`
-	Address    string `json:"address" binding:"required"`
+	UserName    string `json:"username" binding:"required"`
+	Password    string `json:"password" binding:"required"`
+	ComfirmPwd  string `json:"comfirm_pwd" binding:"required"`
+	FirstName   string `json:"first_name" binding:"required"`
+	LastName    string `json:"last_name" binding:"required"`
+	PhoneNumber string `json:"phone_number" binding:"required"`
+	Mail        string `json:"mail" binding:"required"`
+	Address     string `json:"address" binding:"required"`
 }
 
 type userDelete struct {
@@ -53,6 +56,9 @@ type MailOperate struct {
 // @Param password formData string false "Password"
 // @Param comfirm_pwd formData string false "Comfirm Password"
 // @Param mail formData string false "e-Mail"
+// @Param first_name formData string false "First Name"
+// @Param last_name formData string false "Last Name"
+// @Param phone_number formData string false "Phone Number"
 // @Param address formData string false "Address"
 // @Success 200 {string} string "Success"
 // @Failure 400 {string} string "Bad request"
@@ -71,7 +77,7 @@ func UserSignUp(c *gin.Context) {
 		return
 	}
 
-	errPwdValidator := pwd_validator.PwdValidator(request.Username, request.Password, request.Mail)
+	errPwdValidator := fmtv.FmtValidator(request.UserName, request.Password, request.PhoneNumber, request.Mail)
 	if errPwdValidator != nil {
 
 		errorMessage := fmt.Sprintf("%v", errPwdValidator)
@@ -87,7 +93,7 @@ func UserSignUp(c *gin.Context) {
 
 	fmt.Println(passwordEncode)
 
-	err = mariadb.UserSignUp(request.Username, passwordEncode, comfirmPwdEncode, request.Mail, request.Address)
+	err = mariadb.UserSignUp(request.UserName, passwordEncode, comfirmPwdEncode, request.FirstName, request.LastName, request.PhoneNumber, request.Mail, request.Address)
 	if err != nil {
 		errorMessage := fmt.Sprintf("Insert user_info table failed: %v", err)
 		slog.Error(errorMessage)
@@ -96,7 +102,7 @@ func UserSignUp(c *gin.Context) {
 		return
 	} else {
 		// mail verification
-		if err = smtp.SendVerifyMail(c, request.Username, request.Mail); err != nil {
+		if err = smtp.SendVerifyMail(c, request.UserName, request.Mail); err != nil {
 			slog.Error(err.Error())
 		}
 		c.JSON(http.StatusOK, utils.SuccessResponse(c, 200, nil))
