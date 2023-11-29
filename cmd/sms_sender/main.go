@@ -113,9 +113,12 @@ func main() {
 				OrderTime:   params.OrderTime,
 				LimitTime:   params.LimitTime,
 			}
-			if _, err := sender.Sender.Send(msg); err != nil {
-				fmt.Println(err)
+			id, err := sender.Sender.Send(msg)
+			if err != nil {
+				fmt.Printf("Send Error: %s\n", err)
+				return
 			}
+			fmt.Printf("SMS Message ID: %s\n", id)
 		case "query", "cancel":
 			qry := sms.HinetSmsQuery {
 				SmsType:     params.SmsType,
@@ -124,17 +127,23 @@ func main() {
 			}
 			switch params.SmsType {
 			case "query":
-				if _, err := sender.Sender.SendQuery(qry); err != nil {
-					fmt.Println(err)
+				resp, err := sender.Sender.SendQuery(qry)
+				if err != nil {
+					fmt.Printf("Query Error: %s\n", err)
+					return
 				}
+				fmt.Printf("Query Status: %s\n", resp)
 			case "cancel":
 				if err := sender.Sender.SendCancelSms(qry); err != nil {
-					fmt.Println(err)
+					fmt.Printf("Cancel Error: %s\n", err)
+					return
 				}
+				fmt.Println("Sms cancelled successfully.")
 			}
 		default:
 			fmt.Printf("Unsupport SMS Type: %s\n", params.SmsType)
 		}
 	case "fetnet", "fet":
+		// not yet
 	}
 }

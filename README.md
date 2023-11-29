@@ -58,3 +58,21 @@ You could clean test cache by the following command:
 ```bash
 make clean
 ```
+
+## Command Line Utils
+
+**mailer**
+
+Run the following command to build mailer cmd tool, the binary places in the bin folder after compiled successfully:
+
+```bash
+make mailer
+```
+
+**sms_sender**
+
+Run the following command to build sms_sender cmd tool, the binary places in the bin folder after compiled successfully:
+
+```bash
+make sms_sender
+```
