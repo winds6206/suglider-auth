@@ -52,6 +52,12 @@ var apiWhileList = []string{
 	"/api/v1/totp/validate",
 	"/api/v1/otp/mail-verify",
 	"/api/v1/otp/mail-send",
+	"/api/v1/oauth/google/login",
+	"/api/v1/oauth/google/callback",
+	"/api/v1/totp/generate",
+	"/api/v1/totp/verify",
+	"/api/v1/totp/validate",
+	"/api/v1/totp/disable",
 }
 
 func checkAPIWhileList(c *gin.Context) bool {

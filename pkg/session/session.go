@@ -1,28 +1,29 @@
 package session
 
 import (
+	"encoding/json"
+	"fmt"
+	"log/slog"
+	"suglider-auth/configs"
+	"suglider-auth/internal/redis"
+	"suglider-auth/pkg/encrypt"
+	"suglider-auth/pkg/time_convert"
+
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
-	"suglider-auth/pkg/encrypt"
-	"suglider-auth/internal/redis"
-	"encoding/json"
-	"log/slog"
-	"suglider-auth/pkg/time_convert"
-	"suglider-auth/configs"
-	"fmt"
-  )
+)
 
 type sessionData struct {
-	Username	string	`json:"username"`
+	Mail string `json:"mail"`
 }
 
-func AddSession(c *gin.Context, user string) (string, int64, error) {
+func AddSession(c *gin.Context, mail string) (string, int64, error) {
 
 	var errCode int64
 	errCode = 0
 
 	sessionValue := sessionData{
-		Username: user,
+		Mail: mail,
 	}
 
 	jsonSessionValue, err := json.Marshal(sessionValue)
@@ -48,7 +49,7 @@ func AddSession(c *gin.Context, user string) (string, int64, error) {
 		errCode = 1042
 		return "", errCode, err
 	}
-	
+
 	return sessionID, errCode, nil
 }
 
@@ -58,7 +59,7 @@ func CheckSession(c *gin.Context) (bool, error) {
 
 	// Process key format
 	sessionKey := fmt.Sprintf("sid:%s", sid)
-	
+
 	// Exists() function will return bool
 	isExists, err := redis.Exists(sessionKey)
 	if err != nil {

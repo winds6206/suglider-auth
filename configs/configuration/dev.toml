@@ -60,3 +60,7 @@
     path_prefix   = ""
   [mail.expired]
     ttl           = 24 # in hours
+[oauth]
+  [oauth.google]
+    client_id = ""
+    client_secret = ""
