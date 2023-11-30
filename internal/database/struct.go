@@ -3,12 +3,12 @@ package database
 import "database/sql"
 
 type UserInfo struct {
-	Username           string `db:"username"`
-	UserID             string `db:"user_id"`
-	Mail               string `db:"mail"`
-	Password           string `db:"password"`
-	FirstName          string `db:"first_name"`
-	PasswordExpireDate string `db:"password_expire_date"`
+	Username           sql.NullString `db:"username"`
+	UserID             string         `db:"user_id"`
+	Mail               string         `db:"mail"`
+	Password           string         `db:"password"`
+	FirstName          string         `db:"first_name"`
+	PasswordExpireDate string         `db:"password_expire_date"`
 }
 
 type TotpUserInfo struct {
