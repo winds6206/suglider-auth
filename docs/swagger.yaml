@@ -426,9 +426,9 @@ paths:
       - multipart/form-data
       description: disable TOTP
       parameters:
-      - description: User Name
+      - description: Mail
         in: formData
-        name: username
+        name: mail
         type: string
       produces:
       - application/json
@@ -462,9 +462,9 @@ paths:
       - multipart/form-data
       description: generate QRcode
       parameters:
-      - description: User Name
+      - description: Mail
         in: formData
-        name: username
+        name: mail
         type: string
       produces:
       - application/json
@@ -499,9 +499,9 @@ paths:
       description: If a user has enabled TOTP, the API can be used during the login
         process to verify its validity.
       parameters:
-      - description: User Name
+      - description: Mail
         in: formData
-        name: username
+        name: mail
         type: string
       - description: OTP Code
         in: formData
@@ -540,13 +540,13 @@ paths:
       description: The API uses the first enabled TOTP feature to verify the TOTP
         code.
       parameters:
-      - description: User Name
+      - description: Mail
         in: formData
-        name: username
+        name: mail
         type: string
       - description: OTP Code
         in: formData
-        name: otp_ode
+        name: otp_code
         type: string
       produces:
       - application/json
@@ -799,9 +799,9 @@ paths:
       - multipart/form-data
       description: Disable Mail OTP feature
       parameters:
-      - description: User Name
+      - description: Mail
         in: formData
-        name: username
+        name: mail
         type: string
       produces:
       - application/json
@@ -835,9 +835,9 @@ paths:
       - multipart/form-data
       description: Enable Mail OTP feature
       parameters:
-      - description: User Name
+      - description: Mail
         in: formData
-        name: username
+        name: mail
         type: string
       produces:
       - application/json
@@ -871,9 +871,9 @@ paths:
       - multipart/form-data
       description: To send an OTP using email.
       parameters:
-      - description: User Name
+      - description: Mail
         in: formData
-        name: username
+        name: mail
         type: string
       produces:
       - application/json
@@ -908,9 +908,9 @@ paths:
       description: If a user has enabled Mail OTP, the API can be used during the
         login process to verify its validity.
       parameters:
-      - description: User Name
+      - description: Mail
         in: formData
-        name: username
+        name: mail
         type: string
       - description: OTP Code
         in: formData
@@ -1114,6 +1114,18 @@ paths:
       - description: e-Mail
         in: formData
         name: mail
+        type: string
+      - description: First Name
+        in: formData
+        name: first_name
+        type: string
+      - description: Last Name
+        in: formData
+        name: last_name
+        type: string
+      - description: Phone Number
+        in: formData
+        name: phone_number
         type: string
       - description: Address
         in: formData

@@ -17,8 +17,8 @@ import (
 )
 
 type OTPData struct {
-	UserName string `json:"username" binding:"required"`
-	OTPCode  string `json:"otp_code" binding:"required"`
+	Mail    string `json:"mail" binding:"required"`
+	OTPCode string `json:"otp_code" binding:"required"`
 }
 
 func ValidateMailOTP() gin.HandlerFunc {
@@ -34,7 +34,7 @@ func ValidateMailOTP() gin.HandlerFunc {
 		}
 
 		// Check whether user enable 2FA or not.
-		userTwoFactorAuthData, err := mariadb.UserTwoFactorAuth(request.UserName)
+		userTwoFactorAuthData, err := mariadb.GetTwoFactorAuthByMail(request.Mail)
 
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, utils.ErrorResponse(c, 1002, err))
@@ -42,15 +42,15 @@ func ValidateMailOTP() gin.HandlerFunc {
 			return
 		}
 
-		if !userTwoFactorAuthData.MailOTPenabled {
+		if !userTwoFactorAuthData.MailOTPEnabled {
 			c.JSON(http.StatusForbidden, utils.ErrorResponse(c, 1053, map[string]interface{}{
-				"mail_otp_enabled": userTwoFactorAuthData.MailOTPenabled,
+				"mail_otp_enabled": userTwoFactorAuthData.MailOTPEnabled,
 			}))
 			c.Abort()
 			return
 		}
 
-		redisKey := encrypt.HashWithSHA(request.UserName, "sha1")
+		redisKey := encrypt.HashWithSHA(request.Mail, "sha1")
 
 		value, errCode, err := redis.Get("mail_otp:" + redisKey)
 
@@ -73,13 +73,13 @@ func ValidateMailOTP() gin.HandlerFunc {
 		// Verify OTP Code from user input
 		if value == request.OTPCode {
 			c.Set("mail_otp_verify", true)
-			setSession(c, request.UserName)
-			setJWT(c, request.UserName)
+			setSession(c, request.Mail)
+			setJWT(c, request.Mail)
 		} else {
 			c.Set("mail_otp_verify", false)
 		}
 
-		c.Set("username", request.UserName)
+		c.Set("mail", request.Mail)
 		c.Next()
 	}
 }
@@ -97,7 +97,7 @@ func ValidateTOTP() gin.HandlerFunc {
 		}
 
 		// To get TOTP secret
-		totpData, err := mariadb.TotpUserData(request.UserName)
+		totpData, err := mariadb.TotpUserData(request.Mail)
 		if err != nil {
 			if err == sql.ErrNoRows {
 				c.JSON(http.StatusBadRequest, utils.ErrorResponse(c, 1006, err))
@@ -122,18 +122,18 @@ func ValidateTOTP() gin.HandlerFunc {
 
 		if valid {
 			c.Set("totp_verify", true)
-			setSession(c, request.UserName)
-			setJWT(c, request.UserName)
+			setSession(c, request.Mail)
+			setJWT(c, request.Mail)
 		} else {
 			c.Set("totp_verify", false)
 		}
 
-		c.Set("username", request.UserName)
+		c.Set("mail", request.Mail)
 		c.Next()
 	}
 }
 
-func setSession(c *gin.Context, userName string) {
+func setSession(c *gin.Context, mail string) {
 	sid := session.ReadSession(c)
 
 	// Check session exist or not
@@ -146,7 +146,7 @@ func setSession(c *gin.Context, userName string) {
 		return
 	}
 	if !ok {
-		_, errCode, err := session.AddSession(c, userName)
+		_, errCode, err := session.AddSession(c, mail)
 		switch errCode {
 		case 1041:
 			errorMessage := fmt.Sprintf("Failed to create session value JSON data: %v", err)
@@ -171,7 +171,7 @@ func setSession(c *gin.Context, userName string) {
 			c.Abort()
 			return
 		}
-		_, errCode, err := session.AddSession(c, userName)
+		_, errCode, err := session.AddSession(c, mail)
 		switch errCode {
 		case 1041:
 			errorMessage := fmt.Sprintf("Failed to create session value JSON data: %v", err)
@@ -190,9 +190,9 @@ func setSession(c *gin.Context, userName string) {
 	}
 }
 
-func setJWT(c *gin.Context, userName string) {
+func setJWT(c *gin.Context, mail string) {
 
-	token, expireTimeSec, err := jwt.GenerateJWT(userName)
+	token, expireTimeSec, err := jwt.GenerateJWT(mail)
 
 	if err != nil {
 		errorMessage := fmt.Sprintf("Generate the JWT string failed: %v", err)

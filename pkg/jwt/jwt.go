@@ -11,11 +11,11 @@ import (
 var jwtKey = []byte("suglider")
 
 type jwtData struct {
-	Username string `json:"username"`
+	Mail string `json:"mail"`
 	jwt.RegisteredClaims
 }
 
-func GenerateJWT(username string) (string, int, error) {
+func GenerateJWT(mail string) (string, int, error) {
 
 	// Declare the expiration time of the token
 	expireTime := 20 * time.Minute
@@ -23,7 +23,7 @@ func GenerateJWT(username string) (string, int, error) {
 
 	// Create the JWT claims, which includes the username and expiry time
 	claims := &jwtData{
-		Username: username,
+		Mail: mail,
 		RegisteredClaims: jwt.RegisteredClaims{
 			// In JWT, the expiry time is expressed as unix milliseconds
 			ExpiresAt: jwt.NewNumericDate(expirationTime),

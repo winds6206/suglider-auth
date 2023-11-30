@@ -20,7 +20,7 @@ import (
 // @Tags users
 // @Accept multipart/form-data
 // @Produce application/json
-// @Param username formData string false "User Name"
+// @Param mail formData string false "Mail"
 // @Success 200 {string} string "Success"
 // @Failure 400 {string} string "Bad request"
 // @Failure 401 {string} string "Unauthorized"
@@ -28,7 +28,7 @@ import (
 // @Failure 404 {string} string "Not found"
 // @Router /api/v1/user/mail-enable [put]
 func MailOTPEnable(c *gin.Context) {
-	var request userNameOperate
+	var request mailOperate
 
 	// Check the parameter trasnfer from POST
 	err := c.ShouldBindJSON(&request)
@@ -38,8 +38,8 @@ func MailOTPEnable(c *gin.Context) {
 	}
 
 	// Enable Mail OTP
-	rowsAffected, errCode, errMailOTPupdateEnabled := mariadb.MailOTPupdateEnabled(request.UserName, true)
-	if errMailOTPupdateEnabled != nil {
+	rowsAffected, errCode, errMailOTPUpdateEnabled := mariadb.MailOTPUpdateEnabled(request.Mail, true)
+	if errMailOTPUpdateEnabled != nil {
 		switch errCode {
 		case 1002:
 			errorMessage := fmt.Sprintf("Failed to execute SQL syntax: %v", err)
@@ -58,12 +58,12 @@ func MailOTPEnable(c *gin.Context) {
 	// No rows were affected
 	if rowsAffected == 0 {
 		c.JSON(http.StatusOK, utils.SuccessResponse(c, 200, map[string]interface{}{
-			"username": request.UserName,
-			"msg":      "No rows were affected.",
+			"mail": request.Mail,
+			"msg":  "No rows were affected.",
 		}))
 	} else {
 		c.JSON(http.StatusOK, utils.SuccessResponse(c, 200, map[string]interface{}{
-			"username":         request.UserName,
+			"mail":             request.Mail,
 			"mail_otp_enabled": true,
 		}))
 	}
@@ -74,7 +74,7 @@ func MailOTPEnable(c *gin.Context) {
 // @Tags users
 // @Accept multipart/form-data
 // @Produce application/json
-// @Param username formData string false "User Name"
+// @Param mail formData string false "Mail"
 // @Success 200 {string} string "Success"
 // @Failure 400 {string} string "Bad request"
 // @Failure 401 {string} string "Unauthorized"
@@ -82,7 +82,7 @@ func MailOTPEnable(c *gin.Context) {
 // @Failure 404 {string} string "Not found"
 // @Router /api/v1/user/mail-disable [put]
 func MailOTPDisable(c *gin.Context) {
-	var request userNameOperate
+	var request mailOperate
 
 	// Check the parameter trasnfer from POST
 	err := c.ShouldBindJSON(&request)
@@ -92,8 +92,8 @@ func MailOTPDisable(c *gin.Context) {
 	}
 
 	// Disable Mail OTP
-	rowsAffected, errCode, errMailOTPupdateEnabled := mariadb.MailOTPupdateEnabled(request.UserName, false)
-	if errMailOTPupdateEnabled != nil {
+	rowsAffected, errCode, errMailOTPUpdateEnabled := mariadb.MailOTPUpdateEnabled(request.Mail, false)
+	if errMailOTPUpdateEnabled != nil {
 		switch errCode {
 		case 1002:
 			errorMessage := fmt.Sprintf("Failed to execute SQL syntax: %v", err)
@@ -112,12 +112,12 @@ func MailOTPDisable(c *gin.Context) {
 	// No rows were affected
 	if rowsAffected == 0 {
 		c.JSON(http.StatusOK, utils.SuccessResponse(c, 200, map[string]interface{}{
-			"username": request.UserName,
-			"msg":      "No rows were affected.",
+			"mail": request.Mail,
+			"msg":  "No rows were affected.",
 		}))
 	} else {
 		c.JSON(http.StatusOK, utils.SuccessResponse(c, 200, map[string]interface{}{
-			"username":         request.UserName,
+			"mail":             request.Mail,
 			"mail_otp_enabled": false,
 		}))
 	}
@@ -129,7 +129,7 @@ func MailOTPDisable(c *gin.Context) {
 // @Tags users
 // @Accept multipart/form-data
 // @Produce application/json
-// @Param username formData string false "User Name"
+// @Param mail formData string false "Mail"
 // @Success 200 {string} string "Success"
 // @Failure 400 {string} string "Bad request"
 // @Failure 401 {string} string "Unauthorized"
@@ -137,7 +137,7 @@ func MailOTPDisable(c *gin.Context) {
 // @Failure 404 {string} string "Not found"
 // @Router /api/v1/user/mail-send [post]
 func MailOTPSend(c *gin.Context) {
-	var request userNameOperate
+	var request mailOperate
 
 	// Check the parameter trasnfer from POST
 	err := c.ShouldBindJSON(&request)
@@ -146,7 +146,7 @@ func MailOTPSend(c *gin.Context) {
 		return
 	}
 
-	userInfo, err := mariadb.GetUserInfo(request.UserName)
+	userInfo, err := mariadb.GetUserInfo(request.Mail)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			c.JSON(http.StatusBadRequest, utils.ErrorResponse(c, 1048, err))
@@ -167,7 +167,7 @@ func MailOTPSend(c *gin.Context) {
 		}
 	}
 
-	redisKey := encrypt.HashWithSHA(request.UserName, "sha1")
+	redisKey := encrypt.HashWithSHA(request.Mail, "sha1")
 
 	redis.Set("mail_otp:"+redisKey, code, redisTTL)
 
@@ -184,7 +184,7 @@ func MailOTPSend(c *gin.Context) {
 // @Tags users
 // @Accept multipart/form-data
 // @Produce application/json
-// @Param username formData string false "User Name"
+// @Param mail formData string false "Mail"
 // @Param otpCode formData string false "OTP Code"
 // @Success 200 {string} string "Success"
 // @Failure 400 {string} string "Bad request"
@@ -193,11 +193,11 @@ func MailOTPSend(c *gin.Context) {
 // @Failure 404 {string} string "Not found"
 // @Router /api/v1/user/mail-verify [get]
 func MailOTPVerify(c *gin.Context) {
-	userName, isUserNameExists := c.Get("username")
+	mail, isMailExists := c.Get("mail")
 	Result, isMailOTPVerifyExists := c.Get("mail_otp_verify")
 
-	if !isUserNameExists || !isMailOTPVerifyExists {
-		slog.Error("username and mail_otp_verify are not exists.")
+	if !isMailExists || !isMailOTPVerifyExists {
+		slog.Error("mail and mail_otp_verify are not exists.")
 		c.JSON(http.StatusInternalServerError, utils.ErrorResponse(c, 1052, nil))
 		return
 	}
@@ -211,12 +211,12 @@ func MailOTPVerify(c *gin.Context) {
 
 	if verifyResult {
 		c.JSON(http.StatusOK, utils.SuccessResponse(c, 200, map[string]interface{}{
-			"username":        userName,
+			"mail":            mail,
 			"mail_otp_verify": true,
 		}))
 	} else {
 		c.JSON(http.StatusUnauthorized, utils.ErrorResponse(c, 1047, map[string]interface{}{
-			"username":        userName,
+			"mail":            mail,
 			"mail_otp_verify": false,
 		}))
 	}

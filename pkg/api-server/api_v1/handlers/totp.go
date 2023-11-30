@@ -12,8 +12,8 @@ import (
 )
 
 type totpInput struct {
-	Username string `json:"username"`
-	TotpCode string `json:"totpCode"`
+	Mail    string `json:"mail"`
+	OTPCode string `json:"otp_code"`
 }
 
 // @Summary Enable TOTP
@@ -21,7 +21,7 @@ type totpInput struct {
 // @Tags totp
 // @Accept multipart/form-data
 // @Produce application/json
-// @Param username formData string false "User Name"
+// @Param mail formData string false "Mail"
 // @Success 200 {string} string "Success"
 // @Failure 400 {string} string "Bad request"
 // @Failure 401 {string} string "Unauthorized"
@@ -39,7 +39,7 @@ func TotpGenerate(c *gin.Context) {
 	}
 
 	// Look up user ID
-	userIDInfo, err := mariadb.LookupUserID(request.Username)
+	userIDInfo, err := mariadb.LookupUserID(request.Mail)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			c.JSON(http.StatusBadRequest, utils.ErrorResponse(c, 1006, err))
@@ -50,7 +50,7 @@ func TotpGenerate(c *gin.Context) {
 	}
 
 	// Generate TOTP QRcode
-	totpInfo, imageData, errCode, err := totp.TotpGernate(request.Username, userIDInfo.UserID)
+	totpInfo, imageData, errCode, err := totp.TotpGernate(request.Mail, userIDInfo.UserID)
 	if errCode != 0 {
 		c.JSON(http.StatusInternalServerError, utils.ErrorResponse(c, errCode, err))
 	}
@@ -64,8 +64,8 @@ func TotpGenerate(c *gin.Context) {
 // @Tags totp
 // @Accept multipart/form-data
 // @Produce application/json
-// @Param username formData string false "User Name"
-// @Param otp_ode formData string false "OTP Code"
+// @Param mail formData string false "Mail"
+// @Param otp_code formData string false "OTP Code"
 // @Success 200 {string} string "Success"
 // @Failure 400 {string} string "Bad request"
 // @Failure 401 {string} string "Unauthorized"
@@ -85,7 +85,7 @@ func TotpVerify(c *gin.Context) {
 	}
 
 	// To get TOTP secret
-	totpData, err := mariadb.TotpUserData(request.Username)
+	totpData, err := mariadb.TotpUserData(request.Mail)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			c.JSON(http.StatusBadRequest, utils.ErrorResponse(c, 1006, err))
@@ -96,7 +96,7 @@ func TotpVerify(c *gin.Context) {
 	}
 
 	// Verify TOTP Code from user input
-	valid := totp.TotpValidate(request.TotpCode, totpData.TotpSecret)
+	valid := totp.TotpValidate(request.OTPCode, totpData.TotpSecret)
 
 	if !valid {
 		c.JSON(http.StatusBadRequest, utils.ErrorResponse(c, 1007))
@@ -104,7 +104,7 @@ func TotpVerify(c *gin.Context) {
 	}
 
 	// Update TOTP enabled and verified column status in database
-	errTotpUpdateVerify := mariadb.TotpUpdateVerify(request.Username, true, true)
+	errTotpUpdateVerify := mariadb.TotpUpdateVerify(request.Mail, true, true)
 	if errTotpUpdateVerify != nil {
 		c.JSON(http.StatusInternalServerError, utils.ErrorResponse(c, 1002, err))
 		return
@@ -118,7 +118,7 @@ func TotpVerify(c *gin.Context) {
 // @Tags totp
 // @Accept multipart/form-data
 // @Produce application/json
-// @Param username formData string false "User Name"
+// @Param mail formData string false "Mail"
 // @Param otp_code formData string false "OTP Code"
 // @Success 200 {string} string "Success"
 // @Failure 400 {string} string "Bad request"
@@ -128,11 +128,11 @@ func TotpVerify(c *gin.Context) {
 // @Router /api/v1/totp/validate [post]
 func TotpValidate(c *gin.Context) {
 
-	userName, isUserNameExists := c.Get("username")
+	mail, isMailExists := c.Get("mail")
 	Result, isTOTPVerifyExists := c.Get("totp_verify")
 
-	if !isUserNameExists || !isTOTPVerifyExists {
-		slog.Error("username and totp_verify are not exists.")
+	if !isMailExists || !isTOTPVerifyExists {
+		slog.Error("mail and totp_verify are not exists.")
 		c.JSON(http.StatusInternalServerError, utils.ErrorResponse(c, 1052, nil))
 		return
 	}
@@ -146,12 +146,12 @@ func TotpValidate(c *gin.Context) {
 
 	if verifyResult {
 		c.JSON(http.StatusOK, utils.SuccessResponse(c, 200, map[string]interface{}{
-			"username":    userName,
+			"mail":        mail,
 			"totp_verify": true,
 		}))
 	} else {
 		c.JSON(http.StatusUnauthorized, utils.ErrorResponse(c, 1047, map[string]interface{}{
-			"username":    userName,
+			"mail":        mail,
 			"totp_verify": false,
 		}))
 	}
@@ -162,7 +162,7 @@ func TotpValidate(c *gin.Context) {
 // @Tags totp
 // @Accept multipart/form-data
 // @Produce application/json
-// @Param username formData string false "User Name"
+// @Param mail formData string false "Mail"
 // @Success 200 {string} string "Success"
 // @Failure 400 {string} string "Bad request"
 // @Failure 401 {string} string "Unauthorized"
@@ -180,7 +180,7 @@ func TotpDisable(c *gin.Context) {
 	}
 
 	// Update TOTP enabled column status in database
-	errTotpUpdateEnabled := mariadb.TotpUpdateEnabled(request.Username, false)
+	errTotpUpdateEnabled := mariadb.TotpUpdateEnabled(request.Mail, false)
 	if errTotpUpdateEnabled != nil {
 		if errTotpUpdateEnabled == sql.ErrNoRows {
 			c.JSON(http.StatusBadRequest, utils.ErrorResponse(c, 1006, errTotpUpdateEnabled))

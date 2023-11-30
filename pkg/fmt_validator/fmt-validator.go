@@ -14,6 +14,10 @@ type signUpPayload struct {
 	Mail        string `validate:"required,email"`
 }
 
+type mailData struct {
+	Mail string `validate:"required,email"`
+}
+
 func passwordComplexity(fl validator.FieldLevel) bool {
 	password := fl.Field().String()
 
@@ -94,4 +98,20 @@ func FmtValidator(userName, password, phoneNumber, mail string) error {
 	}
 
 	return nil
+}
+
+func MailValidator(mail string) bool {
+
+	payload := &mailData{
+		Mail: mail,
+	}
+
+	v := validator.New()
+
+	err := v.Struct(payload)
+	if err != nil {
+		return false
+	}
+
+	return true
 }

@@ -15,7 +15,7 @@ type totpInfo struct {
 	AuthURL string `json:"auth_url"`
 }
 
-func TotpGernate(username, userID string) (*totpInfo, []byte, int64, error) {
+func TotpGernate(mail, userID string) (*totpInfo, []byte, int64, error) {
 
 	var errCode int64
 	errCode = 0
@@ -23,7 +23,7 @@ func TotpGernate(username, userID string) (*totpInfo, []byte, int64, error) {
 	// Generate TOTP key
 	key, err := totp.Generate(totp.GenerateOpts{
 		Issuer:      "Suglider",
-		AccountName: username + "@example.com",
+		AccountName: mail,
 	})
 	if err != nil {
 		errorMessage := fmt.Sprintf("Generate TOTP key have something problem: %v", err)
@@ -66,7 +66,7 @@ func TotpGernate(username, userID string) (*totpInfo, []byte, int64, error) {
 	}
 
 	if count == 1 {
-		err := mariadb.TotpUpdateSecret(username, key.Secret(), key.URL())
+		err := mariadb.TotpUpdateSecret(mail, key.Secret(), key.URL())
 		if err != nil {
 			errorMessage := fmt.Sprintf("Update totp table failed: %v", err)
 			slog.Error(errorMessage)
