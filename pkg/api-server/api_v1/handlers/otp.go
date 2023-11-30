@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log/slog"
 	"net/http"
+	"regexp"
 	mariadb "suglider-auth/internal/database"
 	smtp "suglider-auth/internal/mail"
 	"suglider-auth/internal/redis"
@@ -138,6 +139,7 @@ func MailOTPDisable(c *gin.Context) {
 // @Router /api/v1/user/mail-send [post]
 func MailOTPSend(c *gin.Context) {
 	var request mailOperate
+	var user string
 
 	// Check the parameter trasnfer from POST
 	err := c.ShouldBindJSON(&request)
@@ -156,6 +158,22 @@ func MailOTPSend(c *gin.Context) {
 		return
 	}
 
+	// Mail user name logic
+	if userInfo.FirstName != "" {
+		user = userInfo.FirstName
+	} else if userInfo.Username.Valid {
+		user = userInfo.Username.String
+	} else {
+		re := regexp.MustCompile(`([^@]+)@`)
+		match := re.FindStringSubmatch(userInfo.Mail)
+		if len(match) > 1 {
+			user = match[1]
+		} else {
+			c.JSON(http.StatusInternalServerError, utils.ErrorResponse(c, 1054, err))
+			return
+		}
+	}
+
 	code := encrypt.RandomNumber(6)
 
 	redisTTL, _, err := time_convert.ConvertTimeFormat("1h")
@@ -171,7 +189,7 @@ func MailOTPSend(c *gin.Context) {
 
 	redis.Set("mail_otp:"+redisKey, code, redisTTL)
 
-	errSendMailOTP := smtp.SendMailOTP(c, userInfo.FirstName, userInfo.Mail, code)
+	errSendMailOTP := smtp.SendMailOTP(c, user, userInfo.Mail, code)
 	if errSendMailOTP != nil {
 		slog.Error(errSendMailOTP.Error())
 	}

@@ -257,7 +257,7 @@ func GetUserInfo(mail string) (userInfo UserInfo, err error) {
 	ctx, cancel := context.WithTimeout(context.Background(), dbTimeOut)
 	defer cancel()
 
-	sqlStr := "SELECT first_name, mail " +
+	sqlStr := "SELECT first_name, username, mail " +
 		"FROM suglider.user_info " +
 		"WHERE user_info.mail=?"
 	err = DataBase.GetContext(ctx, &userInfo, sqlStr, mail)
