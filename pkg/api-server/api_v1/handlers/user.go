@@ -21,6 +21,7 @@ import (
 type userSignUp struct {
 	Mail        string  `json:"mail" binding:"required"`
 	Password    string  `json:"password" binding:"required"`
+	UserName    *string `json:"username"`
 	FirstName   *string `json:"first_name"`
 	LastName    *string `json:"last_name"`
 	PhoneNumber *string `json:"phone_number"`
@@ -52,6 +53,7 @@ type mailOperate struct {
 // @Produce application/json
 // @Param mail formData string false "Mail"
 // @Param password formData string false "Password"
+// @Param username formData string false "User Name"
 // @Param first_name formData string false "First Name"
 // @Param last_name formData string false "Last Name"
 // @Param phone_number formData string false "Phone Number"
@@ -98,6 +100,9 @@ func UserSignUp(c *gin.Context) {
 	if request.LastName == nil {
 		request.LastName = nil
 	}
+	if request.UserName == nil || *request.UserName == "" {
+		request.UserName = nil
+	}
 	if request.PhoneNumber == nil || *request.PhoneNumber == "" {
 		request.PhoneNumber = nil
 	}
@@ -105,7 +110,7 @@ func UserSignUp(c *gin.Context) {
 	// Encode user password
 	passwordEncode, _ := encrypt.SaltedPasswordHash(request.Password)
 
-	err = mariadb.UserSignUp(request.Mail, passwordEncode, request.FirstName, request.LastName, request.PhoneNumber)
+	err = mariadb.UserSignUp(request.Mail, passwordEncode, request.UserName, request.FirstName, request.LastName, request.PhoneNumber)
 	if err != nil {
 		errorMessage := fmt.Sprintf("Insert user_info table failed: %v", err)
 		slog.Error(errorMessage)
@@ -116,7 +121,9 @@ func UserSignUp(c *gin.Context) {
 		// Mail user name decision logic
 		if request.FirstName == nil || *request.FirstName != "" {
 			user = *request.FirstName
-		} else if request.Mail != "" {
+		} else if request.UserName == nil || *request.UserName != "" {
+			user = *request.UserName
+		} else {
 			re := regexp.MustCompile(`([^@]+)@`)
 			match := re.FindStringSubmatch(request.Mail)
 			if len(match) > 1 {
@@ -127,6 +134,7 @@ func UserSignUp(c *gin.Context) {
 			}
 		}
 
+		fmt.Println(user)
 		// mail verification
 		if err = smtp.SendVerifyMail(c, user, request.Mail); err != nil {
 			slog.Error(err.Error())
@@ -613,7 +621,7 @@ func CheckMail(c *gin.Context) {
 		return
 	}
 
-	count, err := mariadb.CheckMail(request.Mail)
+	count, err := mariadb.CheckMailExists(request.Mail)
 
 	if err != nil {
 		errorMessage := fmt.Sprintf("Check whether the mail exists or not failed: %v", err)
@@ -623,13 +631,13 @@ func CheckMail(c *gin.Context) {
 
 	if count == 1 {
 		c.JSON(http.StatusOK, utils.SuccessResponse(c, 200, map[string]interface{}{
-			"username": request.Mail,
-			"exist":    true,
+			"mail":  request.Mail,
+			"exist": true,
 		}))
 	} else {
 		c.JSON(http.StatusOK, utils.SuccessResponse(c, 200, map[string]interface{}{
-			"username": request.Mail,
-			"exist":    false,
+			"mail":  request.Mail,
+			"exist": false,
 		}))
 	}
 

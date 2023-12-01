@@ -25,7 +25,7 @@ func init() {
 	}
 }
 
-func UserSignUp(mail, password string, firstName, lastName, phoneNumber *string) (err error) {
+func UserSignUp(mail, password string, userName, firstName, lastName, phoneNumber *string) (err error) {
 	ctx, cancel := context.WithTimeout(context.Background(), dbTimeOut)
 	defer cancel()
 
@@ -224,7 +224,7 @@ func CheckUsername(userName string) (rowCount int, err error) {
 	return count, err
 }
 
-func CheckMail(mail string) (rowCount int, err error) {
+func CheckMailExists(mail string) (rowCount int, err error) {
 	var count int
 	ctx, cancel := context.WithTimeout(context.Background(), dbTimeOut)
 	defer cancel()
@@ -292,4 +292,14 @@ func GetTwoFactorAuthByMail(mail string) (userTwoFactorAuthInfo UserTwoFactorAut
 		"WHERE user_info.mail=?"
 	err = DataBase.GetContext(ctx, &userTwoFactorAuthInfo, sqlStr, mail)
 	return userTwoFactorAuthInfo, err
+}
+
+func OAuthSignUp(mail, firstName, lastName string) (err error) {
+	ctx, cancel := context.WithTimeout(context.Background(), dbTimeOut)
+	defer cancel()
+
+	sqlStr := "INSERT INTO suglider.user_info(user_id, mail, first_name, last_name) " +
+		"VALUES (UNHEX(REPLACE(UUID(), '-', '')),?,?,?)"
+	_, err = DataBase.ExecContext(ctx, sqlStr, mail, firstName, lastName)
+	return err
 }
