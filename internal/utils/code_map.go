@@ -63,6 +63,7 @@ func ResponseStatusCode() {
 		1052: "username and mail_otp_verify are not exists.",
 		1053: "2FA feature doesn't not enable.",
 		1054: "The result of the email regular expression doesn't match the expected outcome.",
+		1055: "Login failed because of session or jwt problem.",
 		1101: "Fail to parse POST form data.",
 		1102: "Fail to bind POST form data.",
 		1103: "Fail to parse path parameters.",

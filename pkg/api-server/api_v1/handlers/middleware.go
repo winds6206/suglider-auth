@@ -133,7 +133,7 @@ func ValidateTOTP() gin.HandlerFunc {
 	}
 }
 
-func setSession(c *gin.Context, mail string) {
+func setSession(c *gin.Context, mail string) bool {
 	sid := session.ReadSession(c)
 
 	// Check session exist or not
@@ -143,7 +143,7 @@ func setSession(c *gin.Context, mail string) {
 		slog.Error(errorMessage)
 		c.JSON(http.StatusInternalServerError, utils.ErrorResponse(c, 1039, err))
 		c.Abort()
-		return
+		return false
 	}
 	if !ok {
 		_, errCode, err := session.AddSession(c, mail)
@@ -153,14 +153,14 @@ func setSession(c *gin.Context, mail string) {
 			slog.Error(errorMessage)
 			c.JSON(http.StatusInternalServerError, utils.ErrorResponse(c, errCode, err))
 			c.Abort()
-			return
+			return false
 
 		case 1042:
 			errorMessage := fmt.Sprintf("Redis SET data failed: %v", err)
 			slog.Error(errorMessage)
 			c.JSON(http.StatusInternalServerError, utils.ErrorResponse(c, errCode, err))
 			c.Abort()
-			return
+			return false
 		}
 	} else {
 		err = session.DeleteSession(sid)
@@ -169,7 +169,7 @@ func setSession(c *gin.Context, mail string) {
 			slog.Error(errorMessage)
 			c.JSON(http.StatusInternalServerError, utils.ErrorResponse(c, 1040, err))
 			c.Abort()
-			return
+			return false
 		}
 		_, errCode, err := session.AddSession(c, mail)
 		switch errCode {
@@ -178,19 +178,21 @@ func setSession(c *gin.Context, mail string) {
 			slog.Error(errorMessage)
 			c.JSON(http.StatusInternalServerError, utils.ErrorResponse(c, errCode, err))
 			c.Abort()
-			return
+			return false
 
 		case 1042:
 			errorMessage := fmt.Sprintf("Redis SET data failed: %v", err)
 			slog.Error(errorMessage)
 			c.JSON(http.StatusInternalServerError, utils.ErrorResponse(c, errCode, err))
 			c.Abort()
-			return
+			return false
 		}
 	}
+
+	return true
 }
 
-func setJWT(c *gin.Context, mail string) {
+func setJWT(c *gin.Context, mail string) bool {
 
 	token, expireTimeSec, err := jwt.GenerateJWT(mail)
 
@@ -199,9 +201,9 @@ func setJWT(c *gin.Context, mail string) {
 		slog.Error(errorMessage)
 		c.JSON(http.StatusBadRequest, utils.ErrorResponse(c, 1014, err))
 		c.Abort()
-		return
+		return false
 	}
 
 	c.SetCookie("token", token, expireTimeSec, "/", "localhost", false, true)
-
+	return true
 }
