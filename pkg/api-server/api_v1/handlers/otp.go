@@ -158,7 +158,7 @@ func MailOTPSend(c *gin.Context) {
 		return
 	}
 
-	// Mail user name logic
+	// Mail user name decision logic
 	if userInfo.FirstName != "" {
 		user = userInfo.FirstName
 	} else if userInfo.Username.Valid {

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log/slog"
 	"net/http"
+	"regexp"
 	mariadb "suglider-auth/internal/database"
 	smtp "suglider-auth/internal/mail"
 	"suglider-auth/internal/utils"
@@ -18,14 +19,11 @@ import (
 )
 
 type userSignUp struct {
-	UserName    string `json:"username" binding:"required"`
-	Password    string `json:"password" binding:"required"`
-	ComfirmPwd  string `json:"comfirm_pwd" binding:"required"`
-	FirstName   string `json:"first_name"`
-	LastName    string `json:"last_name"`
-	PhoneNumber string `json:"phone_number"`
-	Mail        string `json:"mail" binding:"required"`
-	Address     string `json:"address"`
+	Mail        string  `json:"mail" binding:"required"`
+	Password    string  `json:"password" binding:"required"`
+	FirstName   *string `json:"first_name"`
+	LastName    *string `json:"last_name"`
+	PhoneNumber *string `json:"phone_number"`
 }
 
 type userDelete struct {
@@ -52,14 +50,11 @@ type mailOperate struct {
 // @Tags users
 // @Accept multipart/form-data
 // @Produce application/json
-// @Param username formData string false "User Name"
+// @Param mail formData string false "Mail"
 // @Param password formData string false "Password"
-// @Param comfirm_pwd formData string false "Comfirm Password"
-// @Param mail formData string false "e-Mail"
 // @Param first_name formData string false "First Name"
 // @Param last_name formData string false "Last Name"
 // @Param phone_number formData string false "Phone Number"
-// @Param address formData string false "Address"
 // @Success 200 {string} string "Success"
 // @Failure 400 {string} string "Bad request"
 // @Failure 401 {string} string "Unauthorized"
@@ -69,6 +64,7 @@ type mailOperate struct {
 func UserSignUp(c *gin.Context) {
 	var request userSignUp
 	var err error
+	var user string
 
 	// Check the parameter trasnfer from POST
 	err = c.ShouldBindJSON(&request)
@@ -77,23 +73,39 @@ func UserSignUp(c *gin.Context) {
 		return
 	}
 
-	errPwdValidator := fmtv.FmtValidator(request.UserName, request.Password, request.PhoneNumber, request.Mail)
-	if errPwdValidator != nil {
+	errFmtValidator := fmtv.FmtValidator(request.Mail, request.Password)
+	if errFmtValidator != nil {
 
-		errorMessage := fmt.Sprintf("%v", errPwdValidator)
+		errorMessage := fmt.Sprintf("%v", errFmtValidator)
 		slog.Error(errorMessage)
 
-		c.JSON(http.StatusBadRequest, utils.ErrorResponse(c, 1021, errPwdValidator))
+		c.JSON(http.StatusBadRequest, utils.ErrorResponse(c, 1021, errFmtValidator))
 		return
+	}
+
+	if request.PhoneNumber != nil {
+		ok := fmtv.PhoneNumberValidator(request.PhoneNumber)
+		if !ok {
+			slog.Error("Phone Number is not satisfied of rule.")
+			c.JSON(http.StatusBadRequest, utils.ErrorResponse(c, 1021, nil))
+			return
+		}
+	}
+
+	if request.FirstName == nil {
+		request.FirstName = nil
+	}
+	if request.LastName == nil {
+		request.LastName = nil
+	}
+	if request.PhoneNumber == nil || *request.PhoneNumber == "" {
+		request.PhoneNumber = nil
 	}
 
 	// Encode user password
 	passwordEncode, _ := encrypt.SaltedPasswordHash(request.Password)
-	comfirmPwdEncode, _ := encrypt.SaltedPasswordHash(request.ComfirmPwd)
 
-	fmt.Println(passwordEncode)
-
-	err = mariadb.UserSignUp(request.UserName, passwordEncode, comfirmPwdEncode, request.FirstName, request.LastName, request.PhoneNumber, request.Mail, request.Address)
+	err = mariadb.UserSignUp(request.Mail, passwordEncode, request.FirstName, request.LastName, request.PhoneNumber)
 	if err != nil {
 		errorMessage := fmt.Sprintf("Insert user_info table failed: %v", err)
 		slog.Error(errorMessage)
@@ -101,8 +113,22 @@ func UserSignUp(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, utils.ErrorResponse(c, 1002, err))
 		return
 	} else {
+		// Mail user name decision logic
+		if request.FirstName == nil || *request.FirstName != "" {
+			user = *request.FirstName
+		} else if request.Mail != "" {
+			re := regexp.MustCompile(`([^@]+)@`)
+			match := re.FindStringSubmatch(request.Mail)
+			if len(match) > 1 {
+				user = match[1]
+			} else {
+				c.JSON(http.StatusInternalServerError, utils.ErrorResponse(c, 1054, err))
+				return
+			}
+		}
+
 		// mail verification
-		if err = smtp.SendVerifyMail(c, request.UserName, request.Mail); err != nil {
+		if err = smtp.SendVerifyMail(c, user, request.Mail); err != nil {
 			slog.Error(err.Error())
 		}
 		c.JSON(http.StatusOK, utils.SuccessResponse(c, 200, nil))

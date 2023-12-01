@@ -6,12 +6,11 @@ CREATE TABLE IF NOT EXISTS user_info (
     user_id BINARY(16) NOT NULL,
     username VARCHAR(256) DEFAULT NULL,
     password VARCHAR(256) NOT NULL,
-    comfirm_pwd VARCHAR(256) NOT NULL,
-    last_name VARCHAR(10) NOT NULL,
-    first_name VARCHAR(10) NOT NULL,
-    phone_number VARCHAR(10) NOT NULL,
+    last_name VARCHAR(10),
+    first_name VARCHAR(10),
+    phone_number VARCHAR(10),
     mail VARCHAR(256) NOT NULL,
-    address VARCHAR(256) NOT NULL,
+    address VARCHAR(256),
     mail_otp_enabled BOOL DEFAULT false,
     sms_otp_enabled BOOL DEFAULT false,
     password_expire_date DATE NOT NULL,
@@ -19,6 +18,7 @@ CREATE TABLE IF NOT EXISTS user_info (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     PRIMARY KEY(user_id),
     UNIQUE(username),
+    UNIQUE(phone_number),
     UNIQUE(mail));
 
 CREATE TABLE IF NOT EXISTS aes (

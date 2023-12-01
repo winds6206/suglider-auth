@@ -25,12 +25,13 @@ func init() {
 	}
 }
 
-func UserSignUp(userName, password, comfirmPassword, FirstName, LastName, PhoneNumber, mail, address string) (err error) {
+func UserSignUp(mail, password string, firstName, lastName, phoneNumber *string) (err error) {
 	ctx, cancel := context.WithTimeout(context.Background(), dbTimeOut)
 	defer cancel()
 
-	sqlStr := "INSERT INTO suglider.user_info(user_id, username, password, comfirm_pwd, first_name, last_name, phone_number, mail, address, password_expire_date) VALUES (UNHEX(REPLACE(UUID(), '-', '')),?,?,?,?,?,?,?,?,DATE_ADD(CURRENT_DATE, INTERVAL 90 DAY))"
-	_, err = DataBase.ExecContext(ctx, sqlStr, userName, password, comfirmPassword, FirstName, LastName, PhoneNumber, mail, address)
+	sqlStr := "INSERT INTO suglider.user_info(user_id, mail, password, first_name, last_name, phone_number, password_expire_date) " +
+		"VALUES (UNHEX(REPLACE(UUID(), '-', '')),?,?,?,?,?,DATE_ADD(CURRENT_DATE, INTERVAL 90 DAY))"
+	_, err = DataBase.ExecContext(ctx, sqlStr, mail, password, firstName, lastName, phoneNumber)
 	return err
 }
 
@@ -38,7 +39,8 @@ func UserDelete(userName, mail string) (result sql.Result, err error) {
 	ctx, cancel := context.WithTimeout(context.Background(), dbTimeOut)
 	defer cancel()
 
-	sqlStr := "DELETE FROM suglider.user_info WHERE username=? AND mail=?"
+	sqlStr := "DELETE FROM suglider.user_info " +
+		"WHERE username=? AND mail=?"
 	result, err = DataBase.ExecContext(ctx, sqlStr, userName, mail)
 	return result, err
 }
@@ -48,7 +50,8 @@ func UserDeleteByUUID(userID, userName, mail string) (result sql.Result, err err
 	defer cancel()
 
 	// UNHEX(?) can convert user_id to binary(16)
-	sqlStr := "DELETE FROM suglider.user_info WHERE user_id=UNHEX(?) AND username=? AND mail=?"
+	sqlStr := "DELETE FROM suglider.user_info " +
+		"WHERE user_id=UNHEX(?) AND username=? AND mail=?"
 	result, err = DataBase.ExecContext(ctx, sqlStr, userID, userName, mail)
 	return result, err
 }
@@ -137,7 +140,8 @@ func TotpStoreSecret(userID, totpSecret, totpURL string) (err error) {
 	ctx, cancel := context.WithTimeout(context.Background(), dbTimeOut)
 	defer cancel()
 
-	sqlStr := "INSERT INTO suglider.totp(user_id, totp_secret, totp_url) VALUES (UNHEX(?),?,?)"
+	sqlStr := "INSERT INTO suglider.totp(user_id, totp_secret, totp_url) " +
+		"VALUES (UNHEX(?),?,?)"
 	_, err = DataBase.ExecContext(ctx, sqlStr, userID, totpSecret, totpURL)
 	return err
 }
@@ -159,7 +163,9 @@ func TotpUserCheck(userID string) (rowCount int, err error) {
 	ctx, cancel := context.WithTimeout(context.Background(), dbTimeOut)
 	defer cancel()
 
-	sqlStr := "SELECT COUNT(*) FROM suglider.totp WHERE user_id=UNHEX(?)"
+	sqlStr := "SELECT COUNT(*) " +
+		"FROM suglider.totp " +
+		"WHERE user_id=UNHEX(?)"
 	err = DataBase.GetContext(ctx, &count, sqlStr, userID)
 	return count, err
 }
