@@ -2,15 +2,14 @@ name: suglider_auth_build_image
 
 on:
   push:
-    branches:
-      - 'feature/new-build-pipeline'
     tags:
       - 'v*.*'
   pull_request:
     types:
       - opened
+      - reopened
     branches:
-      - 'feature/new-build-pipeline'
+      - 'main'
   workflow_dispatch:
     inputs:
       enable_container_build:
