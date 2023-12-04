@@ -14,7 +14,7 @@ inputs:
   dockerfile:
     description: dockerfile to build docker image
     required: true
-    default: './build/Dockerfile.pipeline'
+    default: './artifact/build/Dockerfile.pipeline'
   auto_image_tag:
     description: Get git tag as image tag automatically
     default: 'true'
