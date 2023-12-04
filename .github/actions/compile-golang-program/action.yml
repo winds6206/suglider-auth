@@ -43,7 +43,12 @@ runs:
 
     - name: Save Version Info
       shell: sh
-      run: echo ${{ inputs.application_version }} > .application_version
+      run: |
+        if [[ ${{ inputs.application_version }} == '' ]]; then
+            echo '0.0.1' > .application_version
+        else
+            echo ${{ inputs.application_version }} > .application_version
+        fi
 
     - name: Build Go Binary
       shell: sh
