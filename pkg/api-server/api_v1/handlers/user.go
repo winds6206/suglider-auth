@@ -86,13 +86,13 @@ func UserSignUp(c *gin.Context) {
 		return
 	}
 
-	errFmtValidator := fmtv.FmtValidator(request.Mail, request.Password)
-	if errFmtValidator != nil {
+	err = fmtv.FmtValidator(request.Mail, request.Password)
+	if err != nil {
 
-		errorMessage := fmt.Sprintf("%v", errFmtValidator)
+		errorMessage := fmt.Sprintf("%v", err)
 		slog.Error(errorMessage)
 
-		c.JSON(http.StatusBadRequest, utils.ErrorResponse(c, 1021, errFmtValidator))
+		c.JSON(http.StatusBadRequest, utils.ErrorResponse(c, 1021, err))
 		return
 	}
 
@@ -511,7 +511,7 @@ func RefreshJWT(c *gin.Context) {
 // @Tags users
 // @Accept multipart/form-data
 // @Produce application/json
-// @Param username formData string false "User Name"
+// @Param mail formData string false "Mail"
 // @Success 200 {string} string "Success"
 // @Failure 400 {string} string "Bad request"
 // @Failure 401 {string} string "Unauthorized"
@@ -520,7 +520,7 @@ func RefreshJWT(c *gin.Context) {
 // @Router /api/v1/user/password-expire [get]
 func PasswordExpire(c *gin.Context) {
 
-	var request userNameOperate
+	var request mailOperate
 
 	// Check the parameter trasnfer from POST
 	err := c.ShouldBindJSON(&request)
@@ -529,7 +529,7 @@ func PasswordExpire(c *gin.Context) {
 		return
 	}
 
-	resultData, err := mariadb.PasswordExpire(request.UserName)
+	resultData, err := mariadb.GetPasswordExpireByMail(request.Mail)
 
 	if err != nil {
 		if err != nil {
@@ -556,13 +556,13 @@ func PasswordExpire(c *gin.Context) {
 
 	if todayDate.After(parsedDate) {
 		c.JSON(http.StatusOK, utils.SuccessResponse(c, 200, map[string]interface{}{
-			"username":             resultData.Username,
+			"mail":                 resultData.Mail,
 			"password_expire_date": resultData.PasswordExpireDate,
 			"expired":              true,
 		}))
 	} else {
 		c.JSON(http.StatusOK, utils.SuccessResponse(c, 200, map[string]interface{}{
-			"username":             resultData.Username,
+			"mail":                 resultData.Mail,
 			"password_expire_date": resultData.PasswordExpireDate,
 			"expired":              false,
 		}))
@@ -574,7 +574,7 @@ func PasswordExpire(c *gin.Context) {
 // @Tags users
 // @Accept multipart/form-data
 // @Produce application/json
-// @Param username formData string false "User Name"
+// @Param mail formData string false "Mail"
 // @Success 200 {string} string "Success"
 // @Failure 400 {string} string "Bad request"
 // @Failure 401 {string} string "Unauthorized"
@@ -582,18 +582,19 @@ func PasswordExpire(c *gin.Context) {
 // @Failure 404 {string} string "Not found"
 // @Router /api/v1/user/password-extension [patch]
 func PasswordExtension(c *gin.Context) {
-	var request userNameOperate
+	var request mailOperate
+	var err error
 
 	// Check the parameter trasnfer from POST
-	err := c.ShouldBindJSON(&request)
+	err = c.ShouldBindJSON(&request)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, utils.ErrorResponse(c, 1001, err))
 		return
 	}
 
-	errPasswordExtension := mariadb.PasswordExtension(request.UserName)
+	err = mariadb.PasswordExtensionByMail(request.Mail)
 
-	if errPasswordExtension != nil {
+	if err != nil {
 		errorMessage := fmt.Sprintf("Update user_info table failed: %v", err)
 		slog.Error(errorMessage)
 		c.JSON(http.StatusInternalServerError, utils.ErrorResponse(c, 1037, err))
