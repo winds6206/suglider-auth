@@ -46,6 +46,17 @@ type mailOperate struct {
 	Mail string `json:"mail" binding:"required"`
 }
 
+type resetPassword struct {
+	Mail        string `json:"mail" binding:"required"`
+	OldPassword string `json:"old_password" binding:"required"`
+	NewPassword string `json:"new_password" binding:"required"`
+}
+
+type setUpPassword struct {
+	Mail     string `json:"mail" binding:"required"`
+	Password string `json:"password" binding:"required"`
+}
+
 // @Summary Sign Up User
 // @Description registry new user
 // @Tags users
@@ -116,7 +127,6 @@ func UserSignUp(c *gin.Context) {
 	// sql.ErrNoRows indicates that there were no results found for the username provided.
 	if err == sql.ErrNoRows {
 
-		fmt.Println("ErrNoRows")
 		// Encode user password
 		passwordEncode, _ := encrypt.SaltedPasswordHash(request.Password)
 
@@ -129,8 +139,6 @@ func UserSignUp(c *gin.Context) {
 		}
 		// The condition means the user had previously signed up through OAuth2.
 	} else if err == nil && !userInfo.Password.Valid {
-
-		fmt.Println("signed up through OAuth2")
 
 		// Encode user password
 		passwordEncode, _ := encrypt.SaltedPasswordHash(request.Password)
@@ -680,6 +688,166 @@ func CheckMail(c *gin.Context) {
 			"mail":  request.Mail,
 			"exist": false,
 		}))
+	}
+
+}
+
+// @Summary Change Password
+// @Description Users change password by themselves
+// @Tags users
+// @Accept multipart/form-data
+// @Produce application/json
+// @Param mail formData string false "Mail"
+// @Param old_password formData string false "Old Password"
+// @Param new_password formData string false "New Password"
+// @Success 200 {string} string "Success"
+// @Failure 400 {string} string "Bad request"
+// @Failure 401 {string} string "Unauthorized"
+// @Failure 403 {string} string "Forbidden"
+// @Failure 404 {string} string "Not found"
+// @Router /api/v1/user/change-password [patch]
+func ChangePassword(c *gin.Context) {
+	var request resetPassword
+
+	// Check the parameter trasnfer from POST
+	err := c.ShouldBindJSON(&request)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, utils.ErrorResponse(c, 1001, err))
+		return
+	}
+
+	userInfo, err := mariadb.GetPasswordByMail(request.Mail)
+	// No err means user exist
+	if err == nil && userInfo.Password.Valid {
+
+		pwdVerify := encrypt.VerifySaltedPasswordHash(userInfo.Password.String, request.OldPassword)
+
+		// Check old password true or false
+		if pwdVerify {
+
+			// Check new password column rule
+			valid := fmtv.PasswordValidator(request.NewPassword)
+			if valid {
+
+				// Check whether new password is the same as old one or not
+				notPass := encrypt.VerifySaltedPasswordHash(userInfo.Password.String, request.NewPassword)
+				if !notPass {
+
+					// Encode user new password
+					newPasswordEncode, _ := encrypt.SaltedPasswordHash(request.NewPassword)
+
+					// Change user password
+					err := mariadb.UserResetPassword(c, userInfo.Mail, newPasswordEncode)
+					if err != nil {
+						c.JSON(http.StatusBadRequest, utils.ErrorResponse(c, 1027, err))
+						return
+					}
+					c.JSON(http.StatusOK, utils.SuccessResponse(c, 200, map[string]interface{}{
+						"mail": userInfo.Mail,
+						"msg":  "Change password successfully.",
+					}))
+
+				} else {
+					c.JSON(http.StatusBadRequest, utils.ErrorResponse(c, 1059, err))
+					return
+
+				}
+			} else {
+				c.JSON(http.StatusBadRequest, utils.ErrorResponse(c, 1058, nil))
+				return
+			}
+		} else {
+			c.JSON(http.StatusUnauthorized, utils.ErrorResponse(c, 1004))
+			return
+		}
+	} else if err == nil && !userInfo.Password.Valid {
+		c.JSON(http.StatusForbidden, utils.ErrorResponse(c, 1004, map[string]interface{}{
+			"mail": request.Mail,
+			"msg":  "Reset failed: password is invalid, indicating the user had previously signed up through OAuth2. Please sign up using genernal or use OAuth2 to login and setup password.",
+		}))
+		return
+
+		// sql.ErrNoRows indicates that there were no results found for the username provided.
+	} else if err == sql.ErrNoRows {
+		errorMessage := fmt.Sprintf("No search this mail: %v", err)
+		slog.Error(errorMessage)
+		c.JSON(http.StatusNotFound, utils.ErrorResponse(c, 1057, err))
+		return
+
+	} else if err != nil {
+		errorMessage := fmt.Sprintf("Reset password failed: %v", err)
+		slog.Error(errorMessage)
+		c.JSON(http.StatusInternalServerError, utils.ErrorResponse(c, 1002, err))
+		return
+	}
+
+}
+
+// @Summary Set Up Password
+// @Description When user sign up through OAuth2, use this API to set up their password
+// @Tags users
+// @Accept multipart/form-data
+// @Produce application/json
+// @Param mail formData string false "Mail"
+// @Param password formData string false "Password"
+// @Success 200 {string} string "Success"
+// @Failure 400 {string} string "Bad request"
+// @Failure 401 {string} string "Unauthorized"
+// @Failure 403 {string} string "Forbidden"
+// @Failure 404 {string} string "Not found"
+// @Router /api/v1/user/setup-password [patch]
+func SetUpPassword(c *gin.Context) {
+	var request setUpPassword
+
+	// Check the parameter trasnfer from POST
+	err := c.ShouldBindJSON(&request)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, utils.ErrorResponse(c, 1001, err))
+		return
+	}
+
+	userInfo, err := mariadb.GetPasswordByMail(request.Mail)
+	// No err means user exist
+	if err == nil && userInfo.Password.Valid {
+
+		c.JSON(http.StatusForbidden, utils.ErrorResponse(c, 1060, nil))
+		return
+
+	} else if err == nil && !userInfo.Password.Valid {
+
+		// Check password column rule
+		valid := fmtv.PasswordValidator(request.Password)
+		if valid {
+			// Encode user password
+			passwordEncode, _ := encrypt.SaltedPasswordHash(request.Password)
+
+			// Change user password
+			err := mariadb.UserResetPassword(c, userInfo.Mail, passwordEncode)
+			if err != nil {
+				c.JSON(http.StatusBadRequest, utils.ErrorResponse(c, 1027, err))
+				return
+			}
+			c.JSON(http.StatusOK, utils.SuccessResponse(c, 200, map[string]interface{}{
+				"mail": userInfo.Mail,
+				"msg":  "Set up password successfully.",
+			}))
+		} else {
+			c.JSON(http.StatusBadRequest, utils.ErrorResponse(c, 1058, nil))
+			return
+		}
+
+		// sql.ErrNoRows indicates that there were no results found for the username provided.
+	} else if err == sql.ErrNoRows {
+		errorMessage := fmt.Sprintf("No search this mail: %v", err)
+		slog.Error(errorMessage)
+		c.JSON(http.StatusNotFound, utils.ErrorResponse(c, 1057, err))
+		return
+
+	} else if err != nil {
+		errorMessage := fmt.Sprintf("Reset password failed: %v", err)
+		slog.Error(errorMessage)
+		c.JSON(http.StatusInternalServerError, utils.ErrorResponse(c, 1002, err))
+		return
 	}
 
 }

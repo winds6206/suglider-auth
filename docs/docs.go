@@ -876,6 +876,73 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/v1/user/change-password": {
+            "patch": {
+                "description": "Users change password by themselves",
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "users"
+                ],
+                "summary": "Change Password",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Mail",
+                        "name": "mail",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Old Password",
+                        "name": "old_password",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "description": "New Password",
+                        "name": "new_password",
+                        "in": "formData"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "404": {
+                        "description": "Not found",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
         "/api/v1/user/check-mail": {
             "get": {
                 "description": "Check whether the mail exists or not",
@@ -1666,6 +1733,67 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/v1/user/setup-password": {
+            "patch": {
+                "description": "When user sign up through OAuth2, use this API to set up their password",
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "users"
+                ],
+                "summary": "Set Up Password",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Mail",
+                        "name": "mail",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Password",
+                        "name": "password",
+                        "in": "formData"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "404": {
+                        "description": "Not found",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
         "/api/v1/user/sign-up": {
             "post": {
                 "description": "registry new user",
@@ -1682,8 +1810,8 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "User Name",
-                        "name": "username",
+                        "description": "Mail",
+                        "name": "mail",
                         "in": "formData"
                     },
                     {
@@ -1694,14 +1822,8 @@ const docTemplate = `{
                     },
                     {
                         "type": "string",
-                        "description": "Comfirm Password",
-                        "name": "comfirm_pwd",
-                        "in": "formData"
-                    },
-                    {
-                        "type": "string",
-                        "description": "e-Mail",
-                        "name": "mail",
+                        "description": "User Name",
+                        "name": "username",
                         "in": "formData"
                     },
                     {
@@ -1720,12 +1842,6 @@ const docTemplate = `{
                         "type": "string",
                         "description": "Phone Number",
                         "name": "phone_number",
-                        "in": "formData"
-                    },
-                    {
-                        "type": "string",
-                        "description": "Address",
-                        "name": "address",
                         "in": "formData"
                     }
                 ],

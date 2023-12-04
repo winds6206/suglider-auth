@@ -21,6 +21,10 @@ type phoneData struct {
 	PhoneNumber string `validate:"max=10,phoneNumberCheck"`
 }
 
+type passwordData struct {
+	Password string `validate:"required,min=8,max=30,passwordComplexity"`
+}
+
 func passwordComplexity(fl validator.FieldLevel) bool {
 	password := fl.Field().String()
 
@@ -124,6 +128,23 @@ func PhoneNumberValidator(phoneNumber *string) bool {
 
 	v := validator.New()
 	v.RegisterValidation("phoneNumberCheck", phoneNumberCheck)
+
+	err := v.Struct(payload)
+	if err != nil {
+		return false
+	}
+
+	return true
+}
+
+func PasswordValidator(password string) bool {
+
+	payload := &passwordData{
+		Password: password,
+	}
+
+	v := validator.New()
+	v.RegisterValidation("passwordComplexity", passwordComplexity)
 
 	err := v.Struct(payload)
 	if err != nil {
