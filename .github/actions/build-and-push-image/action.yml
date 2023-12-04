@@ -32,7 +32,7 @@ runs:
       uses: actions/download-artifact@v3
       with:
         name: '${{ github.event.repository.name }}-artifact'
-        path: build
+        path: artifact
 
     - name: Setup BuildX
       uses: docker/setup-buildx-action@v3
@@ -52,8 +52,8 @@ runs:
         SPECIFIC_IMAGE_TAG: ${{ inputs.image_tag }}
       run: |
         if [[ $AUTO_IMAGE_TAG == "true" ]]; then
-            if [[ -f ./build/.application_version ]]; then
-                echo "::set-output name=tag::$(cat ./build/application_version.log)"
+            if [[ -f ./artifact/.application_version ]]; then
+                echo "::set-output name=tag::$(cat ./artifact/application_version.log)"
             else
                 echo "::set-output name=tag::latest"
             fi

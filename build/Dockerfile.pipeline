@@ -11,10 +11,10 @@ RUN mkdir -p /usr/local/app/configs && \
     mkdir -p /usr/local/app/docs && \
     mkdir -p /usr/local/app/web
 RUN chown suglider:root /usr/local/app/logs
-COPY ./build/bin/suglider-auth /usr/local/app/bin/suglider-auth
-COPY ./build/configs/ /usr/local/app/configs
-COPY ./build/docs/ /usr/local/app/docs
-COPY ./build/web /usr/local/app/web
+COPY ./artifact/bin/suglider-auth /usr/local/app/bin/suglider-auth
+COPY ./artifact/configs/ /usr/local/app/configs
+COPY ./artifact/docs/ /usr/local/app/docs
+COPY ./artifact/web /usr/local/app/web
 STOPSIGNAL SIGTERM
 WORKDIR /usr/local/app
 USER suglider
