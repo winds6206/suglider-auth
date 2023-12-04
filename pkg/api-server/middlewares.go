@@ -58,6 +58,8 @@ var apiWhileList = []string{
 	"/api/v1/totp/verify",
 	"/api/v1/totp/validate",
 	"/api/v1/totp/disable",
+	"/api/v1/user/change-password",
+	"/api/v1/user/setup-password",
 }
 
 func checkAPIWhileList(c *gin.Context) bool {

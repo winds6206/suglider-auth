@@ -574,6 +574,50 @@ paths:
       summary: Verify TOTP
       tags:
       - totp
+  /api/v1/user/change-password:
+    patch:
+      consumes:
+      - multipart/form-data
+      description: Users change password by themselves
+      parameters:
+      - description: Mail
+        in: formData
+        name: mail
+        type: string
+      - description: Old Password
+        in: formData
+        name: old_password
+        type: string
+      - description: New Password
+        in: formData
+        name: new_password
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            type: string
+        "400":
+          description: Bad request
+          schema:
+            type: string
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+        "403":
+          description: Forbidden
+          schema:
+            type: string
+        "404":
+          description: Not found
+          schema:
+            type: string
+      summary: Change Password
+      tags:
+      - users
   /api/v1/user/check-mail:
     get:
       consumes:
@@ -1093,27 +1137,64 @@ paths:
       summary: Reset Password
       tags:
       - users
+  /api/v1/user/setup-password:
+    patch:
+      consumes:
+      - multipart/form-data
+      description: When user sign up through OAuth2, use this API to set up their
+        password
+      parameters:
+      - description: Mail
+        in: formData
+        name: mail
+        type: string
+      - description: Password
+        in: formData
+        name: password
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            type: string
+        "400":
+          description: Bad request
+          schema:
+            type: string
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+        "403":
+          description: Forbidden
+          schema:
+            type: string
+        "404":
+          description: Not found
+          schema:
+            type: string
+      summary: Set Up Password
+      tags:
+      - users
   /api/v1/user/sign-up:
     post:
       consumes:
       - multipart/form-data
       description: registry new user
       parameters:
-      - description: User Name
+      - description: Mail
         in: formData
-        name: username
+        name: mail
         type: string
       - description: Password
         in: formData
         name: password
         type: string
-      - description: Comfirm Password
+      - description: User Name
         in: formData
-        name: comfirm_pwd
-        type: string
-      - description: e-Mail
-        in: formData
-        name: mail
+        name: username
         type: string
       - description: First Name
         in: formData
@@ -1126,10 +1207,6 @@ paths:
       - description: Phone Number
         in: formData
         name: phone_number
-        type: string
-      - description: Address
-        in: formData
-        name: address
         type: string
       produces:
       - application/json
