@@ -1,11 +1,12 @@
 package configs
 
 import (
-	"os"
+	"flag"
 	"fmt"
 	"log/slog"
 	"log/syslog"
-	"flag"
+	"os"
+
 	"github.com/BurntSushi/toml"
 	"gopkg.in/natefinch/lumberjack.v2"
 )
@@ -16,94 +17,104 @@ var (
 )
 
 type Arguments struct {
-	Host      string
-	Config    string
-	Subpath   string
-	Port      int
-	Syslog    bool
-	Debug     bool
+	Host    string
+	Config  string
+	Subpath string
+	Port    int
+	Syslog  bool
+	Debug   bool
 }
 
 type (
 	Config struct {
-		Database       *Database          `toml:"database"`
-		Redis          *Redis             `toml:"redis"`
-		Session        *Session           `toml:"session"`
-		Server         *serverSettings    `toml:"server"`
-		Log            *logSettings       `toml:"log"`
-		Swagger        *swaggerSettings   `toml:"swagger"`
-		Mail           *mailSettings      `toml:"mail"`
+		Database *Database        `toml:"database"`
+		Redis    *Redis           `toml:"redis"`
+		Session  *Session         `toml:"session"`
+		Server   *serverSettings  `toml:"server"`
+		Log      *logSettings     `toml:"log"`
+		Swagger  *swaggerSettings `toml:"swagger"`
+		Mail     *mailSettings    `toml:"mail"`
+		Oauth    *Oauth           `toml:"oauth"`
 	}
 	Database struct {
-		Host           string             `toml:"host"`
-		Port           string             `toml:"port"`
-		Name           string             `toml:"name"`
-		User           string             `toml:"user"`
-		Password       string             `toml:"password"`
-		Timeout        string             `toml:"timeout"`
-		SyntaxPath     string             `toml:"syntax_path"`
+		Host       string `toml:"host"`
+		Port       string `toml:"port"`
+		Name       string `toml:"name"`
+		User       string `toml:"user"`
+		Password   string `toml:"password"`
+		Timeout    string `toml:"timeout"`
+		SyntaxPath string `toml:"syntax_path"`
 	}
 	Redis struct {
-		Host     string    `toml:"host"`
-		Port     string    `toml:"port"`
-		Password string    `toml:"password"`
+		Host     string `toml:"host"`
+		Port     string `toml:"port"`
+		Password string `toml:"password"`
 	}
 	Session struct {
-		Timeout    string    `toml:"timeout"`
-		Path       string    `toml:"path"`
-		HttpOnly   bool      `toml:"http_only"`
+		Timeout  string `toml:"timeout"`
+		Path     string `toml:"path"`
+		HttpOnly bool   `toml:"http_only"`
 	}
 	serverSettings struct {
-		TemplatePath    string        `toml:"template_path"`
-		StaticPath      string        `toml:"static_path"`
-		SwaggerPath     string        `toml:"swagger_path"`
-		CasbinConfig    string        `toml:"casbin_config"`
-		CasbinTable     string        `toml:"casbin_table"`
-		GracefulTimeout int           `toml:"graceful_timeout"`
-		ReadTimeout     int           `toml:"read_timeout"`
-		WriteTimeout    int           `toml:"write_timeout"`
-		MaxHeaderBytes  int           `toml:"max_header_bytes"`
-		EnableRbac      bool          `toml:"enable_rbac"`
-		EnableCors      bool          `toml:"enable_cors"`
-		CorsCredentials bool          `toml:"cors_credentials"`
-		CorsOrigin      string        `toml:"cors_origin"`
-		CorsMethods     string        `toml:"cors_methods"`
-		CorsHeaders     string        `toml:"cors_headers"`
-		CasbinCache     bool          `toml:"casbin_cache"`
+		TemplatePath    string `toml:"template_path"`
+		StaticPath      string `toml:"static_path"`
+		SwaggerPath     string `toml:"swagger_path"`
+		CasbinConfig    string `toml:"casbin_config"`
+		CasbinTable     string `toml:"casbin_table"`
+		GracefulTimeout int    `toml:"graceful_timeout"`
+		ReadTimeout     int    `toml:"read_timeout"`
+		WriteTimeout    int    `toml:"write_timeout"`
+		MaxHeaderBytes  int    `toml:"max_header_bytes"`
+		EnableRbac      bool   `toml:"enable_rbac"`
+		EnableCors      bool   `toml:"enable_cors"`
+		CorsCredentials bool   `toml:"cors_credentials"`
+		CorsOrigin      string `toml:"cors_origin"`
+		CorsMethods     string `toml:"cors_methods"`
+		CorsHeaders     string `toml:"cors_headers"`
+		CasbinCache     bool   `toml:"casbin_cache"`
 	}
 	logSettings struct {
-		Filelog        *lumberjack.Logger `toml:"filelog"`
-		Syslog         *syslogSettings    `toml:"syslog"`
+		Filelog *lumberjack.Logger `toml:"filelog"`
+		Syslog  *syslogSettings    `toml:"syslog"`
 	}
 	syslogSettings struct {
-		Protocol       string             `toml:"protocol"`
-		Host           string             `toml:"host"`
-		Port           int                `toml:"port"`
+		Protocol string `toml:"protocol"`
+		Host     string `toml:"host"`
+		Port     int    `toml:"port"`
 	}
 	swaggerSettings struct {
-		Theme          string             `toml:"theme"`
+		Theme string `toml:"theme"`
 	}
 	mailSettings struct {
-		Smtp           *smtpSettings       `toml:"smtp"`
-		FrontendUrl    *frontendUrl        `toml:"frontend_url"`
-		Expired        *mailExpired        `toml:"expired"`
+		Smtp        *smtpSettings `toml:"smtp"`
+		FrontendUrl *frontendUrl  `toml:"frontend_url"`
+		Expired     *mailExpired  `toml:"expired"`
 	}
 	smtpSettings struct {
-		Username       string              `toml:"username"`
-		Password       string              `toml:"password"`
-		Mailer         string              `toml:"mailer"`
-		SmtpHost       string              `toml:"smtp_host"`
-		SmtpPort       int                 `toml:"smtp_port"`
-		Insecure       bool                `toml:"smtp_insecure"`
+		Username string `toml:"username"`
+		Password string `toml:"password"`
+		Mailer   string `toml:"mailer"`
+		SmtpHost string `toml:"smtp_host"`
+		SmtpPort int    `toml:"smtp_port"`
+		Insecure bool   `toml:"smtp_insecure"`
 	}
 	frontendUrl struct {
-		Scheme         string              `toml:"scheme"`
-		Domain         string              `toml:"domain"`
-		PathPrefix     string              `toml:"path_prefix"`
-		Port           int                 `toml:"port"`
+		Scheme     string `toml:"scheme"`
+		Domain     string `toml:"domain"`
+		PathPrefix string `toml:"path_prefix"`
+		Port       int    `toml:"port"`
 	}
 	mailExpired struct {
-		TTL            int64               `toml:"ttl"`
+		TTL int64 `toml:"ttl"`
+	}
+
+	Oauth struct {
+		Google Google `toml:"google"`
+	}
+
+	Google struct {
+		ClientID     string `toml:"client_id"`
+		ClientSecret string `toml:"client_secret"`
 	}
 )
 
@@ -142,6 +153,10 @@ func loadConfig() {
 
 		// Session
 		ApplicationConfig.Redis.Host = os.Getenv("Session_TIMEOUT")
+
+		// OAuth Google
+		ApplicationConfig.Oauth.Google.ClientID = os.Getenv("Google_Client_ID")
+		ApplicationConfig.Oauth.Google.ClientSecret = os.Getenv("Google_Client_Secret")
 	} else {
 		_, err := toml.DecodeFile(Args.Config, &ApplicationConfig)
 		if err != nil {
@@ -155,9 +170,15 @@ func loadConfig() {
 func (l *syslogSettings) CreateSyslogLogger(name string) (*syslog.Writer, error) {
 	var hostAddr string
 
-	if l.Protocol == "" { l.Protocol = "udp" }
-	if l.Port == 0 { l.Port = 514 }
-	if l.Host == "" { l.Host = "locahost" }
+	if l.Protocol == "" {
+		l.Protocol = "udp"
+	}
+	if l.Port == 0 {
+		l.Port = 514
+	}
+	if l.Host == "" {
+		l.Host = "locahost"
+	}
 	hostAddr = fmt.Sprintf("%s:%d", l.Host, l.Port)
 
 	logger, err := syslog.Dial(l.Protocol, hostAddr, syslog.LOG_ERR|syslog.LOG_DAEMON, name)

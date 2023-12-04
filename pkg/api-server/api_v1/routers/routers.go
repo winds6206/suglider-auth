@@ -1,6 +1,7 @@
 package routers
 
 import (
+	"suglider-auth/pkg/api-server/api_v1/routers/oauth"
 	"suglider-auth/pkg/api-server/api_v1/routers/otp"
 	"suglider-auth/pkg/api-server/api_v1/routers/rbac"
 	"suglider-auth/pkg/api-server/api_v1/routers/totp"
@@ -27,5 +28,9 @@ func Apiv1Handler(router *gin.RouterGroup, csbn *CasbinEnforcerConfig) {
 	otpRouter := router.Group("/otp")
 	{
 		otp.OtpHandler(otpRouter)
+	}
+	oauthRouter := router.Group("/oauth")
+	{
+		oauth.OAuthHandler(oauthRouter)
 	}
 }

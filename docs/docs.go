@@ -660,8 +660,8 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "User Name",
-                        "name": "username",
+                        "description": "Mail",
+                        "name": "mail",
                         "in": "formData"
                     }
                 ],
@@ -715,8 +715,8 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "User Name",
-                        "name": "username",
+                        "description": "Mail",
+                        "name": "mail",
                         "in": "formData"
                     }
                 ],
@@ -770,8 +770,8 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "User Name",
-                        "name": "username",
+                        "description": "Mail",
+                        "name": "mail",
                         "in": "formData"
                     },
                     {
@@ -831,14 +831,14 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "User Name",
-                        "name": "username",
+                        "description": "Mail",
+                        "name": "mail",
                         "in": "formData"
                     },
                     {
                         "type": "string",
                         "description": "OTP Code",
-                        "name": "otp_ode",
+                        "name": "otp_code",
                         "in": "formData"
                     }
                 ],
@@ -1226,8 +1226,8 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "User Name",
-                        "name": "username",
+                        "description": "Mail",
+                        "name": "mail",
                         "in": "formData"
                     }
                 ],
@@ -1281,8 +1281,8 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "User Name",
-                        "name": "username",
+                        "description": "Mail",
+                        "name": "mail",
                         "in": "formData"
                     }
                 ],
@@ -1336,8 +1336,8 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "User Name",
-                        "name": "username",
+                        "description": "Mail",
+                        "name": "mail",
                         "in": "formData"
                     }
                 ],
@@ -1391,8 +1391,8 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "User Name",
-                        "name": "username",
+                        "description": "Mail",
+                        "name": "mail",
                         "in": "formData"
                     },
                     {
@@ -1702,6 +1702,24 @@ const docTemplate = `{
                         "type": "string",
                         "description": "e-Mail",
                         "name": "mail",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "description": "First Name",
+                        "name": "first_name",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Last Name",
+                        "name": "last_name",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Phone Number",
+                        "name": "phone_number",
                         "in": "formData"
                     },
                     {

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log/slog"
 	"net/http"
+	"regexp"
 	mariadb "suglider-auth/internal/database"
 	smtp "suglider-auth/internal/mail"
 	"suglider-auth/internal/utils"
@@ -18,14 +19,12 @@ import (
 )
 
 type userSignUp struct {
-	UserName    string `json:"username" binding:"required"`
-	Password    string `json:"password" binding:"required"`
-	ComfirmPwd  string `json:"comfirm_pwd" binding:"required"`
-	FirstName   string `json:"first_name"`
-	LastName    string `json:"last_name"`
-	PhoneNumber string `json:"phone_number"`
-	Mail        string `json:"mail" binding:"required"`
-	Address     string `json:"address"`
+	Mail        string  `json:"mail" binding:"required"`
+	Password    string  `json:"password" binding:"required"`
+	UserName    *string `json:"username"`
+	FirstName   *string `json:"first_name"`
+	LastName    *string `json:"last_name"`
+	PhoneNumber *string `json:"phone_number"`
 }
 
 type userDelete struct {
@@ -35,7 +34,7 @@ type userDelete struct {
 }
 
 type userLogin struct {
-	Username string `json:"username" binding:"required"`
+	Account  string `json:"account" binding:"required"`
 	Password string `json:"password" binding:"required"`
 }
 
@@ -43,7 +42,7 @@ type userNameOperate struct {
 	UserName string `json:"username" binding:"required"`
 }
 
-type MailOperate struct {
+type mailOperate struct {
 	Mail string `json:"mail" binding:"required"`
 }
 
@@ -52,14 +51,12 @@ type MailOperate struct {
 // @Tags users
 // @Accept multipart/form-data
 // @Produce application/json
-// @Param username formData string false "User Name"
+// @Param mail formData string false "Mail"
 // @Param password formData string false "Password"
-// @Param comfirm_pwd formData string false "Comfirm Password"
-// @Param mail formData string false "e-Mail"
+// @Param username formData string false "User Name"
 // @Param first_name formData string false "First Name"
 // @Param last_name formData string false "Last Name"
 // @Param phone_number formData string false "Phone Number"
-// @Param address formData string false "Address"
 // @Success 200 {string} string "Success"
 // @Failure 400 {string} string "Bad request"
 // @Failure 401 {string} string "Unauthorized"
@@ -69,6 +66,7 @@ type MailOperate struct {
 func UserSignUp(c *gin.Context) {
 	var request userSignUp
 	var err error
+	var user string
 
 	// Check the parameter trasnfer from POST
 	err = c.ShouldBindJSON(&request)
@@ -77,36 +75,107 @@ func UserSignUp(c *gin.Context) {
 		return
 	}
 
-	errPwdValidator := fmtv.FmtValidator(request.UserName, request.Password, request.PhoneNumber, request.Mail)
-	if errPwdValidator != nil {
+	errFmtValidator := fmtv.FmtValidator(request.Mail, request.Password)
+	if errFmtValidator != nil {
 
-		errorMessage := fmt.Sprintf("%v", errPwdValidator)
+		errorMessage := fmt.Sprintf("%v", errFmtValidator)
 		slog.Error(errorMessage)
 
-		c.JSON(http.StatusBadRequest, utils.ErrorResponse(c, 1021, errPwdValidator))
+		c.JSON(http.StatusBadRequest, utils.ErrorResponse(c, 1021, errFmtValidator))
 		return
 	}
 
-	// Encode user password
-	passwordEncode, _ := encrypt.SaltedPasswordHash(request.Password)
-	comfirmPwdEncode, _ := encrypt.SaltedPasswordHash(request.ComfirmPwd)
+	if request.PhoneNumber != nil {
+		ok := fmtv.PhoneNumberValidator(request.PhoneNumber)
+		if !ok {
+			slog.Error("Phone Number is not satisfied of rule.")
+			c.JSON(http.StatusBadRequest, utils.ErrorResponse(c, 1021, nil))
+			return
+		}
+	}
 
-	fmt.Println(passwordEncode)
+	if request.FirstName == nil {
+		request.FirstName = nil
+	}
+	if request.FirstName == nil {
+		request.FirstName = nil
+	}
+	if request.LastName == nil {
+		request.LastName = nil
+	}
+	if request.UserName == nil || *request.UserName == "" {
+		request.UserName = nil
+	}
+	if request.PhoneNumber == nil || *request.PhoneNumber == "" {
+		request.PhoneNumber = nil
+	}
 
-	err = mariadb.UserSignUp(request.UserName, passwordEncode, comfirmPwdEncode, request.FirstName, request.LastName, request.PhoneNumber, request.Mail, request.Address)
-	if err != nil {
-		errorMessage := fmt.Sprintf("Insert user_info table failed: %v", err)
+	userInfo, err := mariadb.GetPasswordByMail(request.Mail)
+
+	// No err means user exist
+	// sql.ErrNoRows indicates that there were no results found for the username provided.
+	if err == sql.ErrNoRows {
+
+		fmt.Println("ErrNoRows")
+		// Encode user password
+		passwordEncode, _ := encrypt.SaltedPasswordHash(request.Password)
+
+		err = mariadb.UserSignUp(request.Mail, passwordEncode, request.UserName, request.FirstName, request.LastName, request.PhoneNumber)
+		if err != nil {
+			errorMessage := fmt.Sprintf("Insert user_info table failed: %v", err)
+			slog.Error(errorMessage)
+			c.JSON(http.StatusInternalServerError, utils.ErrorResponse(c, 1002, err))
+			return
+		}
+		// The condition means the user had previously signed up through OAuth2.
+	} else if err == nil && !userInfo.Password.Valid {
+
+		fmt.Println("signed up through OAuth2")
+
+		// Encode user password
+		passwordEncode, _ := encrypt.SaltedPasswordHash(request.Password)
+
+		err = mariadb.UpdateSignUp(request.Mail, passwordEncode, request.UserName, request.FirstName, request.LastName, request.PhoneNumber)
+		if err != nil {
+			errorMessage := fmt.Sprintf("Update user_info table failed: %v", err)
+			slog.Error(errorMessage)
+			c.JSON(http.StatusInternalServerError, utils.ErrorResponse(c, 1037, err))
+			return
+		}
+		// Account have already existed
+	} else if err == nil && userInfo.Password.Valid {
+		c.JSON(http.StatusForbidden, utils.ErrorResponse(c, 1056, err))
+		return
+		// Other error condition
+	} else if err != nil {
+		errorMessage := fmt.Sprintf("Sign up failed: %v", err)
 		slog.Error(errorMessage)
-
 		c.JSON(http.StatusInternalServerError, utils.ErrorResponse(c, 1002, err))
 		return
-	} else {
-		// mail verification
-		if err = smtp.SendVerifyMail(c, request.UserName, request.Mail); err != nil {
-			slog.Error(err.Error())
-		}
-		c.JSON(http.StatusOK, utils.SuccessResponse(c, 200, nil))
 	}
+
+	// Mail user name decision logic
+	if request.FirstName != nil && *request.FirstName != "" {
+		user = *request.FirstName
+	} else if request.UserName != nil && *request.UserName != "" {
+		user = *request.UserName
+	} else {
+		re := regexp.MustCompile(`([^@]+)@`)
+		match := re.FindStringSubmatch(request.Mail)
+		if len(match) > 1 {
+			user = match[1]
+		} else {
+			c.JSON(http.StatusInternalServerError, utils.ErrorResponse(c, 1054, err))
+			return
+		}
+	}
+
+	// mail verification
+	if err = smtp.SendVerifyMail(c, user, request.Mail); err != nil {
+		slog.Error(err.Error())
+	}
+	c.JSON(http.StatusOK, utils.SuccessResponse(c, 200, nil))
+
 }
 
 // @Summary Delete User
@@ -200,61 +269,127 @@ func UserLogin(c *gin.Context) {
 		return
 	}
 
-	// Check whether username exist or not
-	userInfo, err := mariadb.UserLogin(request.Username)
+	// Check whether user input data is mail or not.
+	mailValid := fmtv.MailValidator(request.Account)
 
-	// No err means user exist
-	if err == nil {
+	if mailValid {
+		userInfo, err := mariadb.GetPasswordByMail(request.Account)
+		// No err means user exist
+		if err == nil && userInfo.Password.Valid {
 
-		pwdVerify := encrypt.VerifySaltedPasswordHash(userInfo.Password, request.Password)
+			pwdVerify := encrypt.VerifySaltedPasswordHash(userInfo.Password.String, request.Password)
 
-		// Check password true or false
-		if pwdVerify {
+			// Check password true or false
+			if pwdVerify {
 
-			// Check whether user enable 2FA or not.
-			userTwoFactorAuthData, err := mariadb.UserTwoFactorAuth(userInfo.Username)
+				// Check whether user enable 2FA or not.
+				userTwoFactorAuthData, err := mariadb.GetTwoFactorAuthByMail(userInfo.Mail)
 
-			if err != nil {
-				c.JSON(http.StatusInternalServerError, utils.ErrorResponse(c, 1002, err))
+				if err != nil {
+					c.JSON(http.StatusInternalServerError, utils.ErrorResponse(c, 1002, err))
+					return
+				}
+
+				// These conditions indicate that user have enabled the 2FA feature.
+				if userTwoFactorAuthData.TotpEnabled.Valid &&
+					(userTwoFactorAuthData.TotpEnabled.Bool ||
+						userTwoFactorAuthData.SmsOTPEnabled ||
+						userTwoFactorAuthData.MailOTPEnabled) {
+
+					c.JSON(http.StatusOK, utils.SuccessResponse(c, 200, map[string]interface{}{
+						"mail":             request.Account,
+						"totp_enabled":     userTwoFactorAuthData.TotpEnabled.Bool,
+						"mail_otp_enabled": userTwoFactorAuthData.MailOTPEnabled,
+						"sms_otp_enabled":  userTwoFactorAuthData.SmsOTPEnabled,
+					}))
+
+				} else {
+					setSession(c, userInfo.Mail)
+					setJWT(c, userInfo.Mail)
+
+					c.JSON(http.StatusOK, utils.SuccessResponse(c, 200, nil))
+				}
+
+			} else {
+				c.JSON(http.StatusUnauthorized, utils.ErrorResponse(c, 1004))
 				return
 			}
+		} else if err == nil && !userInfo.Password.Valid {
+			c.JSON(http.StatusUnauthorized, utils.ErrorResponse(c, 1004, map[string]interface{}{
+				"mail": request.Account,
+				"msg":  "Login failed: password is NULL, indicating the user had previously signed up through OAuth2.",
+			}))
+			return
+			// sql.ErrNoRows indicates that there were no results found for the username provided.
+		} else if err == sql.ErrNoRows {
+			errorMessage := fmt.Sprintf("User Login failed: %v", err)
+			slog.Error(errorMessage)
+			c.JSON(http.StatusNotFound, utils.ErrorResponse(c, 1003, err))
+			return
 
-			// These conditions indicate that the user hasn't enabled the 2FA feature.
-			if !userTwoFactorAuthData.TotpEnabled.Valid ||
-				(userTwoFactorAuthData.TotpEnabled.Bool &&
-					userTwoFactorAuthData.SmsOTPenabled &&
-					userTwoFactorAuthData.MailOTPenabled) {
-
-				setSession(c, request.Username)
-				setJWT(c, request.Username)
-
-				c.JSON(http.StatusOK, utils.SuccessResponse(c, 200, nil))
-			} else {
-				c.JSON(http.StatusOK, utils.SuccessResponse(c, 200, map[string]interface{}{
-					"username":         request.Username,
-					"totp_enabled":     userTwoFactorAuthData.TotpEnabled.Bool,
-					"mail_otp_enabled": userTwoFactorAuthData.MailOTPenabled,
-					"sms_otp_enabled":  userTwoFactorAuthData.SmsOTPenabled,
-				}))
-			}
-
-		} else {
-			c.JSON(http.StatusUnauthorized, utils.ErrorResponse(c, 1004))
+		} else if err != nil {
+			errorMessage := fmt.Sprintf("Login failed: %v", err)
+			slog.Error(errorMessage)
+			c.JSON(http.StatusInternalServerError, utils.ErrorResponse(c, 1002, err))
 			return
 		}
+	} else {
+		// Check whether username exist or not
+		userInfo, err := mariadb.GetPasswordByUserName(request.Account)
 
-		// sql.ErrNoRows indicates that there were no results found for the username provided.
-	} else if err == sql.ErrNoRows {
-		errorMessage := fmt.Sprintf("User Login failed: %v", err)
-		slog.Error(errorMessage)
-		c.JSON(http.StatusNotFound, utils.ErrorResponse(c, 1003, err))
-		return
+		// No err means user exist
+		if err == nil {
 
-	} else if err != nil {
-		errorMessage := fmt.Sprintf("Login failed: %v", err)
-		slog.Error(errorMessage)
-		c.JSON(http.StatusInternalServerError, utils.ErrorResponse(c, 1002, err))
-		return
+			pwdVerify := encrypt.VerifySaltedPasswordHash(userInfo.Password.String, request.Password)
+
+			// Check password true or false
+			if pwdVerify {
+
+				// Check whether user enable 2FA or not.
+				userTwoFactorAuthData, err := mariadb.GetTwoFactorAuthByMail(userInfo.Mail)
+
+				if err != nil {
+					c.JSON(http.StatusInternalServerError, utils.ErrorResponse(c, 1002, err))
+					return
+				}
+
+				// These conditions indicate that user have enabled the 2FA feature.
+				if userTwoFactorAuthData.TotpEnabled.Valid &&
+					(userTwoFactorAuthData.TotpEnabled.Bool ||
+						userTwoFactorAuthData.SmsOTPEnabled ||
+						userTwoFactorAuthData.MailOTPEnabled) {
+
+					c.JSON(http.StatusOK, utils.SuccessResponse(c, 200, map[string]interface{}{
+						"mail":             request.Account,
+						"totp_enabled":     userTwoFactorAuthData.TotpEnabled.Bool,
+						"mail_otp_enabled": userTwoFactorAuthData.MailOTPEnabled,
+						"sms_otp_enabled":  userTwoFactorAuthData.SmsOTPEnabled,
+					}))
+
+				} else {
+					setSession(c, userInfo.Mail)
+					setJWT(c, userInfo.Mail)
+
+					c.JSON(http.StatusOK, utils.SuccessResponse(c, 200, nil))
+				}
+
+			} else {
+				c.JSON(http.StatusUnauthorized, utils.ErrorResponse(c, 1004))
+				return
+			}
+			// sql.ErrNoRows indicates that there were no results found for the username provided.
+		} else if err == sql.ErrNoRows {
+			errorMessage := fmt.Sprintf("User Login failed: %v", err)
+			slog.Error(errorMessage)
+			c.JSON(http.StatusNotFound, utils.ErrorResponse(c, 1003, err))
+			return
+
+		} else if err != nil {
+			errorMessage := fmt.Sprintf("Login failed: %v", err)
+			slog.Error(errorMessage)
+			c.JSON(http.StatusInternalServerError, utils.ErrorResponse(c, 1002, err))
+			return
+		}
 	}
 }
 
@@ -518,7 +653,7 @@ func CheckUsername(c *gin.Context) {
 // @Router /api/v1/user/check-mail [get]
 func CheckMail(c *gin.Context) {
 
-	var request MailOperate
+	var request mailOperate
 
 	// Check the parameter trasnfer from POST
 	err := c.ShouldBindJSON(&request)
@@ -527,7 +662,7 @@ func CheckMail(c *gin.Context) {
 		return
 	}
 
-	count, err := mariadb.CheckMail(request.Mail)
+	count, err := mariadb.CheckMailExists(request.Mail)
 
 	if err != nil {
 		errorMessage := fmt.Sprintf("Check whether the mail exists or not failed: %v", err)
@@ -537,13 +672,13 @@ func CheckMail(c *gin.Context) {
 
 	if count == 1 {
 		c.JSON(http.StatusOK, utils.SuccessResponse(c, 200, map[string]interface{}{
-			"username": request.Mail,
-			"exist":    true,
+			"mail":  request.Mail,
+			"exist": true,
 		}))
 	} else {
 		c.JSON(http.StatusOK, utils.SuccessResponse(c, 200, map[string]interface{}{
-			"username": request.Mail,
-			"exist":    false,
+			"mail":  request.Mail,
+			"exist": false,
 		}))
 	}
 

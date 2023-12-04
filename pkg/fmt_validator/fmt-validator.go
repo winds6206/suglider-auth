@@ -8,10 +8,17 @@ import (
 )
 
 type signUpPayload struct {
-	Username    string `validate:"required,max=20"`
-	Password    string `validate:"required,min=8,max=30,passwordComplexity"`
+	Mail     string `validate:"required,email"`
+	Username string `validate:"max=20"`
+	Password string `validate:"required,min=8,max=30,passwordComplexity"`
+}
+
+type mailData struct {
+	Mail string `validate:"required,email"`
+}
+
+type phoneData struct {
 	PhoneNumber string `validate:"max=10,phoneNumberCheck"`
-	Mail        string `validate:"required,email"`
 }
 
 func passwordComplexity(fl validator.FieldLevel) bool {
@@ -74,18 +81,15 @@ func PwdValidator(userName, password, mail string) error {
 	return nil
 }
 
-func FmtValidator(userName, password, phoneNumber, mail string) error {
+func FmtValidator(mail, password string) error {
 
 	payload := &signUpPayload{
-		Username:    userName,
-		Password:    password,
-		PhoneNumber: phoneNumber,
-		Mail:        mail,
+		Mail:     mail,
+		Password: password,
 	}
 
 	v := validator.New()
 	v.RegisterValidation("passwordComplexity", passwordComplexity)
-	v.RegisterValidation("phoneNumberCheck", phoneNumberCheck)
 
 	err := v.Struct(payload)
 	if err != nil {
@@ -94,4 +98,37 @@ func FmtValidator(userName, password, phoneNumber, mail string) error {
 	}
 
 	return nil
+}
+
+func MailValidator(mail string) bool {
+
+	payload := &mailData{
+		Mail: mail,
+	}
+
+	v := validator.New()
+
+	err := v.Struct(payload)
+	if err != nil {
+		return false
+	}
+
+	return true
+}
+
+func PhoneNumberValidator(phoneNumber *string) bool {
+
+	payload := &phoneData{
+		PhoneNumber: *phoneNumber,
+	}
+
+	v := validator.New()
+	v.RegisterValidation("phoneNumberCheck", phoneNumberCheck)
+
+	err := v.Struct(payload)
+	if err != nil {
+		return false
+	}
+
+	return true
 }
