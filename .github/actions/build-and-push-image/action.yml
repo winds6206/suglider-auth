@@ -72,4 +72,4 @@ runs:
         context: '${{ inputs.docker_context }}'
         file: '${{ inputs.docker_file }}'
         push: true
-        tags: '${{ inputs.registry_host }}/${{ inputs.image_repo }}/${{ inputs.image_name }}:${{ steps.imageTag.outputs.tag }}'
+        tags: '${{ inputs.registry_host }}/${{ inputs.image_repo }}:${{ steps.imageTag.outputs.tag }}'
