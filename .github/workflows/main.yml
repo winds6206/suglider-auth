@@ -11,14 +11,20 @@ on:
       - opened
     branches:
       - 'feature/new-build-pipeline'
+  workflow_dispatch:
+    inputs:
+      enable_container_build:
+        description: 'enable container as build environment'
+        required: true
+        default: true
+        type: boolean
 
 env:
-  ENABLE_CONTAINER_BUILD: 'true'
   GO_BUILD_CMD: 'cmd'
 
 jobs:
   compile:
-    if: env.ENABLE_CONTAINER_BUILD != 'true'
+    if: ${{ github.event.inputs.enable_container_build == 'false' }}
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -43,7 +49,7 @@ jobs:
           application_version: ${{ steps.tagName.outputs.tag }}
 
   compile-container:
-    if: env.ENABLE_CONTAINER_BUILD == 'true'
+    if: ${{ github.event.inputs.enable_container_build == 'true' }}
     runs-on: ubuntu-latest
     container: golang:${{ matrix.go-version }}
     strategy:
