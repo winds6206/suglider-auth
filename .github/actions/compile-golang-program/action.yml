@@ -1,0 +1,66 @@
+name: "Build Binary with Golang or Make"
+description: "Builds binary of goland application with make or go build command"
+
+inputs:
+  enable_container:
+    description: "Enable golang official image container as build environment"
+    default: 'true'
+
+  enable_cache:
+    description: "Enable cache for go dependicies"
+    default: 'true'
+
+  go_build_cmd:
+    description: "Builds binary of goland application with make or go build command"
+    required: true
+
+  go_version:
+    description: "The go version which build with"
+    required: true
+
+  application_version:
+    description: "The go version which build with"
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    - if:   ${{ inputs.enable_container != 'true' }}
+      name: Setup Go ${{ inputs.go_version }}
+      uses: actions/setup-go@v4
+      with:
+        go-version: ${{ inputs.go_version }}
+
+    - name: Restore Go Cache
+      uses: actions/cache@v3
+      with:
+        path: |
+          ~/.cache/go-build
+          ~/go/pkg/mod
+        key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+        restore-keys: |
+          ${{ runner.os }}-go-
+
+    - name: Save Version Info
+      shell: sh
+      run: echo ${{ inputs.application_version }} > .application_version
+
+    - name: Build Go Binary
+      shell: sh
+      run:  make build VERSION=${{ inputs.application_version }}
+
+    - name: Save Go Cache
+      id:   cache-go-save
+      uses: actions/cache/save@v3
+      with:
+        path: |
+          ~/.cache/go-build
+          ~/go/pkg/mod
+        key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+
+    - name: Upload go binary as artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: '${{ github.repository }}-artifact'
+        path: '${{ github.workspace }}/**/*'
+        retention-days: 1

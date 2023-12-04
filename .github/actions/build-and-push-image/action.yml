@@ -1,0 +1,58 @@
+name: "Build and Publish to Docker"
+description: "Pushes built artifacts to Docker"
+
+inputs:
+  registry_repo:
+    description: repository of github container registry
+    default: 'ghcr.io'
+  image_name:
+    description: name of docker image
+    default: '${{ github.repository }}' # The owner and repository name. For example, octocat/Hello-World.
+  image_tag:
+    description: tag of docker image
+    default: 'latest'
+  dockerfile:
+    description: dockerfile to build docker image
+    required: true
+    default: './build/Dockerfile.pipeline'
+  auto_image_tag:
+    description: Get git tag as image tag automatically
+    default: 'true'
+
+runs:
+  using: "composite"
+  steps:
+    - name: Download artifacts
+      uses: actions/download-artifact@v3
+      with:
+        name: '${{ github.repository }}-artifact'
+        # path: build
+
+    - name: Setup BuildX
+      uses: docker/setup-buildx-action@v1
+
+    - name: Login to the Registry
+      uses: docker/login-action@v1
+      with:
+        username: '${{ secrets.registry_username }}'
+        password: '${{ secrets.registry_password }}'
+
+    - name: Get version as image tag
+      id: imageTag
+      shell: bash
+      env:
+        AUTO_IMAGE_TAG: ${{ inputs.auto_image_tag }}
+        SPECIFIC_IMAGE_TAG: ${{ inputs.image_tag }}
+      run: |
+        if [[ $AUTO_IMAGE_TAG == "true" ]]; then
+          echo "::set-output name=tag::$(cat .application_version)"
+        else
+          echo "::set-output name=tag::$SPECIFIC_IMAGE_TAG"
+        fi
+
+    - name: Build and push docker image
+      uses: docker/build-push-action@v2
+      with:
+        context: '${{ inputs.dockerfile }}'
+        push: true
+        tags: '${{ inputs.registry_repo }}/${{ inputs.image_name }}:${{ steps.imageTag.outputs.tag }}'

@@ -1,0 +1,21 @@
+FROM alpine:latest
+ARG TZ="Asia/Taipei"
+ENV TZ $TZ
+RUN apk add -U --no-cache tzdata
+RUN cp /usr/share/zoneinfo/$TZ /etc/localtime && echo "$TZ" > /etc/timezone
+RUN adduser -S suglider && echo "suglider:suglider" | chpasswd suglider
+
+RUN mkdir -p /usr/local/app/configs && \
+    mkdir -p /usr/local/app/bin && \
+    mkdir -p /usr/local/app/logs && \
+    mkdir -p /usr/local/app/docs && \
+    mkdir -p /usr/local/app/web
+RUN chown suglider:root /usr/local/app/logs
+COPY ./bin/suglider-auth /usr/local/app/bin/suglider-auth
+COPY ./configs/ /usr/local/app/configs
+COPY ./docs/ /usr/local/app/docs
+COPY ./web /usr/local/app/web
+STOPSIGNAL SIGTERM
+WORKDIR /usr/local/app
+USER suglider
+ENTRYPOINT /usr/local/app/bin/suglider-auth

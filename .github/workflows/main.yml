@@ -1,0 +1,77 @@
+name: suglider_auth_build_image
+
+on:
+  push:
+    branches:
+      - 'feature/new-build-pipeline'
+    tags:
+      - 'v*.*'
+  pull_request:
+    types:
+      - opened
+    branches:
+      - 'feature/new-build-pipeline'
+
+env:
+  ENABLE_CONTAINER_BUILD: true
+  GO_BUILD_CMD: 'cmd'
+
+jobs:
+  compile:
+    if: ${{ !vars.ENABLE_CONTAINER }}
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        go-version: [ '1.19', '1.20', '1.21' ]
+        exclude:
+          - go-version: '1.19'
+          - go-version: '1.20'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: olegtarasov/get-tag@v2.1.2
+        id: tagName
+        with:
+          tagRegex: "v(.*)"
+          tagRegexGroup: 1
+      - name: Build Go Application ${{ matrix.go-version }}
+        uses: ./.github/actions/compile-golang-program
+        with:
+          enable_container: true
+          enable_cache: true
+          go_build_cmd: ${{ env.GO_BUILD_CMD }}
+          go_version: ${{ matrix.go-version }}
+          application_version: ${{ steps.tagName.outputs.tag }}
+
+  compile-container:
+    if: ${{ vars.ENABLE_CONTAINER_BUILD }}
+    runs-on: ubuntu-latest
+    container: golang:${{ matrix.go-version }}
+    strategy:
+      matrix:
+        go-version: [ '1.19', '1.20', '1.21' ]
+        exclude:
+          - go-version: '1.19'
+          - go-version: '1.20'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: olegtarasov/get-tag@v2.1.2
+        id: tagName
+        with:
+          tagRegex: "v(.*)"
+          tagRegexGroup: 1
+      - name: Build Go Application ${{ matrix.go-version }}
+        uses: ./.github/actions/compile-golang-program
+        with:
+          enable_container: true
+          enable_cache: true
+          go_build_cmd: ${{ env.GO_BUILD_CMD }}
+          go_version: ${{ matrix.go-version }}
+          application_version: ${{ steps.tagName.outputs.tag }}
+
+  build-publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Build and Push docker image
+        uses: ./.github/actions/build-push-imag
+        with:
+          auto_image_tag: 'true'
