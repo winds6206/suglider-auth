@@ -1516,8 +1516,8 @@
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "User Name",
-                        "name": "username",
+                        "description": "Mail",
+                        "name": "mail",
                         "in": "formData"
                     }
                 ],
@@ -1571,8 +1571,8 @@
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "User Name",
-                        "name": "username",
+                        "description": "Mail",
+                        "name": "mail",
                         "in": "formData"
                     }
                 ],

@@ -992,9 +992,9 @@ paths:
       - multipart/form-data
       description: Check whether a user's password has expired or not
       parameters:
-      - description: User Name
+      - description: Mail
         in: formData
-        name: username
+        name: mail
         type: string
       produces:
       - application/json
@@ -1028,9 +1028,9 @@ paths:
       - multipart/form-data
       description: Extension user's password
       parameters:
-      - description: User Name
+      - description: Mail
         in: formData
-        name: username
+        name: mail
         type: string
       produces:
       - application/json

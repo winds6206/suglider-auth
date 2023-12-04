@@ -1519,8 +1519,8 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "User Name",
-                        "name": "username",
+                        "description": "Mail",
+                        "name": "mail",
                         "in": "formData"
                     }
                 ],
@@ -1574,8 +1574,8 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "User Name",
-                        "name": "username",
+                        "description": "Mail",
+                        "name": "mail",
                         "in": "formData"
                     }
                 ],

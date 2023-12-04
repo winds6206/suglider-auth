@@ -85,23 +85,23 @@ func GetPasswordByMail(mail string) (userInfo UserInfo, err error) {
 	return userInfo, err
 }
 
-func PasswordExpire(userName string) (userInfo UserInfo, err error) {
+func GetPasswordExpireByMail(mail string) (userInfo UserInfo, err error) {
 	ctx, cancel := context.WithTimeout(context.Background(), dbTimeOut)
 	defer cancel()
 
-	err = DataBase.GetContext(ctx, &userInfo, "SELECT username, password_expire_date FROM suglider.user_info WHERE username=?", userName)
+	err = DataBase.GetContext(ctx, &userInfo, "SELECT mail, password_expire_date FROM suglider.user_info WHERE mail=?", mail)
 
 	return userInfo, err
 }
 
-func PasswordExtension(userName string) (err error) {
+func PasswordExtensionByMail(mail string) (err error) {
 	ctx, cancel := context.WithTimeout(context.Background(), dbTimeOut)
 	defer cancel()
 
 	sqlStr := "UPDATE suglider.user_info " +
 		"SET password_expire_date = DATE_ADD(CURRENT_DATE, INTERVAL 90 DAY)" +
-		"WHERE user_info.username = ?"
-	_, err = DataBase.ExecContext(ctx, sqlStr, userName)
+		"WHERE user_info.mail = ?"
+	_, err = DataBase.ExecContext(ctx, sqlStr, mail)
 	return err
 }
 
