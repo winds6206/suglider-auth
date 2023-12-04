@@ -29,9 +29,20 @@ func UserSignUp(mail, password string, userName, firstName, lastName, phoneNumbe
 	ctx, cancel := context.WithTimeout(context.Background(), dbTimeOut)
 	defer cancel()
 
-	sqlStr := "INSERT INTO suglider.user_info(user_id, mail, password, first_name, last_name, phone_number, password_expire_date) " +
-		"VALUES (UNHEX(REPLACE(UUID(), '-', '')),?,?,?,?,?,DATE_ADD(CURRENT_DATE, INTERVAL 90 DAY))"
-	_, err = DataBase.ExecContext(ctx, sqlStr, mail, password, firstName, lastName, phoneNumber)
+	sqlStr := "INSERT INTO suglider.user_info(user_id, mail, password, username, first_name, last_name, phone_number, password_expire_date) " +
+		"VALUES (UNHEX(REPLACE(UUID(), '-', '')),?,?,?,?,?,?,DATE_ADD(CURRENT_DATE, INTERVAL 90 DAY))"
+	_, err = DataBase.ExecContext(ctx, sqlStr, mail, password, userName, firstName, lastName, phoneNumber)
+	return err
+}
+
+func UpdateSignUp(mail, password string, userName, firstName, lastName, phoneNumber *string) (err error) {
+	ctx, cancel := context.WithTimeout(context.Background(), dbTimeOut)
+	defer cancel()
+
+	sqlStr := "UPDATE suglider.user_info " +
+		"SET password = ?, username = ?, first_name = ?, last_name = ?, phone_number = ?, password_expire_date = DATE_ADD(CURRENT_DATE, INTERVAL 90 DAY)" +
+		"WHERE user_info.mail = ?"
+	_, err = DataBase.ExecContext(ctx, sqlStr, password, userName, firstName, lastName, phoneNumber, mail)
 	return err
 }
 
@@ -60,7 +71,7 @@ func GetPasswordByUserName(userName string) (userInfo UserInfo, err error) {
 	ctx, cancel := context.WithTimeout(context.Background(), dbTimeOut)
 	defer cancel()
 
-	err = DataBase.GetContext(ctx, &userInfo, "SELECT username, mail, password, LOWER(HEX(user_id)) AS user_id FROM suglider.user_info WHERE username=?", userName)
+	err = DataBase.GetContext(ctx, &userInfo, "SELECT username, mail, password FROM suglider.user_info WHERE username=?", userName)
 
 	return userInfo, err
 }
@@ -69,7 +80,7 @@ func GetPasswordByMail(mail string) (userInfo UserInfo, err error) {
 	ctx, cancel := context.WithTimeout(context.Background(), dbTimeOut)
 	defer cancel()
 
-	err = DataBase.GetContext(ctx, &userInfo, "SELECT mail, password, LOWER(HEX(user_id)) AS user_id FROM suglider.user_info WHERE mail=?", mail)
+	err = DataBase.GetContext(ctx, &userInfo, "SELECT mail, password FROM suglider.user_info WHERE mail=?", mail)
 
 	return userInfo, err
 }

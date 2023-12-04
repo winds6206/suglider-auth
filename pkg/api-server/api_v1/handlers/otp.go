@@ -159,9 +159,9 @@ func MailOTPSend(c *gin.Context) {
 	}
 
 	// Mail user name decision logic
-	if userInfo.FirstName != "" {
-		user = userInfo.FirstName
-	} else if userInfo.Username.Valid {
+	if userInfo.FirstName.Valid && userInfo.FirstName.String != "" {
+		user = userInfo.FirstName.String
+	} else if userInfo.Username.Valid && userInfo.Username.String != "" {
 		user = userInfo.Username.String
 	} else {
 		re := regexp.MustCompile(`([^@]+)@`)
