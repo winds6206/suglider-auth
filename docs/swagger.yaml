@@ -11,6 +11,68 @@ info:
   title: Suglider-Auth API Doc
   version: "1.0"
 paths:
+  /api/v1/oauth/google/login:
+    get:
+      consumes:
+      - multipart/form-data
+      description: Login through Google OAuth2.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            type: string
+        "400":
+          description: Bad request
+          schema:
+            type: string
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+        "403":
+          description: Forbidden
+          schema:
+            type: string
+        "404":
+          description: Not found
+          schema:
+            type: string
+      summary: Google OAuth2 Login
+      tags:
+      - oauth2
+  /api/v1/oauth/google/sign-up:
+    get:
+      consumes:
+      - multipart/form-data
+      description: Registry new user through Google OAuth2.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            type: string
+        "400":
+          description: Bad request
+          schema:
+            type: string
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+        "403":
+          description: Forbidden
+          schema:
+            type: string
+        "404":
+          description: Not found
+          schema:
+            type: string
+      summary: Google OAuth2 Sign Up
+      tags:
+      - oauth2
   /api/v1/rbac/grouping/{name}/delete:
     delete:
       consumes:
