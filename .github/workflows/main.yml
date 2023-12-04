@@ -77,6 +77,10 @@ jobs:
 
   build-publish:
     needs: [ compile, compile-container ]
+    if: |
+      always() &&
+      (needs.compile.result == 'success' || needs.compile.result == 'skipped') &&
+      (needs.compile-container.result == 'success' || needs.compile-container.result == 'skipped')
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
