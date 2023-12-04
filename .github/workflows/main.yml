@@ -24,7 +24,7 @@ env:
 
 jobs:
   compile:
-    if: ${{ github.event.inputs.enable_container_build == 'false' }}
+    if: ${{ !github.event.inputs.enable_container_build }}
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -49,7 +49,7 @@ jobs:
           application_version: ${{ steps.tagName.outputs.tag }}
 
   compile-container:
-    if: ${{ github.event.inputs.enable_container_build == 'true' }}
+    if: ${{ github.event.inputs.enable_container_build }}
     runs-on: ubuntu-latest
     container: golang:${{ matrix.go-version }}
     strategy:
@@ -75,6 +75,7 @@ jobs:
           application_version: ${{ steps.tagName.outputs.tag }}
 
   build-publish:
+    needs: [ compile, compile-container ]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
