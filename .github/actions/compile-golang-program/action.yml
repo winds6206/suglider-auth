@@ -52,7 +52,7 @@ runs:
       env:
         APPLICATION_VERSION: ${{ inputs.application_version }}
 
-    - if: ${{ go_build_cmd == 'make' }}
+    - if: ${{ inputs.go_build_cmd == 'make' }}
       name: Build Go Binary with Make
       shell: sh
       run:  make build VERSION=${{ inputs.application_version }}
