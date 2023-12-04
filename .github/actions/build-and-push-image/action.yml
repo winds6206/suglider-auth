@@ -2,12 +2,15 @@ name: "Build and Publish to Docker"
 description: "Pushes built artifacts to Docker"
 
 inputs:
-  registry_repo:
+  registry_host:
     description: repository of github container registry
     default: 'ghcr.io'
-  image_name:
+  image_repo:
     description: name of docker image
     default: '${{ github.repository }}' # The owner and repository name. For example, octocat/Hello-World.
+  image_name:
+    description: name of docker image
+    default: '${{ github.event.repository.name }}'
   image_tag:
     description: tag of docker image
     default: 'latest'
@@ -42,7 +45,7 @@ runs:
     - name: Login to the Registry
       uses: docker/login-action@v3
       with:
-        registry: '${{ inputs.registry_repo }}'
+        registry: '${{ inputs.registry_host }}'
         username: '${{ inputs.registry_username }}'
         password: '${{ inputs.registry_password }}'
 
@@ -69,4 +72,4 @@ runs:
         context: '${{ inputs.docker_context }}'
         file: '${{ inputs.docker_file }}'
         push: true
-        tags: '${{ inputs.registry_repo }}/${{ inputs.image_name }}:${{ steps.imageTag.outputs.tag }}'
+        tags: '${{ inputs.registry_host }}/${{ inputs.image_repo }}/${{ inputs.image_name }}:${{ steps.imageTag.outputs.tag }}'
