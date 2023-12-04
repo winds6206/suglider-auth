@@ -4,7 +4,6 @@ description: "Builds binary of goland application with make or go build command"
 inputs:
   enable_container:
     description: "Enable golang official image container as build environment"
-    default: 'true'
 
   enable_cache:
     description: "Enable cache for go dependicies"
@@ -25,13 +24,14 @@ inputs:
 runs:
   using: "composite"
   steps:
-    - if:   ${{ inputs.enable_container != 'true' }}
+    - if: ${{ inputs.enable_container != 'true' }}
       name: Setup Go ${{ inputs.go_version }}
       uses: actions/setup-go@v4
       with:
         go-version: ${{ inputs.go_version }}
 
-    - name: Restore Go Cache
+    - if: ${{ inputs.enable_cache == 'true' }}
+      name: Restore Go Cache
       uses: actions/cache@v3
       with:
         path: |
@@ -54,7 +54,8 @@ runs:
       shell: sh
       run:  make build VERSION=${{ inputs.application_version }}
 
-    - name: Save Go Cache
+    - if: ${{ inputs.enable_cache == 'true' }}
+      name: Save Go Cache
       id:   cache-go-save
       uses: actions/cache/save@v3
       with:

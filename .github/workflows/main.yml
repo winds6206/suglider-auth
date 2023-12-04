@@ -16,15 +16,16 @@ on:
       enable_container_build:
         description: 'enable container as build environment'
         required: true
-        default: true
-        type: boolean
+        default: 'true'
+        type: string
 
 env:
+  ENABLE_CONTAINER_BUILD: ${{ github.event.inputs.enable_container_build }}
   GO_BUILD_CMD: 'cmd'
 
 jobs:
   compile:
-    if: ${{ !github.event.inputs.enable_container_build }}
+    if: ${{ github.event.inputs.enable_container_build != 'true' }}
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -42,14 +43,14 @@ jobs:
       - name: Build Go Application ${{ matrix.go-version }}
         uses: ./.github/actions/compile-golang-program
         with:
-          enable_container: true
-          enable_cache: true
+          enable_cache: 'true'
+          enable_container: ${{ env.ENABLE_CONTAINER_BUILD }}
           go_build_cmd: ${{ env.GO_BUILD_CMD }}
           go_version: ${{ matrix.go-version }}
           application_version: ${{ steps.tagName.outputs.tag }}
 
   compile-container:
-    if: ${{ github.event.inputs.enable_container_build }}
+    if: ${{ github.event.inputs.enable_container_build == 'true' }}
     runs-on: ubuntu-latest
     container: golang:${{ matrix.go-version }}
     strategy:
