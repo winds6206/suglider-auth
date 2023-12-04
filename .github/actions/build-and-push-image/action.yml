@@ -31,7 +31,7 @@ runs:
     - name: Download artifacts
       uses: actions/download-artifact@v3
       with:
-        name: '${{ github.repository }}-artifact'
+        name: '${{ github.event.repository.name }}-artifact'
         path: build
 
     - name: Setup BuildX

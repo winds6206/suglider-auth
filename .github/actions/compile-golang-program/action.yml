@@ -67,6 +67,6 @@ runs:
     - name: Upload go binary as artifacts
       uses: actions/upload-artifact@v3
       with:
-        name: '${{ github.repository }}-artifact'
+        name: '${{ github.event.repository.name }}-artifact'
         path: '${{ github.workspace }}/**/*'
         retention-days: 1
