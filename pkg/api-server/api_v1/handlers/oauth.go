@@ -140,11 +140,6 @@ func OAuthGoogleCallback(c *gin.Context) {
 
 			c.JSON(http.StatusInternalServerError, utils.ErrorResponse(c, 1002, err))
 			return
-		} else {
-			c.JSON(http.StatusOK, utils.SuccessResponse(c, 200, map[string]interface{}{
-				"mail":    oAuthResponse.Email,
-				"message": "Google login successful!",
-			}))
 		}
 
 		okSetSession := setSession(c, oAuthResponse.Email)

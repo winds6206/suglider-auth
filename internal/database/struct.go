@@ -6,8 +6,8 @@ type UserInfo struct {
 	Username           sql.NullString `db:"username"`
 	UserID             string         `db:"user_id"`
 	Mail               string         `db:"mail"`
-	Password           string         `db:"password"`
-	FirstName          string         `db:"first_name"`
+	Password           sql.NullString `db:"password"`
+	FirstName          sql.NullString `db:"first_name"`
 	PasswordExpireDate string         `db:"password_expire_date"`
 }
 
@@ -21,7 +21,7 @@ type TotpUserInfo struct {
 
 type UserTwoFactorAuthInfo struct {
 	Mail           string         `db:"mail"`
-	UserName       string         `db:"username"`
+	UserName       sql.NullString `db:"username"`
 	UserID         sql.NullString `db:"user_id"`
 	TotpEnabled    sql.NullBool   `db:"totp_enabled"`
 	MailOTPEnabled bool           `db:"mail_otp_enabled"`

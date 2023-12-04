@@ -97,6 +97,9 @@ func UserSignUp(c *gin.Context) {
 	if request.FirstName == nil {
 		request.FirstName = nil
 	}
+	if request.FirstName == nil {
+		request.FirstName = nil
+	}
 	if request.LastName == nil {
 		request.LastName = nil
 	}
@@ -107,40 +110,72 @@ func UserSignUp(c *gin.Context) {
 		request.PhoneNumber = nil
 	}
 
-	// Encode user password
-	passwordEncode, _ := encrypt.SaltedPasswordHash(request.Password)
+	userInfo, err := mariadb.GetPasswordByMail(request.Mail)
 
-	err = mariadb.UserSignUp(request.Mail, passwordEncode, request.UserName, request.FirstName, request.LastName, request.PhoneNumber)
-	if err != nil {
-		errorMessage := fmt.Sprintf("Insert user_info table failed: %v", err)
+	// No err means user exist
+	// sql.ErrNoRows indicates that there were no results found for the username provided.
+	if err == sql.ErrNoRows {
+
+		fmt.Println("ErrNoRows")
+		// Encode user password
+		passwordEncode, _ := encrypt.SaltedPasswordHash(request.Password)
+
+		err = mariadb.UserSignUp(request.Mail, passwordEncode, request.UserName, request.FirstName, request.LastName, request.PhoneNumber)
+		if err != nil {
+			errorMessage := fmt.Sprintf("Insert user_info table failed: %v", err)
+			slog.Error(errorMessage)
+			c.JSON(http.StatusInternalServerError, utils.ErrorResponse(c, 1002, err))
+			return
+		}
+		// The condition means the user had previously signed up through OAuth2.
+	} else if err == nil && !userInfo.Password.Valid {
+
+		fmt.Println("signed up through OAuth2")
+
+		// Encode user password
+		passwordEncode, _ := encrypt.SaltedPasswordHash(request.Password)
+
+		err = mariadb.UpdateSignUp(request.Mail, passwordEncode, request.UserName, request.FirstName, request.LastName, request.PhoneNumber)
+		if err != nil {
+			errorMessage := fmt.Sprintf("Update user_info table failed: %v", err)
+			slog.Error(errorMessage)
+			c.JSON(http.StatusInternalServerError, utils.ErrorResponse(c, 1037, err))
+			return
+		}
+		// Account have already existed
+	} else if err == nil && userInfo.Password.Valid {
+		c.JSON(http.StatusForbidden, utils.ErrorResponse(c, 1056, err))
+		return
+		// Other error condition
+	} else if err != nil {
+		errorMessage := fmt.Sprintf("Sign up failed: %v", err)
 		slog.Error(errorMessage)
-
 		c.JSON(http.StatusInternalServerError, utils.ErrorResponse(c, 1002, err))
 		return
-	} else {
-		// Mail user name decision logic
-		if request.FirstName == nil || *request.FirstName != "" {
-			user = *request.FirstName
-		} else if request.UserName == nil || *request.UserName != "" {
-			user = *request.UserName
-		} else {
-			re := regexp.MustCompile(`([^@]+)@`)
-			match := re.FindStringSubmatch(request.Mail)
-			if len(match) > 1 {
-				user = match[1]
-			} else {
-				c.JSON(http.StatusInternalServerError, utils.ErrorResponse(c, 1054, err))
-				return
-			}
-		}
-
-		fmt.Println(user)
-		// mail verification
-		if err = smtp.SendVerifyMail(c, user, request.Mail); err != nil {
-			slog.Error(err.Error())
-		}
-		c.JSON(http.StatusOK, utils.SuccessResponse(c, 200, nil))
 	}
+
+	// Mail user name decision logic
+	if request.FirstName != nil && *request.FirstName != "" {
+		user = *request.FirstName
+	} else if request.UserName != nil && *request.UserName != "" {
+		user = *request.UserName
+	} else {
+		re := regexp.MustCompile(`([^@]+)@`)
+		match := re.FindStringSubmatch(request.Mail)
+		if len(match) > 1 {
+			user = match[1]
+		} else {
+			c.JSON(http.StatusInternalServerError, utils.ErrorResponse(c, 1054, err))
+			return
+		}
+	}
+
+	// mail verification
+	if err = smtp.SendVerifyMail(c, user, request.Mail); err != nil {
+		slog.Error(err.Error())
+	}
+	c.JSON(http.StatusOK, utils.SuccessResponse(c, 200, nil))
+
 }
 
 // @Summary Delete User
@@ -240,9 +275,9 @@ func UserLogin(c *gin.Context) {
 	if mailValid {
 		userInfo, err := mariadb.GetPasswordByMail(request.Account)
 		// No err means user exist
-		if err == nil {
+		if err == nil && userInfo.Password.Valid {
 
-			pwdVerify := encrypt.VerifySaltedPasswordHash(userInfo.Password, request.Password)
+			pwdVerify := encrypt.VerifySaltedPasswordHash(userInfo.Password.String, request.Password)
 
 			// Check password true or false
 			if pwdVerify {
@@ -279,6 +314,12 @@ func UserLogin(c *gin.Context) {
 				c.JSON(http.StatusUnauthorized, utils.ErrorResponse(c, 1004))
 				return
 			}
+		} else if err == nil && !userInfo.Password.Valid {
+			c.JSON(http.StatusUnauthorized, utils.ErrorResponse(c, 1004, map[string]interface{}{
+				"mail": request.Account,
+				"msg":  "Login failed: password is NULL, indicating the user had previously signed up through OAuth2.",
+			}))
+			return
 			// sql.ErrNoRows indicates that there were no results found for the username provided.
 		} else if err == sql.ErrNoRows {
 			errorMessage := fmt.Sprintf("User Login failed: %v", err)
@@ -299,7 +340,7 @@ func UserLogin(c *gin.Context) {
 		// No err means user exist
 		if err == nil {
 
-			pwdVerify := encrypt.VerifySaltedPasswordHash(userInfo.Password, request.Password)
+			pwdVerify := encrypt.VerifySaltedPasswordHash(userInfo.Password.String, request.Password)
 
 			// Check password true or false
 			if pwdVerify {
