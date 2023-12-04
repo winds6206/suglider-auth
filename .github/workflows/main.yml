@@ -1,0 +1,90 @@
+name: suglider_auth_build_image
+
+on:
+  push:
+    tags:
+      - 'v*.*'
+  pull_request:
+    types:
+      - opened
+      - reopened
+    branches:
+      - 'main'
+  workflow_dispatch:
+    inputs:
+      enable_container_build:
+        description: 'enable container as build environment'
+        required: true
+        default: 'true'
+        type: string
+
+env:
+  GO_BUILD_CMD: 'make'
+
+jobs:
+  compile:
+    if: ${{ github.event.inputs.enable_container_build == 'false' }}
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        go-version: [ '1.19', '1.20', '1.21' ]
+        exclude:
+          - go-version: '1.19'
+          - go-version: '1.20'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: olegtarasov/get-tag@v2.1.2
+        id: tagName
+        with:
+          tagRegex: "v(.*)"
+          tagRegexGroup: 1
+      - name: Build Go Application ${{ matrix.go-version }}
+        uses: ./.github/actions/compile-golang-program
+        with:
+          enable_cache: 'true'
+          enable_container: ${{ github.event.inputs.enable_container_build }}
+          go_build_cmd: ${{ env.GO_BUILD_CMD }}
+          go_version: ${{ matrix.go-version }}
+          application_version: ${{ steps.tagName.outputs.tag }}
+
+  compile-container:
+    if: ${{ github.event.inputs.enable_container_build != 'false' }}
+    runs-on: ubuntu-latest
+    container: golang:${{ matrix.go-version }}
+    strategy:
+      matrix:
+        go-version: [ '1.19', '1.20', '1.21' ]
+        exclude:
+          - go-version: '1.19'
+          - go-version: '1.20'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: olegtarasov/get-tag@v2.1.2
+        id: tagName
+        with:
+          tagRegex: "v(.*)"
+          tagRegexGroup: 1
+      - name: Build Go Application ${{ matrix.go-version }}
+        uses: ./.github/actions/compile-golang-program
+        with:
+          enable_container: true
+          enable_cache: true
+          go_build_cmd: ${{ env.GO_BUILD_CMD }}
+          go_version: ${{ matrix.go-version }}
+          application_version: ${{ steps.tagName.outputs.tag }}
+
+  build-publish:
+    needs: [ compile, compile-container ]
+    if: |
+      always() &&
+      (needs.compile.result == 'success' || needs.compile.result == 'skipped') &&
+      (needs.compile-container.result == 'success' || needs.compile-container.result == 'skipped')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build and Push docker image
+        uses: ./.github/actions/build-and-push-image
+        with:
+          auto_image_tag: 'true'
+          registry_username: ${{ github.actor }}
+          registry_password: ${{ secrets.REGISTRY_PASSWORD }}

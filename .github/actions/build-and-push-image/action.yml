@@ -1,0 +1,75 @@
+name: "Build and Publish to Docker"
+description: "Pushes built artifacts to Docker"
+
+inputs:
+  registry_host:
+    description: repository of github container registry
+    default: 'ghcr.io'
+  image_repo:
+    description: name of docker image
+    default: '${{ github.repository }}' # The owner and repository name. For example, octocat/Hello-World.
+  image_name:
+    description: name of docker image
+    default: '${{ github.event.repository.name }}'
+  image_tag:
+    description: tag of docker image
+    default: 'latest'
+  docker_context:
+    description: build's context is the set of files located in the specified PATH or URL
+    default: '.'
+  docker_file:
+    description: dockerfile to build docker image
+    default: './build/Dockerfile.pipeline'
+  auto_image_tag:
+    description: Get git tag as image tag automatically
+    default: 'true'
+  registry_username:
+    description: The username to login docker registry
+    required: true
+  registry_password:
+    description: The personal access token to login docker registry
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    - name: Download artifacts
+      uses: actions/download-artifact@v3
+      with:
+        name: '${{ github.event.repository.name }}-artifact'
+        path: artifact
+
+    - name: Setup BuildX
+      uses: docker/setup-buildx-action@v3
+
+    - name: Login to the Registry
+      uses: docker/login-action@v3
+      with:
+        registry: '${{ inputs.registry_host }}'
+        username: '${{ inputs.registry_username }}'
+        password: '${{ inputs.registry_password }}'
+
+    - name: Get version as image tag
+      id: imageTag
+      shell: bash
+      env:
+        AUTO_IMAGE_TAG: ${{ inputs.auto_image_tag }}
+        SPECIFIC_IMAGE_TAG: ${{ inputs.image_tag }}
+      run: |
+        if [[ $AUTO_IMAGE_TAG == "true" ]]; then
+            if [[ -f ./artifact/.application_version ]]; then
+                echo "::set-output name=tag::$(cat ./artifact/application_version.log)"
+            else
+                echo "::set-output name=tag::latest"
+            fi
+        else
+            echo "::set-output name=tag::$SPECIFIC_IMAGE_TAG"
+        fi
+
+    - name: Build and push docker image
+      uses: docker/build-push-action@v2
+      with:
+        context: '${{ inputs.docker_context }}'
+        file: '${{ inputs.docker_file }}'
+        push: true
+        tags: '${{ inputs.registry_host }}/${{ inputs.image_repo }}:${{ steps.imageTag.outputs.tag }}'
