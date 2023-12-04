@@ -33,6 +33,41 @@ var (
 	oauthStateString  = "randomstate"
 )
 
+// @Summary Google OAuth2 Sign Up
+// @Description Registry new user through Google OAuth2.
+// @Tags oauth2
+// @Accept multipart/form-data
+// @Produce application/json
+// @Success 200 {string} string "Success"
+// @Failure 400 {string} string "Bad request"
+// @Failure 401 {string} string "Unauthorized"
+// @Failure 403 {string} string "Forbidden"
+// @Failure 404 {string} string "Not found"
+// @Router /api/v1/oauth/google/sign-up [get]
+func OAuthGoogleSignUp(c *gin.Context) {
+	googleOauthConfig = &oauth2.Config{
+		RedirectURL:  "http://localhost:9527/api/v1/oauth/google/callback",
+		ClientID:     configs.ApplicationConfig.Oauth.Google.ClientID,
+		ClientSecret: configs.ApplicationConfig.Oauth.Google.ClientSecret,
+		Scopes:       []string{"https://www.googleapis.com/auth/userinfo.profile", "https://www.googleapis.com/auth/userinfo.email"},
+		Endpoint:     google.Endpoint,
+	}
+
+	url := googleOauthConfig.AuthCodeURL(oauthStateString)
+	c.Redirect(http.StatusTemporaryRedirect, url)
+}
+
+// @Summary Google OAuth2 Login
+// @Description Login through Google OAuth2.
+// @Tags oauth2
+// @Accept multipart/form-data
+// @Produce application/json
+// @Success 200 {string} string "Success"
+// @Failure 400 {string} string "Bad request"
+// @Failure 401 {string} string "Unauthorized"
+// @Failure 403 {string} string "Forbidden"
+// @Failure 404 {string} string "Not found"
+// @Router /api/v1/oauth/google/login [get]
 func OAuthGoogleLogin(c *gin.Context) {
 	googleOauthConfig = &oauth2.Config{
 		RedirectURL:  "http://localhost:9527/api/v1/oauth/google/callback",
@@ -130,7 +165,7 @@ func OAuthGoogleCallback(c *gin.Context) {
 				}))
 			}
 		}
-		// if mail is not exist, program will automatic to set up
+		// if mail is not exist, program will automatic to create
 	} else {
 
 		err := mariadb.OAuthSignUp(oAuthResponse.Email, oAuthResponse.GivenName, oAuthResponse.FamilyName)

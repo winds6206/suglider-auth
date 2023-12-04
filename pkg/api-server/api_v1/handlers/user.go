@@ -6,6 +6,7 @@ import (
 	"log/slog"
 	"net/http"
 	"regexp"
+	"strings"
 	mariadb "suglider-auth/internal/database"
 	smtp "suglider-auth/internal/mail"
 	"suglider-auth/internal/utils"
@@ -274,6 +275,12 @@ func UserLogin(c *gin.Context) {
 	err := c.ShouldBindJSON(&request)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, utils.ErrorResponse(c, 1001, err))
+		return
+	}
+
+	// Check  password can't post space or empty string
+	if strings.TrimSpace(request.Password) == "" || request.Password == "" {
+		c.JSON(http.StatusForbidden, utils.ErrorResponse(c, 1061, err))
 		return
 	}
 

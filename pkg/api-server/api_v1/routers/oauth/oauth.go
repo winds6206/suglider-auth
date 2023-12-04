@@ -9,5 +9,6 @@ import (
 func OAuthHandler(router *gin.RouterGroup) {
 
 	router.GET("/google/login", handlers.OAuthGoogleLogin)
+	router.GET("/google/sign-up", handlers.OAuthGoogleSignUp)
 	router.GET("/google/callback", handlers.OAuthGoogleCallback)
 }

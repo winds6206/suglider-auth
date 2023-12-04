@@ -69,6 +69,7 @@ func ResponseStatusCode() {
 		1058: "The new password is not satisfied of rule.",
 		1059: "New password is the same old one.",
 		1060: "The user password have already existed.",
+		1061: "The password can't empty.",
 		1101: "Fail to parse POST form data.",
 		1102: "Fail to bind POST form data.",
 		1103: "Fail to parse path parameters.",
