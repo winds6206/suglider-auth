@@ -18,7 +18,7 @@ env:
 
 jobs:
   compile:
-    if: ${{ env.ENABLE_CONTAINER_BUILD != 'true' }}
+    if: env.ENABLE_CONTAINER_BUILD != 'true'
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -43,7 +43,7 @@ jobs:
           application_version: ${{ steps.tagName.outputs.tag }}
 
   compile-container:
-    if: ${{ env.ENABLE_CONTAINER_BUILD == 'true' }}
+    if: env.ENABLE_CONTAINER_BUILD == 'true'
     runs-on: ubuntu-latest
     container: golang:${{ matrix.go-version }}
     strategy:
