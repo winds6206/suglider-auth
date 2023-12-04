@@ -13,12 +13,12 @@ on:
       - 'feature/new-build-pipeline'
 
 env:
-  ENABLE_CONTAINER_BUILD: true
+  ENABLE_CONTAINER_BUILD: 'true'
   GO_BUILD_CMD: 'cmd'
 
 jobs:
   compile:
-    if: ${{ !vars.ENABLE_CONTAINER }}
+    if: ${{ env.ENABLE_CONTAINER_BUILD != 'true' }}
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -43,7 +43,7 @@ jobs:
           application_version: ${{ steps.tagName.outputs.tag }}
 
   compile-container:
-    if: ${{ vars.ENABLE_CONTAINER_BUILD }}
+    if: ${{ env.ENABLE_CONTAINER_BUILD == 'true' }}
     runs-on: ubuntu-latest
     container: golang:${{ matrix.go-version }}
     strategy:
@@ -72,6 +72,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Build and Push docker image
-        uses: ./.github/actions/build-push-imag
+        uses: ./.github/actions/build-and-push-imag
         with:
           auto_image_tag: 'true'
