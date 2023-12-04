@@ -53,7 +53,7 @@ runs:
       run: |
         if [[ $AUTO_IMAGE_TAG == "true" ]]; then
             if [[ -f ./build/.application_version ]]; then
-                echo "::set-output name=tag::$(cat ./build/.application_version)"
+                echo "::set-output name=tag::$(cat ./build/application_version.log)"
             else
                 echo "::set-output name=tag::latest"
             fi
