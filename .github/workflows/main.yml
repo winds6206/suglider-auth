@@ -20,7 +20,6 @@ on:
         type: string
 
 env:
-  ENABLE_CONTAINER_BUILD: ${{ github.event.inputs.enable_container_build }}
   GO_BUILD_CMD: 'cmd'
 
 jobs:
@@ -44,7 +43,7 @@ jobs:
         uses: ./.github/actions/compile-golang-program
         with:
           enable_cache: 'true'
-          enable_container: ${{ env.ENABLE_CONTAINER_BUILD }}
+          enable_container: ${{ github.event.inputs.enable_container_build }}
           go_build_cmd: ${{ env.GO_BUILD_CMD }}
           go_version: ${{ matrix.go-version }}
           application_version: ${{ steps.tagName.outputs.tag }}
@@ -89,4 +88,4 @@ jobs:
         with:
           auto_image_tag: 'true'
           registry_username: ${{ github.actor }}
-          registry_password: ${{ secrets.registry_password }}
+          registry_password: ${{ secrets.REGISTRY_PASSWORD }}
