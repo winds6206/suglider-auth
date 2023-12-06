@@ -82,11 +82,34 @@ func DeleteSession(sid string) error {
 	return nil
 }
 
-func ReadSession(c *gin.Context) string {
+func ReadSession(c *gin.Context) (string, sessionData, int64, error) {
+
+	var errCode int64
+	errCode = 0
+
+	var data sessionData
+
 	session := sessions.Default(c)
 	sid := session.Get("sid")
 
 	// Convert interface{} type to String type
-	StrSid := fmt.Sprintf("%v", sid)
-	return StrSid
+	strSid := fmt.Sprintf("%v", sid)
+
+	// Process key format
+	sessionKey := fmt.Sprintf("sid:%s", sid)
+
+	// Get value
+	value, errCode, err := redis.Get(sessionKey)
+	if err != nil {
+		return "", sessionData{}, errCode, err
+	}
+
+	err = json.Unmarshal([]byte(value), &data)
+	if err != nil {
+		errCode = 1063
+		return "", sessionData{}, errCode, err
+	}
+
+	return strSid, data, errCode, nil
+
 }

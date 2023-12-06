@@ -73,8 +73,16 @@ func ValidateMailOTP() gin.HandlerFunc {
 		// Verify OTP Code from user input
 		if value == request.OTPCode {
 			c.Set("mail_otp_verify", true)
-			setSession(c, request.Mail)
-			setJWT(c, request.Mail)
+			okSetSession := setSession(c, request.Mail)
+			if !okSetSession {
+				c.Abort()
+				return
+			}
+			okSetJWT := setJWT(c, request.Mail)
+			if !okSetJWT {
+				c.Abort()
+				return
+			}
 		} else {
 			c.Set("mail_otp_verify", false)
 		}
@@ -122,8 +130,17 @@ func ValidateTOTP() gin.HandlerFunc {
 
 		if valid {
 			c.Set("totp_verify", true)
-			setSession(c, request.Mail)
-			setJWT(c, request.Mail)
+			okSetSession := setSession(c, request.Mail)
+			if !okSetSession {
+				c.Abort()
+				return
+			}
+			okSetJWT := setJWT(c, request.Mail)
+			if !okSetJWT {
+				c.Abort()
+				return
+			}
+
 		} else {
 			c.Set("totp_verify", false)
 		}
@@ -134,7 +151,6 @@ func ValidateTOTP() gin.HandlerFunc {
 }
 
 func setSession(c *gin.Context, mail string) bool {
-	sid := session.ReadSession(c)
 
 	// Check session exist or not
 	ok, err := session.CheckSession(c)
@@ -142,7 +158,6 @@ func setSession(c *gin.Context, mail string) bool {
 		errorMessage := fmt.Sprintf("Checking whether key exist or not happen something wrong: %v", err)
 		slog.Error(errorMessage)
 		c.JSON(http.StatusInternalServerError, utils.ErrorResponse(c, 1039, err))
-		c.Abort()
 		return false
 	}
 	if !ok {
@@ -152,39 +167,56 @@ func setSession(c *gin.Context, mail string) bool {
 			errorMessage := fmt.Sprintf("Failed to create session value JSON data: %v", err)
 			slog.Error(errorMessage)
 			c.JSON(http.StatusInternalServerError, utils.ErrorResponse(c, errCode, err))
-			c.Abort()
 			return false
 
 		case 1042:
 			errorMessage := fmt.Sprintf("Redis SET data failed: %v", err)
 			slog.Error(errorMessage)
 			c.JSON(http.StatusInternalServerError, utils.ErrorResponse(c, errCode, err))
-			c.Abort()
 			return false
 		}
 	} else {
+		sid, _, errCode, err := session.ReadSession(c)
+
+		switch errCode {
+		case 1043:
+			errorMessage := fmt.Sprintf("Redis key does not exist: %v", err)
+			slog.Error(errorMessage)
+			c.JSON(http.StatusInternalServerError, utils.ErrorResponse(c, errCode, err))
+			return false
+
+		case 1044:
+			errorMessage := fmt.Sprintf("Redis GET data failed: %v", err)
+			slog.Error(errorMessage)
+			c.JSON(http.StatusInternalServerError, utils.ErrorResponse(c, errCode, err))
+			return false
+
+		case 1063:
+			errorMessage := fmt.Sprintf("The json data unmarshal failed: %v", err)
+			slog.Error(errorMessage)
+			c.JSON(http.StatusInternalServerError, utils.ErrorResponse(c, errCode, err))
+			return false
+		}
+
 		err = session.DeleteSession(sid)
 		if err != nil {
 			errorMessage := fmt.Sprintf("Delete key(sid:%s) failed: %v", sid, err)
 			slog.Error(errorMessage)
 			c.JSON(http.StatusInternalServerError, utils.ErrorResponse(c, 1040, err))
-			c.Abort()
 			return false
 		}
-		_, errCode, err := session.AddSession(c, mail)
+		_, errCode, err = session.AddSession(c, mail)
 		switch errCode {
 		case 1041:
 			errorMessage := fmt.Sprintf("Failed to create session value JSON data: %v", err)
 			slog.Error(errorMessage)
 			c.JSON(http.StatusInternalServerError, utils.ErrorResponse(c, errCode, err))
-			c.Abort()
 			return false
 
 		case 1042:
 			errorMessage := fmt.Sprintf("Redis SET data failed: %v", err)
 			slog.Error(errorMessage)
 			c.JSON(http.StatusInternalServerError, utils.ErrorResponse(c, errCode, err))
-			c.Abort()
 			return false
 		}
 	}
@@ -200,7 +232,6 @@ func setJWT(c *gin.Context, mail string) bool {
 		errorMessage := fmt.Sprintf("Generate the JWT string failed: %v", err)
 		slog.Error(errorMessage)
 		c.JSON(http.StatusBadRequest, utils.ErrorResponse(c, 1014, err))
-		c.Abort()
 		return false
 	}
 

@@ -7,7 +7,7 @@ import (
 
 	"github.com/casbin/casbin/v2"
 	"github.com/jmoiron/sqlx"
-	"github.com/memwey/casbin-sqlx-adapter"
+	sqlxadapter "github.com/memwey/casbin-sqlx-adapter"
 )
 
 type CasbinSettings struct {
@@ -23,22 +23,22 @@ type CasbinEnforcerConfig struct {
 }
 
 type CasbinPolicy struct {
-	Sub         string    `json:"subject"`
-	Obj         string    `json:"object"`
-	Act         string    `json:"action"`
+	Sub string `json:"subject"`
+	Obj string `json:"object"`
+	Act string `json:"action"`
 }
 
 type CasbinGroupingPolicy struct {
-	Member      string    `json:"member"`
-	Role        string    `json:"role"`
+	Member string `json:"member"`
+	Role   string `json:"role"`
 }
 
 type CasbinObject struct {
-	Obj         string    `json:"object"`
+	Obj string `json:"object"`
 }
 
 func NewCasbinCachedEnforcer(cs *CasbinSettings) (*casbin.CachedEnforcer, error) {
-	csbnAdapterOpts := &sqlxadapter.AdapterOptions {
+	csbnAdapterOpts := &sqlxadapter.AdapterOptions{
 		DB:        cs.Db,
 		TableName: cs.Table,
 		// DriverName:     "mysql",
@@ -59,14 +59,14 @@ func NewCasbinEnforcerConfig(cs *CasbinSettings) (*CasbinEnforcerConfig, error) 
 	}
 	enforcer.EnableAutoSave(true)
 	enforcer.EnableCache(cs.EnableCache)
-	csbnConfig := &CasbinEnforcerConfig {
+	csbnConfig := &CasbinEnforcerConfig{
 		Enforcer:    enforcer,
 		CasbinTable: cs.Table,
 	}
 	return csbnConfig, nil
 }
 
-func(cec *CasbinEnforcerConfig) InitPolicies() error {
+func (cec *CasbinEnforcerConfig) InitPolicies() error {
 	if ok, err := cec.Enforcer.Enforcer.AddPolicy("admin", "/*", "*"); !ok {
 		if err != nil {
 			return err
@@ -80,6 +80,15 @@ func(cec *CasbinEnforcerConfig) InitPolicies() error {
 		"/api/v1/user/login",
 		"/api/v1/user/logout",
 		"/api/v1/user/sign-up",
+		"/api/v1/user/forgot-password",
+		"/api/v1/user/verify-mail",
+		"/api/v1/user/verify-mail/resend",
+		"/api/v1/totp/validate",
+		"/api/v1/otp/mail/verify",
+		"/api/v1/otp/mail/send",
+		"/api/v1/oauth/google/login",
+		"/api/v1/oauth/google/sign-up",
+		"/api/v1/oauth/google/callback",
 	}
 	for _, item := range anonymousPolicies {
 		if ok, err := cec.Enforcer.Enforcer.AddPolicy("anonymous", item, "GET"); !ok {
@@ -99,7 +108,8 @@ func(cec *CasbinEnforcerConfig) InitPolicies() error {
 	return nil
 }
 
-func(cs *CasbinSettings) ListPoliciesCtx(ctx context.Context) ([][]string, error) {
+// Not in use
+func (cs *CasbinSettings) ListPoliciesCtx(ctx context.Context) ([][]string, error) {
 	policies := make([][]string, 0)
 	query := fmt.Sprintf("SELECT DISTINCT v0, v1, v2 FROM %s WHERE %s = ?", cs.Table, "p_type")
 	rows, err := cs.Db.QueryContext(ctx, query, "p")
@@ -115,12 +125,13 @@ func(cs *CasbinSettings) ListPoliciesCtx(ctx context.Context) ([][]string, error
 		if err := rows.Scan(&sub, &obj, &act); err != nil {
 			return nil, err
 		}
-		policies = append(policies, []string { sub, obj, act })
+		policies = append(policies, []string{sub, obj, act})
 	}
 	return policies, nil
 }
 
-func(cs *CasbinSettings) ListGroupingPoliciesCtx(ctx context.Context) ([][]string, error) {
+// Not in use
+func (cs *CasbinSettings) ListGroupingPoliciesCtx(ctx context.Context) ([][]string, error) {
 	gpolicies := make([][]string, 0)
 	query := fmt.Sprintf("SELECT DISTINCT v0, v1 FROM %s WHERE %s = ?", cs.Table, "p_type")
 	rows, err := cs.Db.QueryContext(ctx, query, "g")
@@ -129,18 +140,19 @@ func(cs *CasbinSettings) ListGroupingPoliciesCtx(ctx context.Context) ([][]strin
 	}
 	for rows.Next() {
 		var (
-			m  string
-			r  string
+			m string
+			r string
 		)
 		if err := rows.Scan(&m, &r); err != nil {
 			return nil, err
 		}
-		gpolicies = append(gpolicies, []string { m, r })
+		gpolicies = append(gpolicies, []string{m, r})
 	}
 	return gpolicies, nil
 }
 
-func(cs *CasbinSettings) ListRolesCtx(ctx context.Context) ([]string, error) {
+// Not in use
+func (cs *CasbinSettings) ListRolesCtx(ctx context.Context) ([]string, error) {
 	roles := make([]string, 0)
 	query := fmt.Sprintf("SELECT DISTINCT %s FROM %s WHERE %s = ?", "*", cs.Table, "p_type")
 	rows, err := cs.Db.QueryContext(ctx, query, "g")
@@ -160,7 +172,8 @@ func(cs *CasbinSettings) ListRolesCtx(ctx context.Context) ([]string, error) {
 	return roles, nil
 }
 
-func(cs *CasbinSettings) ListMembersCtx(ctx context.Context) ([]string, error) {
+// Not in use
+func (cs *CasbinSettings) ListMembersCtx(ctx context.Context) ([]string, error) {
 	members := make([]string, 0)
 	query := fmt.Sprintf("SELECT DISTINCT %s FROM %s WHERE %s = ?", "v0", cs.Table, "p_type")
 	rows, err := cs.Db.QueryContext(ctx, query, "g")
@@ -180,7 +193,8 @@ func(cs *CasbinSettings) ListMembersCtx(ctx context.Context) ([]string, error) {
 	return members, nil
 }
 
-func(cs *CasbinSettings) GetMembersWithRoleCtx(ctx context.Context, name string) ([]string, error) {
+// Not in use
+func (cs *CasbinSettings) GetMembersWithRoleCtx(ctx context.Context, name string) ([]string, error) {
 	members := make([]string, 0)
 	query := fmt.Sprintf(
 		"SELECT DISTINCT %s FROM %s WHERE %s = ? AND %s = ?",
@@ -206,7 +220,8 @@ func(cs *CasbinSettings) GetMembersWithRoleCtx(ctx context.Context, name string)
 	return members, nil
 }
 
-func(cs *CasbinSettings) GetRolesOfMemberCtx(ctx context.Context, name string) ([]string, error) {
+// Not in use
+func (cs *CasbinSettings) GetRolesOfMemberCtx(ctx context.Context, name string) ([]string, error) {
 	roles := make([]string, 0)
 	query := fmt.Sprintf(
 		"SELECT DISTINCT %s FROM %s WHERE %s = ? AND %s = ?",
@@ -232,18 +247,19 @@ func(cs *CasbinSettings) GetRolesOfMemberCtx(ctx context.Context, name string) (
 	return roles, nil
 }
 
-func(cec *CasbinEnforcerConfig) ListAllPolicies() [][]string {
+// Not in use
+func (cec *CasbinEnforcerConfig) ListAllPolicies() [][]string {
 	policies := cec.Enforcer.GetPolicy()
 	return policies
 }
 
-func(cec *CasbinEnforcerConfig) ListRoles() []string {
+func (cec *CasbinEnforcerConfig) ListRoles() []string {
 	// roles := cec.Enforcer.GetAllRoles()
 	roles := cec.Enforcer.GetAllSubjects()
 	return roles
 }
 
-func(cec *CasbinEnforcerConfig) ListMembers() []string {
+func (cec *CasbinEnforcerConfig) ListMembers() []string {
 	members := make([]string, 0)
 	gps := cec.Enforcer.GetGroupingPolicy()
 	for _, item := range gps {
@@ -253,7 +269,7 @@ func(cec *CasbinEnforcerConfig) ListMembers() []string {
 	return list
 }
 
-func(cec *CasbinEnforcerConfig) GetMembersWithRole(name string) ([]string, error) {
+func (cec *CasbinEnforcerConfig) GetMembersWithRole(name string) ([]string, error) {
 	members, err := cec.Enforcer.GetUsersForRole(name)
 	if err != nil {
 		return nil, err
@@ -261,7 +277,7 @@ func(cec *CasbinEnforcerConfig) GetMembersWithRole(name string) ([]string, error
 	return members, nil
 }
 
-func(cec *CasbinEnforcerConfig) GetRolesOfMember(name string) ([]string, error) {
+func (cec *CasbinEnforcerConfig) GetRolesOfMember(name string) ([]string, error) {
 	roles, err := cec.Enforcer.GetRolesForUser(name)
 	if err != nil {
 		return nil, err
@@ -269,7 +285,7 @@ func(cec *CasbinEnforcerConfig) GetRolesOfMember(name string) ([]string, error) 
 	return roles, nil
 }
 
-func(cec *CasbinEnforcerConfig) AddPolicy(cp *CasbinPolicy) error {
+func (cec *CasbinEnforcerConfig) AddPolicy(cp *CasbinPolicy) error {
 	if ok, err := cec.Enforcer.AddPolicy(cp.Sub, cp.Obj, cp.Act); !ok {
 		if err != nil {
 			return err
@@ -280,7 +296,7 @@ func(cec *CasbinEnforcerConfig) AddPolicy(cp *CasbinPolicy) error {
 	return nil
 }
 
-func(cec *CasbinEnforcerConfig) AddGroupingPolicy(cgp *CasbinGroupingPolicy) error {
+func (cec *CasbinEnforcerConfig) AddGroupingPolicy(cgp *CasbinGroupingPolicy) error {
 	if ok, err := cec.Enforcer.AddGroupingPolicy(cgp.Member, cgp.Role); !ok {
 		if err != nil {
 			return err
@@ -291,7 +307,7 @@ func(cec *CasbinEnforcerConfig) AddGroupingPolicy(cgp *CasbinGroupingPolicy) err
 	return nil
 }
 
-func(cec *CasbinEnforcerConfig) DeletePolicy(cp *CasbinPolicy) error {
+func (cec *CasbinEnforcerConfig) DeletePolicy(cp *CasbinPolicy) error {
 	if ok, err := cec.Enforcer.RemovePolicy(cp.Sub, cp.Obj, cp.Act); !ok {
 		if err != nil {
 			return err
@@ -302,7 +318,7 @@ func(cec *CasbinEnforcerConfig) DeletePolicy(cp *CasbinPolicy) error {
 	return nil
 }
 
-func(cec *CasbinEnforcerConfig) DeleteGroupingPolicy(cgp *CasbinGroupingPolicy) error {
+func (cec *CasbinEnforcerConfig) DeleteGroupingPolicy(cgp *CasbinGroupingPolicy) error {
 	if ok, err := cec.Enforcer.RemoveGroupingPolicy(cgp.Member, cgp.Role); !ok {
 		if err != nil {
 			return err
@@ -313,7 +329,7 @@ func(cec *CasbinEnforcerConfig) DeleteGroupingPolicy(cgp *CasbinGroupingPolicy) 
 	return nil
 }
 
-func(cec *CasbinEnforcerConfig) DeleteRole(name string) error {
+func (cec *CasbinEnforcerConfig) DeleteRole(name string) error {
 	if ok, err := cec.Enforcer.RemoveFilteredPolicy(0, name); !ok {
 		if err != nil {
 			return err
@@ -327,7 +343,7 @@ func(cec *CasbinEnforcerConfig) DeleteRole(name string) error {
 	return nil
 }
 
-func(cec *CasbinEnforcerConfig) DeleteMemeber(name string) error {
+func (cec *CasbinEnforcerConfig) DeleteMemeber(name string) error {
 	if ok, err := cec.Enforcer.RemoveFilteredGroupingPolicy(0, name); !ok {
 		if err != nil {
 			return err

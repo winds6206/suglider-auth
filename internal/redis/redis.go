@@ -1,12 +1,13 @@
 package redis
 
 import (
-	"github.com/redis/go-redis/v9"
-	"suglider-auth/configs"
-	"log/slog"
 	"context"
-	"time"
 	"fmt"
+	"log/slog"
+	"suglider-auth/configs"
+	"time"
+
+	"github.com/redis/go-redis/v9"
 )
 
 var rdb *redis.Client
@@ -16,14 +17,14 @@ func init() {
 	rdb = redis.NewClient(&redis.Options{
 		Addr:     configs.ApplicationConfig.Redis.Host + ":" + configs.ApplicationConfig.Redis.Port,
 		Password: configs.ApplicationConfig.Redis.Password,
-		DB:       0,  // use default DB
+		DB:       0, // use default DB
 	})
 
 	pong, err := rdb.Ping(ctx).Result()
 	if err != nil {
 		errorMessage := fmt.Sprintf("Can not connect to redis: %v", err)
 		slog.Error(errorMessage)
-		
+
 		panic(err)
 	}
 
@@ -60,9 +61,8 @@ func Get(key string) (string, int64, error) {
 		return "", errCode, err
 
 	} else {
-		slog.Info(fmt.Sprintf("key: %s", value))
 		return value, errCode, nil
-    }
+	}
 }
 
 // Redis EXISTS

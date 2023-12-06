@@ -6,14 +6,6 @@ vendor/
 test/
 bin/
 tmp/
-oauth2-server/bin/
-oauth2-server/test/
-oauth2-server/vendor/
-oauth2-server/tmp/
-do-scheduler/bin/
-do-scheduler/test/
-do-scheduler/vendor/
-do-scheduler/tmp/
 
 # python temp paths
 __pycache__/

@@ -1,6 +1,7 @@
 package api_server
 
 import (
+	"fmt"
 	"log/slog"
 	"net/http"
 	"suglider-auth/internal/utils"
@@ -12,9 +13,11 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// The Casbin middleware does not immediately update the database.
 func userPrivilege(csbn *rbac.CasbinEnforcerConfig) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		sub, exist := c.Get("Username")
+		sub, exist := c.Get("mail")
+
 		if !exist {
 			sub = "anonymous"
 		}
@@ -28,16 +31,23 @@ func userPrivilege(csbn *rbac.CasbinEnforcerConfig) gin.HandlerFunc {
 		default:
 		}
 
-		if pass, err := csbn.Enforcer.Enforce(sub.(string), obj, act); !pass {
-			if err != nil {
-				slog.ErrorContext(c, err.Error())
-			}
-			c.Redirect(http.StatusTemporaryRedirect, "/login")
+		fmt.Println(sub)
+		fmt.Println(obj)
+		fmt.Println(act)
+
+		pass, err := csbn.Enforcer.Enforce(sub.(string), obj, act)
+		fmt.Println(pass)
+		if err != nil {
+			errorMessage := fmt.Sprintf("Check user permission failed: %v", err)
+			slog.Error(errorMessage)
+			c.JSON(http.StatusInternalServerError, utils.ErrorResponse(c, 1065, err))
 			c.Abort()
-			// c.AbortWithStatusJSON(http.StatusForbidden, gin.H {
-			// 	"status": "forbidden",
-			// 	"message": "You don't have the required permission.",
-			// })
+			return
+		}
+		if !pass {
+			c.JSON(http.StatusForbidden, utils.ErrorResponse(c, 1064, nil))
+			c.Abort()
+			return
 		}
 		c.Next()
 	}
@@ -50,16 +60,11 @@ var apiWhileList = []string{
 	"/api/v1/user/verify-mail",
 	"/api/v1/user/verify-mail/resend",
 	"/api/v1/totp/validate",
-	"/api/v1/otp/mail-verify",
-	"/api/v1/otp/mail-send",
+	"/api/v1/otp/mail/verify",
+	"/api/v1/otp/mail/send",
 	"/api/v1/oauth/google/login",
+	"/api/v1/oauth/google/sign-up",
 	"/api/v1/oauth/google/callback",
-	"/api/v1/totp/generate",
-	"/api/v1/totp/verify",
-	"/api/v1/totp/validate",
-	"/api/v1/totp/disable",
-	"/api/v1/user/change-password",
-	"/api/v1/user/setup-password",
 }
 
 func checkAPIWhileList(c *gin.Context) bool {
@@ -97,19 +102,48 @@ func CheckUserJWT() gin.HandlerFunc {
 			if err == http.ErrNoCookie {
 				isExists := checkSessionID(c)
 				if isExists {
+					_, data, errCode, err := session.ReadSession(c)
+
+					switch errCode {
+					case 1043:
+						errorMessage := fmt.Sprintf("Redis key does not exist: %v", err)
+						slog.Error(errorMessage)
+						c.JSON(http.StatusInternalServerError, utils.ErrorResponse(c, errCode, err))
+						c.Abort()
+						return
+
+					case 1044:
+						errorMessage := fmt.Sprintf("Redis GET data failed: %v", err)
+						slog.Error(errorMessage)
+						c.JSON(http.StatusInternalServerError, utils.ErrorResponse(c, errCode, err))
+						c.Abort()
+						return
+
+					case 1063:
+						errorMessage := fmt.Sprintf("The json data unmarshal failed: %v", err)
+						slog.Error(errorMessage)
+						c.JSON(http.StatusInternalServerError, utils.ErrorResponse(c, errCode, err))
+						c.Abort()
+						return
+					}
+
+					c.Set("mail", data.Mail)
 					c.Next()
 					return
 				} else {
 					c.JSON(http.StatusUnauthorized, utils.ErrorResponse(c, 1019, map[string]interface{}{
 						"msg": "Both of JWT and sessionID can't found.",
 					}))
+					c.Abort()
 					return
 				}
 			}
 			c.JSON(http.StatusInternalServerError, utils.ErrorResponse(c, 1020, err))
+			c.Abort()
 			return
 		}
 
+		// Get client JWT
 		claims, errCode, errParseJWT := jwt.ParseJWT(cookie)
 
 		if errParseJWT != nil {
@@ -118,14 +152,17 @@ func CheckUserJWT() gin.HandlerFunc {
 
 			case 1015:
 				c.JSON(http.StatusUnauthorized, utils.ErrorResponse(c, errCode, err))
+				c.Abort()
 				return
 
 			case 1016:
 				c.JSON(http.StatusBadRequest, utils.ErrorResponse(c, errCode, err))
+				c.Abort()
 				return
 
 			case 1017:
 				c.JSON(http.StatusUnauthorized, utils.ErrorResponse(c, errCode, err))
+				c.Abort()
 				return
 			}
 		}
@@ -134,6 +171,7 @@ func CheckUserJWT() gin.HandlerFunc {
 			c.JSON(http.StatusUnauthorized, utils.ErrorResponse(c, 1050, err))
 			return
 		} else {
+			c.Set("mail", claims.Mail)
 			c.Next()
 		}
 	}

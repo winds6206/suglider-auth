@@ -284,7 +284,7 @@ func UserLogin(c *gin.Context) {
 		return
 	}
 
-	// Check whether user input data is mail or not.
+	// Check whether user input data is mail format or not.
 	mailValid := fmtv.MailValidator(request.Account)
 
 	if mailValid {
@@ -319,8 +319,14 @@ func UserLogin(c *gin.Context) {
 					}))
 
 				} else {
-					setSession(c, userInfo.Mail)
-					setJWT(c, userInfo.Mail)
+					okSetSession := setSession(c, userInfo.Mail)
+					if !okSetSession {
+						return
+					}
+					okSetJWT := setJWT(c, userInfo.Mail)
+					if !okSetJWT {
+						return
+					}
 
 					c.JSON(http.StatusOK, utils.SuccessResponse(c, 200, nil))
 				}
@@ -348,6 +354,7 @@ func UserLogin(c *gin.Context) {
 			c.JSON(http.StatusInternalServerError, utils.ErrorResponse(c, 1002, err))
 			return
 		}
+		// User input data is not mail format
 	} else {
 		// Check whether username exist or not
 		userInfo, err := mariadb.GetPasswordByUserName(request.Account)
@@ -382,8 +389,14 @@ func UserLogin(c *gin.Context) {
 					}))
 
 				} else {
-					setSession(c, userInfo.Mail)
-					setJWT(c, userInfo.Mail)
+					okSetSession := setSession(c, userInfo.Mail)
+					if !okSetSession {
+						return
+					}
+					okSetJWT := setJWT(c, userInfo.Mail)
+					if !okSetJWT {
+						return
+					}
 
 					c.JSON(http.StatusOK, utils.SuccessResponse(c, 200, nil))
 				}
@@ -425,7 +438,27 @@ func UserLogout(c *gin.Context) {
 	c.SetCookie("token", "", -1, "/", "localhost", false, true)
 
 	// Clear session
-	sid := session.ReadSession(c)
+	sid, _, errCode, err := session.ReadSession(c)
+
+	switch errCode {
+	case 1043:
+		errorMessage := fmt.Sprintf("Redis key does not exist: %v", err)
+		slog.Error(errorMessage)
+		c.JSON(http.StatusInternalServerError, utils.ErrorResponse(c, errCode, err))
+		return
+
+	case 1044:
+		errorMessage := fmt.Sprintf("Redis GET data failed: %v", err)
+		slog.Error(errorMessage)
+		c.JSON(http.StatusInternalServerError, utils.ErrorResponse(c, errCode, err))
+		return
+
+	case 1063:
+		errorMessage := fmt.Sprintf("The json data unmarshal failed: %v", err)
+		slog.Error(errorMessage)
+		c.JSON(http.StatusInternalServerError, utils.ErrorResponse(c, errCode, err))
+		return
+	}
 
 	// Check session exist or not
 	ok, err := session.CheckSession(c)
