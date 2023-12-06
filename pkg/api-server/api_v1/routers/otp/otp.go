@@ -8,8 +8,8 @@ import (
 
 func OtpHandler(router *gin.RouterGroup) {
 
-	router.PUT("/mail-enable", handlers.MailOTPEnable)
-	router.PUT("/mail-disable", handlers.MailOTPDisable)
-	router.POST("/mail-send", handlers.MailOTPSend)
-	router.GET("/mail-verify", handlers.ValidateMailOTP(), handlers.MailOTPVerify)
+	router.PUT("/mail/enable", handlers.MailOTPEnable)
+	router.PUT("/mail/disable", handlers.MailOTPDisable)
+	router.POST("/mail/send", handlers.MailOTPSend)
+	router.GET("/mail/verify", handlers.ValidateMailOTP(), handlers.MailOTPVerify)
 }

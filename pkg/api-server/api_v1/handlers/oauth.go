@@ -158,11 +158,12 @@ func OAuthGoogleCallback(c *gin.Context) {
 					"message": "Google login successful!",
 				}))
 			} else {
-				c.JSON(http.StatusInternalServerError, utils.ErrorResponse(c, 1002, map[string]interface{}{
-					"mail":        oAuthResponse.Email,
-					"set_session": okSetSession,
-					"set_jwt":     okSetJWT,
-				}))
+				return
+				// c.JSON(http.StatusInternalServerError, utils.ErrorResponse(c, 1002, map[string]interface{}{
+				// 	"mail":        oAuthResponse.Email,
+				// 	"set_session": okSetSession,
+				// 	"set_jwt":     okSetJWT,
+				// }))
 			}
 		}
 		// if mail is not exist, program will automatic to create
@@ -186,11 +187,12 @@ func OAuthGoogleCallback(c *gin.Context) {
 				"message": "Google login successful!",
 			}))
 		} else {
-			c.JSON(http.StatusInternalServerError, utils.ErrorResponse(c, 1002, map[string]interface{}{
-				"mail":        oAuthResponse.Email,
-				"set_session": okSetSession,
-				"set_jwt":     okSetJWT,
-			}))
+			return
+			// c.JSON(http.StatusInternalServerError, utils.ErrorResponse(c, 1002, map[string]interface{}{
+			// 	"mail":        oAuthResponse.Email,
+			// 	"set_session": okSetSession,
+			// 	"set_jwt":     okSetJWT,
+			// }))
 		}
 	}
 
