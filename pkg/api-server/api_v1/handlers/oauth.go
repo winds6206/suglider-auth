@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"database/sql"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -172,6 +173,27 @@ func OAuthGoogleCallback(c *gin.Context) {
 		err := mariadb.OAuthSignUp(oAuthResponse.Email, oAuthResponse.GivenName, oAuthResponse.FamilyName)
 		if err != nil {
 			errorMessage := fmt.Sprintf("Insert user_info table failed: %v", err)
+			slog.Error(errorMessage)
+
+			c.JSON(http.StatusInternalServerError, utils.ErrorResponse(c, 1002, err))
+			return
+		}
+
+		// Look up user ID
+		userInfo, err := mariadb.LookupUserID(oAuthResponse.Email)
+		if err != nil {
+			if err == sql.ErrNoRows {
+				c.JSON(http.StatusBadRequest, utils.ErrorResponse(c, 1006, err))
+				return
+			}
+			c.JSON(http.StatusInternalServerError, utils.ErrorResponse(c, 1002, err))
+			return
+		}
+
+		// Insert personal_info table by user_id
+		err = mariadb.InsertPersonalInfo(userInfo.UserID)
+		if err != nil {
+			errorMessage := fmt.Sprintf("Insert personal_info table failed: %v", err)
 			slog.Error(errorMessage)
 
 			c.JSON(http.StatusInternalServerError, utils.ErrorResponse(c, 1002, err))

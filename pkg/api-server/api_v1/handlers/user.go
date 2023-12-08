@@ -58,6 +58,18 @@ type setUpPassword struct {
 	Password string `json:"password" binding:"required"`
 }
 
+type updatePersonalInfo struct {
+	Mail        string  `json:"mail" binding:"required"`
+	UserName    *string `json:"username"`
+	FirstName   *string `json:"first_name"`
+	LastName    *string `json:"last_name"`
+	PhoneNumber *string `json:"phone_number"`
+	Address     *string `json:"address"`
+	Birthday    *string `json:"birthday"`
+	Sex         *string `json:"sex"`
+	BloodType   *string `json:"blood_type"`
+}
+
 // @Summary Sign Up User
 // @Description registry new user
 // @Tags users
@@ -97,7 +109,7 @@ func UserSignUp(c *gin.Context) {
 		return
 	}
 
-	if request.PhoneNumber != nil {
+	if request.PhoneNumber != nil && *request.PhoneNumber != "" {
 		ok := fmtv.PhoneNumberValidator(request.PhoneNumber)
 		if !ok {
 			slog.Error("Phone Number is not satisfied of rule.")
@@ -106,9 +118,6 @@ func UserSignUp(c *gin.Context) {
 		}
 	}
 
-	if request.FirstName == nil {
-		request.FirstName = nil
-	}
 	if request.FirstName == nil {
 		request.FirstName = nil
 	}
@@ -138,6 +147,28 @@ func UserSignUp(c *gin.Context) {
 			c.JSON(http.StatusInternalServerError, utils.ErrorResponse(c, 1002, err))
 			return
 		}
+
+		// Look up user ID
+		userInfo, err := mariadb.LookupUserID(request.Mail)
+		if err != nil {
+			if err == sql.ErrNoRows {
+				c.JSON(http.StatusBadRequest, utils.ErrorResponse(c, 1006, err))
+				return
+			}
+			c.JSON(http.StatusInternalServerError, utils.ErrorResponse(c, 1002, err))
+			return
+		}
+
+		// Insert personal_info table by user_id
+		err = mariadb.InsertPersonalInfo(userInfo.UserID)
+		if err != nil {
+			errorMessage := fmt.Sprintf("Insert personal_info table failed: %v", err)
+			slog.Error(errorMessage)
+
+			c.JSON(http.StatusInternalServerError, utils.ErrorResponse(c, 1002, err))
+			return
+		}
+
 		// The condition means the user had previously signed up through OAuth2.
 	} else if err == nil && !userInfo.Password.Valid {
 
@@ -890,5 +921,94 @@ func SetUpPassword(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, utils.ErrorResponse(c, 1002, err))
 		return
 	}
+
+}
+
+// @Summary Update Personal Information
+// @Description Update Personal Information.
+// @Tags users
+// @Accept multipart/form-data
+// @Produce application/json
+// @Param mail formData string false "Mail"
+// @Param username formData string false "User Name"
+// @Param last_name formData string false "Last Name"
+// @Param first_name formData string false "First Name"
+// @Param phone_number formData string false "Phone Number"
+// @Param address formData string false "Address"
+// @Param birthday formData string false "Birthday"
+// @Param sex formData string false "Sex"
+// @Param blood_type formData string false "Blood Type"
+// @Success 200 {string} string "Success"
+// @Failure 400 {string} string "Bad request"
+// @Failure 401 {string} string "Unauthorized"
+// @Failure 403 {string} string "Forbidden"
+// @Failure 404 {string} string "Not found"
+// @Router /api/v1/user/update-personal-info [put]
+func UpdatePersonalInfo(c *gin.Context) {
+
+	var request updatePersonalInfo
+
+	// Check the parameter trasnfer from POST
+	err := c.ShouldBindJSON(&request)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, utils.ErrorResponse(c, 1001, err))
+		return
+	}
+
+	if request.PhoneNumber != nil && *request.PhoneNumber != "" {
+		ok := fmtv.PhoneNumberValidator(request.PhoneNumber)
+		if !ok {
+			slog.Error("Phone Number is not satisfied of format rule.")
+			c.JSON(http.StatusBadRequest, utils.ErrorResponse(c, 1021, nil))
+			return
+		}
+	}
+
+	if request.Birthday != nil && *request.Birthday != "" {
+		ok := fmtv.DateValidator(request.Birthday)
+		if !ok {
+			slog.Error("Birthday is not satisfied of format rule.")
+			c.JSON(http.StatusBadRequest, utils.ErrorResponse(c, 1021, nil))
+			return
+		}
+	}
+
+	if request.FirstName == nil {
+		request.FirstName = nil
+	}
+	if request.LastName == nil {
+		request.LastName = nil
+	}
+	if request.Address == nil {
+		request.Address = nil
+	}
+	if request.Birthday == nil || *request.Birthday == "" {
+		request.Birthday = nil
+	}
+	if request.Sex == nil {
+		request.Sex = nil
+	}
+	if request.BloodType == nil {
+		request.BloodType = nil
+	}
+	if request.UserName == nil || *request.UserName == "" {
+		request.UserName = nil
+	}
+	if request.PhoneNumber == nil || *request.PhoneNumber == "" {
+		request.PhoneNumber = nil
+	}
+
+	err = mariadb.UpdatePersonalInfoByMail(request.Mail, request.UserName, request.LastName, request.FirstName, request.PhoneNumber, request.Address, request.Birthday, request.Sex, request.BloodType)
+	if err != nil {
+		errorMessage := fmt.Sprintf("Update personal information failed: %v", err)
+		slog.Error(errorMessage)
+		c.JSON(http.StatusInternalServerError, utils.ErrorResponse(c, 1066, err))
+		return
+	}
+
+	c.JSON(http.StatusOK, utils.SuccessResponse(c, 200, map[string]interface{}{
+		"mail": request.Mail,
+		"msg":  "Update personal information successfully.",
+	}))
 
 }
