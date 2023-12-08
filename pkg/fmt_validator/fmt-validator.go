@@ -2,6 +2,7 @@ package fmt_validator
 
 import (
 	"regexp"
+	"time"
 	"unicode"
 
 	"github.com/go-playground/validator/v10"
@@ -23,6 +24,10 @@ type phoneData struct {
 
 type passwordData struct {
 	Password string `validate:"required,min=8,max=30,passwordComplexity"`
+}
+
+type dateData struct {
+	Date string `validate:"required,dateCheck"`
 }
 
 func passwordComplexity(fl validator.FieldLevel) bool {
@@ -52,10 +57,6 @@ func passwordComplexity(fl validator.FieldLevel) bool {
 func phoneNumberCheck(fl validator.FieldLevel) bool {
 	phoneNumber := fl.Field().String()
 
-	if phoneNumber == "" {
-		return true
-	}
-
 	matched, _ := regexp.MatchString(`^\d+$`, phoneNumber)
 
 	if !matched {
@@ -63,6 +64,19 @@ func phoneNumberCheck(fl validator.FieldLevel) bool {
 	}
 
 	return true
+}
+
+func dateCheck(fl validator.FieldLevel) bool {
+	date := fl.Field().String()
+
+	_, err := time.Parse("2006-01-02", date)
+
+	if err != nil {
+		return false
+	}
+
+	return true
+
 }
 
 func PwdValidator(userName, password, mail string) error {
@@ -145,6 +159,23 @@ func PasswordValidator(password string) bool {
 
 	v := validator.New()
 	v.RegisterValidation("passwordComplexity", passwordComplexity)
+
+	err := v.Struct(payload)
+	if err != nil {
+		return false
+	}
+
+	return true
+}
+
+func DateValidator(date *string) bool {
+
+	payload := &dateData{
+		Date: *date,
+	}
+
+	v := validator.New()
+	v.RegisterValidation("dateCheck", dateCheck)
 
 	err := v.Struct(payload)
 	if err != nil {

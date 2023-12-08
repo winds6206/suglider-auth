@@ -25,18 +25,26 @@ func userPrivilege(csbn *rbac.CasbinEnforcerConfig) gin.HandlerFunc {
 		act := c.Request.Method
 
 		switch c.Request.URL.Path {
-		case "/login", "/sing-up", "/api/v1/user/login",
-			"/api/v1/user/logout", "/api/v1/user/sing-up":
+		case "/login",
+			"/sing-up",
+			"/api/v1/user/login",
+			"/api/v1/user/logout",
+			"/api/v1/user/sing-up",
+			"/api/v1/user/forgot-password",
+			"/api/v1/user/verify-mail",
+			"/api/v1/user/verify-mail/resend",
+			"/api/v1/totp/validate",
+			"/api/v1/otp/mail/verify",
+			"/api/v1/otp/mail/send",
+			"/api/v1/oauth/google/login",
+			"/api/v1/oauth/google/sign-up",
+			"/api/v1/oauth/google/callback":
 			sub = "anonymous"
 		default:
 		}
 
-		fmt.Println(sub)
-		fmt.Println(obj)
-		fmt.Println(act)
-
 		pass, err := csbn.Enforcer.Enforce(sub.(string), obj, act)
-		fmt.Println(pass)
+
 		if err != nil {
 			errorMessage := fmt.Sprintf("Check user permission failed: %v", err)
 			slog.Error(errorMessage)
@@ -54,8 +62,9 @@ func userPrivilege(csbn *rbac.CasbinEnforcerConfig) gin.HandlerFunc {
 }
 
 var apiWhileList = []string{
-	"/api/v1/user/sign-up",
 	"/api/v1/user/login",
+	"/api/v1/user/logout",
+	"/api/v1/user/sign-up",
 	"/api/v1/user/forgot-password",
 	"/api/v1/user/verify-mail",
 	"/api/v1/user/verify-mail/resend",

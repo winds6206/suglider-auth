@@ -29,10 +29,14 @@ func UserSignUp(mail, password string, userName, firstName, lastName, phoneNumbe
 	ctx, cancel := context.WithTimeout(context.Background(), dbTimeOut)
 	defer cancel()
 
-	sqlStr := "INSERT INTO suglider.user_info(user_id, mail, password, username, first_name, last_name, phone_number, password_expire_date) " +
+	sqlUserInfo := "INSERT INTO suglider.user_info(user_id, mail, password, username, first_name, last_name, phone_number, password_expire_date) " +
 		"VALUES (UNHEX(REPLACE(UUID(), '-', '')),?,?,?,?,?,?,DATE_ADD(CURRENT_DATE, INTERVAL 90 DAY))"
-	_, err = DataBase.ExecContext(ctx, sqlStr, mail, password, userName, firstName, lastName, phoneNumber)
-	return err
+	_, err = DataBase.ExecContext(ctx, sqlUserInfo, mail, password, userName, firstName, lastName, phoneNumber)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func UpdateSignUp(mail, password string, userName, firstName, lastName, phoneNumber *string) (err error) {
@@ -40,10 +44,14 @@ func UpdateSignUp(mail, password string, userName, firstName, lastName, phoneNum
 	defer cancel()
 
 	sqlStr := "UPDATE suglider.user_info " +
-		"SET password = ?, username = ?, first_name = ?, last_name = ?, phone_number = ?, password_expire_date = DATE_ADD(CURRENT_DATE, INTERVAL 90 DAY)" +
+		"SET password = ?, username = ?, first_name = ?, last_name = ?, phone_number = ?, password_expire_date = DATE_ADD(CURRENT_DATE, INTERVAL 90 DAY), password_updated_at = CURRENT_TIMESTAMP " +
 		"WHERE user_info.mail = ?"
 	_, err = DataBase.ExecContext(ctx, sqlStr, password, userName, firstName, lastName, phoneNumber, mail)
-	return err
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func UserDelete(userName, mail string) (result sql.Result, err error) {
@@ -102,7 +110,11 @@ func PasswordExtensionByMail(mail string) (err error) {
 		"SET password_expire_date = DATE_ADD(CURRENT_DATE, INTERVAL 90 DAY)" +
 		"WHERE user_info.mail = ?"
 	_, err = DataBase.ExecContext(ctx, sqlStr, mail)
-	return err
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func UserSetMailVerified(ctx context.Context, mail string) error {
@@ -128,7 +140,7 @@ func UserMailIsVerified(ctx context.Context, mail string) (bool, error) {
 }
 
 func UserResetPassword(ctx context.Context, mail, password string) error {
-	statmt := fmt.Sprintf("UPDATE %s SET password = ?, password_expire_date = DATE_ADD(CURRENT_DATE, INTERVAL 90 DAY) WHERE %s = ?", "user_info", "mail")
+	statmt := fmt.Sprintf("UPDATE %s SET password = ?, password_expire_date = DATE_ADD(CURRENT_DATE, INTERVAL 90 DAY, password_updated_at = CURRENT_TIMESTAMP) WHERE %s = ?", "user_info", "mail")
 	if _, err := DataBase.ExecContext(ctx, statmt, password, mail); err != nil {
 		return err
 	}
@@ -154,7 +166,11 @@ func TotpStoreSecret(userID, totpSecret, totpURL string) (err error) {
 	sqlStr := "INSERT INTO suglider.totp(user_id, totp_secret, totp_url) " +
 		"VALUES (UNHEX(?),?,?)"
 	_, err = DataBase.ExecContext(ctx, sqlStr, userID, totpSecret, totpURL)
-	return err
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func TotpUpdateSecret(mail, totpSecret, totpURL string) (err error) {
@@ -166,7 +182,11 @@ func TotpUpdateSecret(mail, totpSecret, totpURL string) (err error) {
 		"SET totp_secret = ?, totp_url = ? " +
 		"WHERE user_info.mail = ?"
 	_, err = DataBase.ExecContext(ctx, sqlStr, totpSecret, totpURL, mail)
-	return err
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func TotpUserCheck(userID string) (rowCount int, err error) {
@@ -202,7 +222,11 @@ func TotpUpdateVerify(mail string, totpEnabled, totpVerified bool) (err error) {
 		"SET totp_enabled = ?, totp_verified = ? " +
 		"WHERE mail = ?"
 	_, err = DataBase.ExecContext(ctx, sqlStr, totpEnabled, totpVerified, mail)
-	return err
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func TotpUpdateEnabled(mail string, totpEnabled bool) (err error) {
@@ -214,7 +238,11 @@ func TotpUpdateEnabled(mail string, totpEnabled bool) (err error) {
 		"SET totp_enabled = ? " +
 		"WHERE mail = ?"
 	_, err = DataBase.ExecContext(ctx, sqlStr, totpEnabled, mail)
-	return err
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func LookupUserID(mail string) (userInfo UserInfo, err error) {
@@ -312,5 +340,40 @@ func OAuthSignUp(mail, firstName, lastName string) (err error) {
 	sqlStr := "INSERT INTO suglider.user_info(user_id, mail, first_name, last_name) " +
 		"VALUES (UNHEX(REPLACE(UUID(), '-', '')),?,?,?)"
 	_, err = DataBase.ExecContext(ctx, sqlStr, mail, firstName, lastName)
-	return err
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func InsertPersonalInfo(user_id string) (err error) {
+	ctx, cancel := context.WithTimeout(context.Background(), dbTimeOut)
+	defer cancel()
+
+	sqlStr := "INSERT INTO suglider.personal_info(user_id) VALUES (UNHEX(?))"
+	_, err = DataBase.ExecContext(ctx, sqlStr, user_id)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func UpdatePersonalInfoByMail(mail string, userName, lastName, firstName, phoneNumber, address, birthday, sex, bloodType *string) (err error) {
+	ctx, cancel := context.WithTimeout(context.Background(), dbTimeOut)
+	defer cancel()
+
+	sqlStr := "UPDATE suglider.user_info " +
+		"JOIN suglider.personal_info ON user_info.user_id = personal_info.user_id " +
+		"SET user_info.username = ?, user_info.last_name = ?, user_info.first_name = ?, " +
+		"user_info.phone_number = ?, personal_info.address = ?, personal_info.birthday = ?, " +
+		"personal_info.sex = ?, personal_info.blood_type = ? " +
+		"WHERE user_info.mail = ?"
+	_, err = DataBase.ExecContext(ctx, sqlStr, userName, lastName, firstName, phoneNumber, address, birthday, sex, bloodType, mail)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
