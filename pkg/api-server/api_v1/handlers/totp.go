@@ -11,11 +11,6 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type totpInput struct {
-	Mail    string `json:"mail"`
-	OTPCode string `json:"otp_code"`
-}
-
 // @Summary Enable TOTP
 // @Description generate QRcode
 // @Tags totp
@@ -29,7 +24,7 @@ type totpInput struct {
 // @Failure 404 {string} string "Not found"
 // @Router /api/v1/totp/generate [post]
 func TotpGenerate(c *gin.Context) {
-	var request totpInput
+	var request mailOperate
 
 	// Check the parameter trasnfer from POST
 	err := c.ShouldBindJSON(&request)
@@ -75,7 +70,7 @@ func TotpGenerate(c *gin.Context) {
 func TotpVerify(c *gin.Context) {
 	// The API uses the first enabled TOTP feature to verify the TOTP code.
 
-	var request totpInput
+	var request otpData
 
 	// Check the parameter trasnfer from POST
 	err := c.ShouldBindJSON(&request)
@@ -170,7 +165,7 @@ func TotpValidate(c *gin.Context) {
 // @Failure 404 {string} string "Not found"
 // @Router /api/v1/totp/disable [put]
 func TotpDisable(c *gin.Context) {
-	var request totpInput
+	var request mailOperate
 
 	// Check the parameter trasnfer from POST
 	err := c.ShouldBindJSON(&request)

@@ -7,875 +7,6 @@
 	},
 	"item": [
 		{
-			"name": "totp",
-			"item": [
-				{
-					"name": "Enable TOTP",
-					"request": {
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"username\": \"tony\"\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "http://localhost:9527/api/v1/totp/generate",
-							"protocol": "http",
-							"host": [
-								"localhost"
-							],
-							"port": "9527",
-							"path": [
-								"api",
-								"v1",
-								"totp",
-								"generate"
-							]
-						},
-						"description": "generate QRcode"
-					},
-					"response": [
-						{
-							"name": "/api/v1/totp/generate",
-							"originalRequest": {
-								"method": "POST",
-								"header": [],
-								"body": {
-									"mode": "raw",
-									"raw": "{\n    \"username\": \"tony\"\n}",
-									"options": {
-										"raw": {
-											"language": "json"
-										}
-									}
-								},
-								"url": {
-									"raw": "http://localhost:9527/api/v1/totp/generate",
-									"protocol": "http",
-									"host": [
-										"localhost"
-									],
-									"port": "9527",
-									"path": [
-										"api",
-										"v1",
-										"totp",
-										"generate"
-									]
-								}
-							},
-							"_postman_previewlanguage": null,
-							"header": null,
-							"cookie": [],
-							"body": null
-						}
-					]
-				},
-				{
-					"name": "Verify TOTP",
-					"request": {
-						"method": "PATCH",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"username\": \"tony\",\n    \"totpcode\": \"116008\"\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "http://localhost:9527/api/v1/totp/verify",
-							"protocol": "http",
-							"host": [
-								"localhost"
-							],
-							"port": "9527",
-							"path": [
-								"api",
-								"v1",
-								"totp",
-								"verify"
-							]
-						},
-						"description": "The API uses the first enabled TOTP feature to verify the TOTP code."
-					},
-					"response": [
-						{
-							"name": "/api/v1/totp/verify",
-							"originalRequest": {
-								"method": "PATCH",
-								"header": [],
-								"body": {
-									"mode": "raw",
-									"raw": "{\n    \"username\": \"tony\",\n    \"otp_code\": \"123456\"\n}",
-									"options": {
-										"raw": {
-											"language": "json"
-										}
-									}
-								},
-								"url": {
-									"raw": "http://localhost:9527/api/v1/totp/verify",
-									"protocol": "http",
-									"host": [
-										"localhost"
-									],
-									"port": "9527",
-									"path": [
-										"api",
-										"v1",
-										"totp",
-										"verify"
-									]
-								}
-							},
-							"_postman_previewlanguage": null,
-							"header": null,
-							"cookie": [],
-							"body": null
-						}
-					]
-				},
-				{
-					"name": "Verify TOTP Validate",
-					"request": {
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "http://localhost:9527/api/v1/totp/validate",
-							"protocol": "http",
-							"host": [
-								"localhost"
-							],
-							"port": "9527",
-							"path": [
-								"api",
-								"v1",
-								"totp",
-								"validate"
-							]
-						},
-						"description": "If a user has enabled TOTP, the API can be used during the login process to verify its validity."
-					},
-					"response": [
-						{
-							"name": "/api/v1/totp/validate",
-							"originalRequest": {
-								"method": "POST",
-								"header": [],
-								"body": {
-									"mode": "raw",
-									"raw": "{\n    \"username\": \"tony\",\n    \"otp_code\": \"559479\"\n}",
-									"options": {
-										"raw": {
-											"language": "json"
-										}
-									}
-								},
-								"url": {
-									"raw": "http://localhost:9527/api/v1/totp/validate",
-									"protocol": "http",
-									"host": [
-										"localhost"
-									],
-									"port": "9527",
-									"path": [
-										"api",
-										"v1",
-										"totp",
-										"validate"
-									]
-								}
-							},
-							"_postman_previewlanguage": null,
-							"header": null,
-							"cookie": [],
-							"body": null
-						}
-					]
-				},
-				{
-					"name": "Disable TOTP",
-					"request": {
-						"method": "PUT",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"username\": \"tony\"\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "http://localhost:9527/api/v1/totp/disable",
-							"protocol": "http",
-							"host": [
-								"localhost"
-							],
-							"port": "9527",
-							"path": [
-								"api",
-								"v1",
-								"totp",
-								"disable"
-							]
-						},
-						"description": "disable TOTP"
-					},
-					"response": [
-						{
-							"name": "/api/v1/totp/disable",
-							"originalRequest": {
-								"method": "PUT",
-								"header": [],
-								"body": {
-									"mode": "raw",
-									"raw": "{\n    \"username\": \"tony\"\n}",
-									"options": {
-										"raw": {
-											"language": "json"
-										}
-									}
-								},
-								"url": {
-									"raw": "http://localhost:9527/api/v1/totp/disable",
-									"protocol": "http",
-									"host": [
-										"localhost"
-									],
-									"port": "9527",
-									"path": [
-										"api",
-										"v1",
-										"totp",
-										"disable"
-									]
-								}
-							},
-							"_postman_previewlanguage": null,
-							"header": null,
-							"cookie": [],
-							"body": null
-						}
-					]
-				}
-			]
-		},
-		{
-			"name": "privilege",
-			"item": [
-				{
-					"name": "Add RBAC Grouping Policy",
-					"request": {
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "http://localhost:9527/api/v1/rbac/grouping/add",
-							"protocol": "http",
-							"host": [
-								"localhost"
-							],
-							"port": "9527",
-							"path": [
-								"api",
-								"v1",
-								"rbac",
-								"grouping",
-								"add"
-							]
-						}
-					},
-					"response": [
-						{
-							"name": "/api/v1/rbac/grouping/add",
-							"originalRequest": {
-								"method": "POST",
-								"header": [],
-								"body": {
-									"mode": "raw",
-									"raw": "{\n    \"member\": \"tony\",\n    \"role\": \"admin\"\n}",
-									"options": {
-										"raw": {
-											"language": "json"
-										}
-									}
-								},
-								"url": {
-									"raw": "http://localhost:9527/api/v1/rbac/grouping/add",
-									"protocol": "http",
-									"host": [
-										"localhost"
-									],
-									"port": "9527",
-									"path": [
-										"api",
-										"v1",
-										"rbac",
-										"grouping",
-										"add"
-									]
-								}
-							},
-							"_postman_previewlanguage": null,
-							"header": null,
-							"cookie": [],
-							"body": null
-						}
-					]
-				},
-				{
-					"name": "Delete RBAC Single Grouping Policy (Remove A Role of Member)",
-					"request": {
-						"method": "DELETE",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "http://localhost:9527/api/v1/rbac/grouping/delete",
-							"protocol": "http",
-							"host": [
-								"localhost"
-							],
-							"port": "9527",
-							"path": [
-								"api",
-								"v1",
-								"rbac",
-								"grouping",
-								"delete"
-							]
-						}
-					},
-					"response": [
-						{
-							"name": "/api/v1/rbac/grouping/delete",
-							"originalRequest": {
-								"method": "DELETE",
-								"header": [],
-								"body": {
-									"mode": "raw",
-									"raw": "{\n    \"member\": \"tony\",\n    \"role\": \"admin\"\n}",
-									"options": {
-										"raw": {
-											"language": "json"
-										}
-									}
-								},
-								"url": {
-									"raw": "http://localhost:9527/api/v1/rbac/grouping/delete",
-									"protocol": "http",
-									"host": [
-										"localhost"
-									],
-									"port": "9527",
-									"path": [
-										"api",
-										"v1",
-										"rbac",
-										"grouping",
-										"delete"
-									]
-								}
-							},
-							"_postman_previewlanguage": null,
-							"header": null,
-							"cookie": [],
-							"body": null
-						}
-					]
-				},
-				{
-					"name": "Delete RBAC Grouping Policy (Member)",
-					"request": {
-						"method": "DELETE",
-						"header": [],
-						"url": {
-							"raw": "http://localhost:9527/api/v1/rbac/grouping/:name/delete",
-							"protocol": "http",
-							"host": [
-								"localhost"
-							],
-							"port": "9527",
-							"path": [
-								"api",
-								"v1",
-								"rbac",
-								"grouping",
-								":name",
-								"delete"
-							],
-							"variable": [
-								{
-									"key": "name",
-									"value": ""
-								}
-							]
-						},
-						"description": "Delete all roles associated with a specified member"
-					},
-					"response": [
-						{
-							"name": "/api/v1/rbac/grouping/:name/delete",
-							"originalRequest": {
-								"method": "DELETE",
-								"header": [],
-								"url": {
-									"raw": "http://localhost:9527/api/v1/rbac/grouping/:name/delete",
-									"protocol": "http",
-									"host": [
-										"localhost"
-									],
-									"port": "9527",
-									"path": [
-										"api",
-										"v1",
-										"rbac",
-										"grouping",
-										":name",
-										"delete"
-									],
-									"variable": [
-										{
-											"key": "name",
-											"value": "tony"
-										}
-									]
-								}
-							},
-							"_postman_previewlanguage": null,
-							"header": null,
-							"cookie": [],
-							"body": null
-						}
-					]
-				},
-				{
-					"name": "Get Roles of Member",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "http://localhost:9527/api/v1/rbac/member/:name",
-							"protocol": "http",
-							"host": [
-								"localhost"
-							],
-							"port": "9527",
-							"path": [
-								"api",
-								"v1",
-								"rbac",
-								"member",
-								":name"
-							],
-							"variable": [
-								{
-									"key": "name",
-									"value": ""
-								}
-							]
-						}
-					},
-					"response": [
-						{
-							"name": "/api/v1/rbac/member/:name",
-							"originalRequest": {
-								"method": "GET",
-								"header": [],
-								"url": {
-									"raw": "http://localhost:9527/api/v1/rbac/member/:name",
-									"protocol": "http",
-									"host": [
-										"localhost"
-									],
-									"port": "9527",
-									"path": [
-										"api",
-										"v1",
-										"rbac",
-										"member",
-										":name"
-									],
-									"variable": [
-										{
-											"key": "name",
-											"value": ""
-										}
-									]
-								}
-							},
-							"_postman_previewlanguage": null,
-							"header": null,
-							"cookie": [],
-							"body": null
-						}
-					]
-				},
-				{
-					"name": "List All Members",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "http://localhost:9527/api/v1/rbac/members",
-							"protocol": "http",
-							"host": [
-								"localhost"
-							],
-							"port": "9527",
-							"path": [
-								"api",
-								"v1",
-								"rbac",
-								"members"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "List All Policies",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "http://localhost:9527/api/v1/rbac/policies",
-							"protocol": "http",
-							"host": [
-								"localhost"
-							],
-							"port": "9527",
-							"path": [
-								"api",
-								"v1",
-								"rbac",
-								"policies"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "List All Roles",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "http://localhost:9527/api/v1/rbac/roles",
-							"protocol": "http",
-							"host": [
-								"localhost"
-							],
-							"port": "9527",
-							"path": [
-								"api",
-								"v1",
-								"rbac",
-								"roles"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Add RBAC Policy",
-					"request": {
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "http://localhost:9527/api/v1/rbac/policy/add",
-							"protocol": "http",
-							"host": [
-								"localhost"
-							],
-							"port": "9527",
-							"path": [
-								"api",
-								"v1",
-								"rbac",
-								"policy",
-								"add"
-							]
-						}
-					},
-					"response": [
-						{
-							"name": "/api/v1/rbac/policy/add",
-							"originalRequest": {
-								"method": "POST",
-								"header": [],
-								"body": {
-									"mode": "raw",
-									"raw": "{\n    \"subject\": \"develop\",\n    \"object\": \"/login\",\n    \"action\": \"POST\"\n}",
-									"options": {
-										"raw": {
-											"language": "json"
-										}
-									}
-								},
-								"url": {
-									"raw": "http://localhost:9527/api/v1/rbac/policy/add",
-									"protocol": "http",
-									"host": [
-										"localhost"
-									],
-									"port": "9527",
-									"path": [
-										"api",
-										"v1",
-										"rbac",
-										"policy",
-										"add"
-									]
-								}
-							},
-							"_postman_previewlanguage": null,
-							"header": null,
-							"cookie": [],
-							"body": null
-						}
-					]
-				},
-				{
-					"name": "Delete RBAC Single Policy",
-					"request": {
-						"method": "DELETE",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "http://localhost:9527/api/v1/rbac/policy/delete",
-							"protocol": "http",
-							"host": [
-								"localhost"
-							],
-							"port": "9527",
-							"path": [
-								"api",
-								"v1",
-								"rbac",
-								"policy",
-								"delete"
-							]
-						}
-					},
-					"response": [
-						{
-							"name": "/api/v1/rbac/policy/delete",
-							"originalRequest": {
-								"method": "DELETE",
-								"header": [],
-								"body": {
-									"mode": "raw",
-									"raw": "{\n    \"subject\": \"develop\",\n    \"object\": \"/login\",\n    \"action\": \"POST\"\n}",
-									"options": {
-										"raw": {
-											"language": "json"
-										}
-									}
-								},
-								"url": {
-									"raw": "http://localhost:9527/api/v1/rbac/policy/delete",
-									"protocol": "http",
-									"host": [
-										"localhost"
-									],
-									"port": "9527",
-									"path": [
-										"api",
-										"v1",
-										"rbac",
-										"policy",
-										"delete"
-									]
-								}
-							},
-							"_postman_previewlanguage": null,
-							"header": null,
-							"cookie": [],
-							"body": null
-						}
-					]
-				},
-				{
-					"name": "Delete RBAC Policy (Role)",
-					"request": {
-						"method": "DELETE",
-						"header": [],
-						"url": {
-							"raw": "http://localhost:9527/api/v1/rbac/policy/:name/delete",
-							"protocol": "http",
-							"host": [
-								"localhost"
-							],
-							"port": "9527",
-							"path": [
-								"api",
-								"v1",
-								"rbac",
-								"policy",
-								":name",
-								"delete"
-							],
-							"variable": [
-								{
-									"key": "name",
-									"value": ""
-								}
-							]
-						}
-					},
-					"response": [
-						{
-							"name": "/api/v1/rbac/policy/:name/delete",
-							"originalRequest": {
-								"method": "DELETE",
-								"header": [],
-								"url": {
-									"raw": "http://localhost:9527/api/v1/rbac/policy/:name/delete",
-									"protocol": "http",
-									"host": [
-										"localhost"
-									],
-									"port": "9527",
-									"path": [
-										"api",
-										"v1",
-										"rbac",
-										"policy",
-										":name",
-										"delete"
-									],
-									"variable": [
-										{
-											"key": "name",
-											"value": ""
-										}
-									]
-								}
-							},
-							"_postman_previewlanguage": null,
-							"header": null,
-							"cookie": [],
-							"body": null
-						}
-					]
-				},
-				{
-					"name": "Get Members With Role",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "http://localhost:9527/api/v1/rbac/role/:name",
-							"protocol": "http",
-							"host": [
-								"localhost"
-							],
-							"port": "9527",
-							"path": [
-								"api",
-								"v1",
-								"rbac",
-								"role",
-								":name"
-							],
-							"variable": [
-								{
-									"key": "name",
-									"value": ""
-								}
-							]
-						}
-					},
-					"response": [
-						{
-							"name": "/api/v1/rbac/role/:name",
-							"originalRequest": {
-								"method": "GET",
-								"header": [],
-								"url": {
-									"raw": "http://localhost:9527/api/v1/rbac/role/:name",
-									"protocol": "http",
-									"host": [
-										"localhost"
-									],
-									"port": "9527",
-									"path": [
-										"api",
-										"v1",
-										"rbac",
-										"role",
-										":name"
-									],
-									"variable": [
-										{
-											"key": "name",
-											"value": ""
-										}
-									]
-								}
-							},
-							"_postman_previewlanguage": null,
-							"header": null,
-							"cookie": [],
-							"body": null
-						}
-					]
-				}
-			]
-		},
-		{
 			"name": "user",
 			"item": [
 				{
@@ -916,7 +47,7 @@
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n    \"username\": \"tony\",\n    \"password\": \"Qaz@1234\",\n    \"comfirm_pwd\": \"Qaz@1234\",\n    \"first_name\": \"Tony\",\n    \"last_name\": \"Jhang\",\n    \"phone_number\": \"0975827064\",\n    \"mail\": \"tony@example.com\",\n    \"address\": \"Taichung\"\n}",
+									"raw": "{\n    \"mail\": \"tony@example.com\",\n    \"password\": \"Qaz@1234\",\n    \"username\": \"tony\",\n    \"first_name\": \"Tony\",\n    \"last_name\": \"Jhang\",\n    \"phone_number\": \"0975827064\"\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -983,7 +114,7 @@
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n    \"username\": \"tony\",\n    \"password\": \"12345678\"\n}",
+									"raw": "{\n    \"account\": \"tony@example.com\",\n    \"password\": \"12345678\"\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -1013,7 +144,7 @@
 					]
 				},
 				{
-					"name": "Delete User",
+					"name": "Delete Account",
 					"request": {
 						"method": "DELETE",
 						"header": [],
@@ -1057,7 +188,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n    \"username\": \"tony\",\n    \"mail\": \"tony@example.com\"\n}",
+									"raw": "{\n    \"mail\": \"tony@example.com\"\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -1278,7 +409,7 @@
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n    \"username\": \"tony\"\n}",
+									"raw": "{\n    \"mail\": \"tony@example.com\"\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -1352,7 +483,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n    \"username\": \"tony\"\n}",
+									"raw": "{\n    \"mail\": \"tony@example.com\"\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -1742,6 +873,138 @@
 					]
 				},
 				{
+					"name": "User Change Password",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"mail\": \"tony@example.com\",\n    \"old_password\": \"Qaz@1234\",\n    \"new_password\": \"Qaz!1234\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:9527/api/v1/user/change-password",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "9527",
+							"path": [
+								"api",
+								"v1",
+								"user",
+								"change-password"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "/api/v1/user/change-password",
+							"originalRequest": {
+								"method": "PATCH",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"mail\": \"tony@example.com\",\n    \"old_password\": \"Qaz@1234\",\n    \"new_password\": \"Qaz!1234\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:9527/api/v1/user/change-password",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "9527",
+									"path": [
+										"api",
+										"v1",
+										"user",
+										"change-password"
+									]
+								}
+							},
+							"_postman_previewlanguage": null,
+							"header": null,
+							"cookie": [],
+							"body": null
+						}
+					]
+				},
+				{
+					"name": "User Set Up Password",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"mail\": \"tony@example.com\",\n    \"password\": \"Qaz@1234\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:9527/api/v1/user/setup-password",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "9527",
+							"path": [
+								"api",
+								"v1",
+								"user",
+								"setup-password"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "/api/v1/user/setup-password",
+							"originalRequest": {
+								"method": "PATCH",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"mail\": \"tony@example.com\",\n    \"password\": \"Qaz@1234\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:9527/api/v1/user/setup-password",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "9527",
+									"path": [
+										"api",
+										"v1",
+										"user",
+										"setup-password"
+									]
+								}
+							},
+							"_postman_previewlanguage": null,
+							"header": null,
+							"cookie": [],
+							"body": null
+						}
+					]
+				},
+				{
 					"name": "Mail Check",
 					"protocolProfileBehavior": {
 						"disableBodyPruning": true
@@ -1811,6 +1074,947 @@
 					]
 				},
 				{
+					"name": "Update Personal Information",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"mail\": \"tony@twister5.com.tw\",\n    \"username\": \"tony-v3\",\n    \"last_name\": \"Jhang\",\n    \"first_name\": \"Tony\",\n    \"phone_number\": null,\n    \"address\": null,\n    \"birthday\": null,\n    \"sex\": \"male\",\n    \"blood_type\": \"A\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:9527/api/v1/user/update-personal-info",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "9527",
+							"path": [
+								"api",
+								"v1",
+								"user",
+								"update-personal-info"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "/api/v1/user/update-personal-info",
+							"originalRequest": {
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"mail\": \"tony@example.com\",\n    \"username\": \"tony\",\n    \"last_name\": \"Jhang\",\n    \"first_name\": \"Tony\",\n    \"phone_number\": \"0912345678\",\n    \"address\": \"Taichung\",\n    \"birthday\": \"2000-12-12\",\n    \"sex\": \"male\",\n    \"blood_type\": \"A\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:9527/api/v1/user/update-personal-info",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "9527",
+									"path": [
+										"api",
+										"v1",
+										"user",
+										"update-personal-info"
+									]
+								}
+							},
+							"_postman_previewlanguage": null,
+							"header": null,
+							"cookie": [],
+							"body": null
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "totp",
+			"item": [
+				{
+					"name": "Enable TOTP",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"username\": \"tony\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:9527/api/v1/totp/generate",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "9527",
+							"path": [
+								"api",
+								"v1",
+								"totp",
+								"generate"
+							]
+						},
+						"description": "generate QRcode"
+					},
+					"response": [
+						{
+							"name": "/api/v1/totp/generate",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"mail\": \"tony@example.com\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:9527/api/v1/totp/generate",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "9527",
+									"path": [
+										"api",
+										"v1",
+										"totp",
+										"generate"
+									]
+								}
+							},
+							"_postman_previewlanguage": null,
+							"header": null,
+							"cookie": [],
+							"body": null
+						}
+					]
+				},
+				{
+					"name": "Verify TOTP",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"username\": \"tony\",\n    \"totpcode\": \"116008\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:9527/api/v1/totp/verify",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "9527",
+							"path": [
+								"api",
+								"v1",
+								"totp",
+								"verify"
+							]
+						},
+						"description": "The API uses the first enabled TOTP feature to verify the TOTP code."
+					},
+					"response": [
+						{
+							"name": "/api/v1/totp/verify",
+							"originalRequest": {
+								"method": "PATCH",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"mail\": \"tony@example.com\",\n    \"otp_code\": \"690619\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:9527/api/v1/totp/verify",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "9527",
+									"path": [
+										"api",
+										"v1",
+										"totp",
+										"verify"
+									]
+								}
+							},
+							"_postman_previewlanguage": null,
+							"header": null,
+							"cookie": [],
+							"body": null
+						}
+					]
+				},
+				{
+					"name": "Verify TOTP Validate",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:9527/api/v1/totp/validate",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "9527",
+							"path": [
+								"api",
+								"v1",
+								"totp",
+								"validate"
+							]
+						},
+						"description": "If a user has enabled TOTP, the API can be used during the login process to verify its validity."
+					},
+					"response": [
+						{
+							"name": "/api/v1/totp/validate",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"mail\": \"tony@example.com\",\n    \"otp_code\": \"090187\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:9527/api/v1/totp/validate",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "9527",
+									"path": [
+										"api",
+										"v1",
+										"totp",
+										"validate"
+									]
+								}
+							},
+							"_postman_previewlanguage": null,
+							"header": null,
+							"cookie": [],
+							"body": null
+						}
+					]
+				},
+				{
+					"name": "Disable TOTP",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"username\": \"tony\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:9527/api/v1/totp/disable",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "9527",
+							"path": [
+								"api",
+								"v1",
+								"totp",
+								"disable"
+							]
+						},
+						"description": "disable TOTP"
+					},
+					"response": [
+						{
+							"name": "/api/v1/totp/disable",
+							"originalRequest": {
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"mail\": \"tony@example.com\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:9527/api/v1/totp/disable",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "9527",
+									"path": [
+										"api",
+										"v1",
+										"totp",
+										"disable"
+									]
+								}
+							},
+							"_postman_previewlanguage": null,
+							"header": null,
+							"cookie": [],
+							"body": null
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "privilege",
+			"item": [
+				{
+					"name": "Add RBAC Grouping Policy",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:9527/api/v1/rbac/grouping/add",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "9527",
+							"path": [
+								"api",
+								"v1",
+								"rbac",
+								"grouping",
+								"add"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "/api/v1/rbac/grouping/add",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"member\": \"tony@example.com\",\n    \"role\": \"admin\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:9527/api/v1/rbac/grouping/add",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "9527",
+									"path": [
+										"api",
+										"v1",
+										"rbac",
+										"grouping",
+										"add"
+									]
+								}
+							},
+							"_postman_previewlanguage": null,
+							"header": null,
+							"cookie": [],
+							"body": null
+						}
+					]
+				},
+				{
+					"name": "Delete RBAC Single Grouping Policy",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:9527/api/v1/rbac/grouping/delete",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "9527",
+							"path": [
+								"api",
+								"v1",
+								"rbac",
+								"grouping",
+								"delete"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "/api/v1/rbac/grouping/delete",
+							"originalRequest": {
+								"method": "DELETE",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"member\": \"tony@example.com\",\n    \"role\": \"admin\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:9527/api/v1/rbac/grouping/delete",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "9527",
+									"path": [
+										"api",
+										"v1",
+										"rbac",
+										"grouping",
+										"delete"
+									]
+								}
+							},
+							"_postman_previewlanguage": null,
+							"header": null,
+							"cookie": [],
+							"body": null
+						}
+					]
+				},
+				{
+					"name": "Delete RBAC Grouping Policy (By member)",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:9527/api/v1/rbac/grouping/:name/delete",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "9527",
+							"path": [
+								"api",
+								"v1",
+								"rbac",
+								"grouping",
+								":name",
+								"delete"
+							],
+							"variable": [
+								{
+									"key": "name",
+									"value": ""
+								}
+							]
+						},
+						"description": "Delete all roles associated with a specified member"
+					},
+					"response": [
+						{
+							"name": "/api/v1/rbac/grouping/:member/delete",
+							"originalRequest": {
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:9527/api/v1/rbac/grouping/:member/delete",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "9527",
+									"path": [
+										"api",
+										"v1",
+										"rbac",
+										"grouping",
+										":member",
+										"delete"
+									],
+									"variable": [
+										{
+											"key": "member",
+											"value": "tony@example.com"
+										}
+									]
+								}
+							},
+							"_postman_previewlanguage": null,
+							"header": null,
+							"cookie": [],
+							"body": null
+						}
+					]
+				},
+				{
+					"name": "Get Roles of Member",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:9527/api/v1/rbac/member/:name",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "9527",
+							"path": [
+								"api",
+								"v1",
+								"rbac",
+								"member",
+								":name"
+							],
+							"variable": [
+								{
+									"key": "name",
+									"value": ""
+								}
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "/api/v1/rbac/member/:member",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:9527/api/v1/rbac/member/:member",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "9527",
+									"path": [
+										"api",
+										"v1",
+										"rbac",
+										"member",
+										":member"
+									],
+									"variable": [
+										{
+											"key": "member",
+											"value": "tony@example.com"
+										}
+									]
+								}
+							},
+							"_postman_previewlanguage": null,
+							"header": null,
+							"cookie": [],
+							"body": null
+						}
+					]
+				},
+				{
+					"name": "List All Members",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:9527/api/v1/rbac/members",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "9527",
+							"path": [
+								"api",
+								"v1",
+								"rbac",
+								"members"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "List All Policies",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:9527/api/v1/rbac/policies",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "9527",
+							"path": [
+								"api",
+								"v1",
+								"rbac",
+								"policies"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "List All Roles",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:9527/api/v1/rbac/roles",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "9527",
+							"path": [
+								"api",
+								"v1",
+								"rbac",
+								"roles"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Add RBAC Policy",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:9527/api/v1/rbac/policy/add",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "9527",
+							"path": [
+								"api",
+								"v1",
+								"rbac",
+								"policy",
+								"add"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "/api/v1/rbac/policy/add",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"subject\": \"develop\",\n    \"object\": \"/login\",\n    \"action\": \"POST\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:9527/api/v1/rbac/policy/add",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "9527",
+									"path": [
+										"api",
+										"v1",
+										"rbac",
+										"policy",
+										"add"
+									]
+								}
+							},
+							"_postman_previewlanguage": null,
+							"header": null,
+							"cookie": [],
+							"body": null
+						}
+					]
+				},
+				{
+					"name": "Delete RBAC Single Policy",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:9527/api/v1/rbac/policy/delete",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "9527",
+							"path": [
+								"api",
+								"v1",
+								"rbac",
+								"policy",
+								"delete"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "/api/v1/rbac/policy/delete",
+							"originalRequest": {
+								"method": "DELETE",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"subject\": \"develop\",\n    \"object\": \"/login\",\n    \"action\": \"POST\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:9527/api/v1/rbac/policy/delete",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "9527",
+									"path": [
+										"api",
+										"v1",
+										"rbac",
+										"policy",
+										"delete"
+									]
+								}
+							},
+							"_postman_previewlanguage": null,
+							"header": null,
+							"cookie": [],
+							"body": null
+						}
+					]
+				},
+				{
+					"name": "Delete RBAC Policy (By role)",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:9527/api/v1/rbac/policy/:role/delete",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "9527",
+							"path": [
+								"api",
+								"v1",
+								"rbac",
+								"policy",
+								":role",
+								"delete"
+							],
+							"variable": [
+								{
+									"key": "role",
+									"value": ""
+								}
+							]
+						},
+						"description": "This action will delete role and all member will also remove from the group."
+					},
+					"response": [
+						{
+							"name": "/api/v1/rbac/policy/:role/delete",
+							"originalRequest": {
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:9527/api/v1/rbac/policy/:role/delete",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "9527",
+									"path": [
+										"api",
+										"v1",
+										"rbac",
+										"policy",
+										":role",
+										"delete"
+									],
+									"variable": [
+										{
+											"key": "role",
+											"value": "admin"
+										}
+									]
+								}
+							},
+							"_postman_previewlanguage": null,
+							"header": null,
+							"cookie": [],
+							"body": null
+						}
+					]
+				},
+				{
+					"name": "Get Members With Role",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:9527/api/v1/rbac/role/:role",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "9527",
+							"path": [
+								"api",
+								"v1",
+								"rbac",
+								"role",
+								":role"
+							],
+							"variable": [
+								{
+									"key": "role",
+									"value": ""
+								}
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "/api/v1/rbac/role/:role",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:9527/api/v1/rbac/role/:role",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "9527",
+									"path": [
+										"api",
+										"v1",
+										"rbac",
+										"role",
+										":role"
+									],
+									"variable": [
+										{
+											"key": "role",
+											"value": "admin"
+										}
+									]
+								}
+							},
+							"_postman_previewlanguage": null,
+							"header": null,
+							"cookie": [],
+							"body": null
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "mail-otp",
+			"item": [
+				{
 					"name": "Mail OTP Enable",
 					"request": {
 						"method": "PUT",
@@ -1820,7 +2024,7 @@
 							"raw": ""
 						},
 						"url": {
-							"raw": "http://localhost:9527/api/v1/otp/mail-enable",
+							"raw": "http://localhost:9527/api/v1/otp/mail/enable",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -1830,13 +2034,14 @@
 								"api",
 								"v1",
 								"otp",
-								"mail-enable"
+								"mail",
+								"enable"
 							]
 						}
 					},
 					"response": [
 						{
-							"name": "/api/v1/otp/mail-enable",
+							"name": "/api/v1/otp/mail/enable",
 							"originalRequest": {
 								"method": "PUT",
 								"header": [
@@ -1849,7 +2054,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n    \"username\": \"tony\"\n}",
+									"raw": "{\n    \"mail\": \"tony@example.com\"\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -1857,7 +2062,7 @@
 									}
 								},
 								"url": {
-									"raw": "http://localhost:9527/api/v1/otp/mail-enable",
+									"raw": "http://localhost:9527/api/v1/otp/mail/enable",
 									"protocol": "http",
 									"host": [
 										"localhost"
@@ -1867,7 +2072,8 @@
 										"api",
 										"v1",
 										"otp",
-										"mail-enable"
+										"mail",
+										"enable"
 									]
 								}
 							},
@@ -1893,7 +2099,7 @@
 							}
 						},
 						"url": {
-							"raw": "http://localhost:9527/api/v1/otp/mail-disable",
+							"raw": "http://localhost:9527/api/v1/otp/mail/disable",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -1903,19 +2109,20 @@
 								"api",
 								"v1",
 								"otp",
-								"mail-disable"
+								"mail",
+								"disable"
 							]
 						}
 					},
 					"response": [
 						{
-							"name": "/api/v1/otp/mail-disable",
+							"name": "/api/v1/otp/mail/disable",
 							"originalRequest": {
 								"method": "PUT",
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n    \"username\": \"tony\"\n}",
+									"raw": "{\n    \"mail\": \"tony@example.com\"\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -1923,7 +2130,7 @@
 									}
 								},
 								"url": {
-									"raw": "http://localhost:9527/api/v1/otp/mail-disable",
+									"raw": "http://localhost:9527/api/v1/otp/mail/disable",
 									"protocol": "http",
 									"host": [
 										"localhost"
@@ -1933,7 +2140,8 @@
 										"api",
 										"v1",
 										"otp",
-										"mail-disable"
+										"mail",
+										"disable"
 									]
 								}
 							},
@@ -1959,7 +2167,7 @@
 							}
 						},
 						"url": {
-							"raw": "http://localhost:9527/api/v1/otp/mail-send",
+							"raw": "http://localhost:9527/api/v1/otp/mail/send",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -1969,19 +2177,20 @@
 								"api",
 								"v1",
 								"otp",
-								"mail-send"
+								"mail",
+								"send"
 							]
 						}
 					},
 					"response": [
 						{
-							"name": "/api/v1/otp/mail-send",
+							"name": "/api/v1/otp/mail/send",
 							"originalRequest": {
 								"method": "POST",
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n    \"username\": \"tony\"\n}",
+									"raw": "{\n    \"mail\": \"tony@example.com\"\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -1989,7 +2198,7 @@
 									}
 								},
 								"url": {
-									"raw": "http://localhost:9527/api/v1/otp/mail-send",
+									"raw": "http://localhost:9527/api/v1/otp/mail/send",
 									"protocol": "http",
 									"host": [
 										"localhost"
@@ -1999,7 +2208,8 @@
 										"api",
 										"v1",
 										"otp",
-										"mail-send"
+										"mail",
+										"send"
 									]
 								}
 							},
@@ -2028,7 +2238,7 @@
 							}
 						},
 						"url": {
-							"raw": "http://localhost:9527/api/v1/otp/mail-verify",
+							"raw": "http://localhost:9527/api/v1/otp/mail/verify",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -2038,19 +2248,20 @@
 								"api",
 								"v1",
 								"otp",
-								"mail-verify"
+								"mail",
+								"verify"
 							]
 						}
 					},
 					"response": [
 						{
-							"name": "/api/v1/otp/mail-verify",
+							"name": "/api/v1/otp/mail/verify",
 							"originalRequest": {
 								"method": "GET",
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n    \"username\": \"tony\",\n    \"otp_code\": \"682620\"\n}",
+									"raw": "{\n    \"mail\": \"tony@example.com\",\n    \"otp_code\": \"387181\"\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -2058,7 +2269,7 @@
 									}
 								},
 								"url": {
-									"raw": "http://localhost:9527/api/v1/otp/mail-verify",
+									"raw": "http://localhost:9527/api/v1/otp/mail/verify",
 									"protocol": "http",
 									"host": [
 										"localhost"
@@ -2068,7 +2279,8 @@
 										"api",
 										"v1",
 										"otp",
-										"mail-verify"
+										"mail",
+										"verify"
 									]
 								}
 							},

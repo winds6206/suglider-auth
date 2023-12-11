@@ -119,7 +119,7 @@ const docTemplate = `{
         },
         "/api/v1/rbac/grouping/add": {
             "post": {
-                "description": "new a group (member-role) policy",
+                "description": "Create a group (member-role) policy.",
                 "consumes": [
                     "application/json"
                 ],
@@ -133,7 +133,7 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "Member",
+                        "description": "Enter user mail",
                         "name": "member",
                         "in": "formData"
                     },
@@ -180,7 +180,7 @@ const docTemplate = `{
         },
         "/api/v1/rbac/grouping/delete": {
             "delete": {
-                "description": "delete a single policy (remove a role of member)",
+                "description": "Delete a single policy (remove a role of member).",
                 "consumes": [
                     "application/json"
                 ],
@@ -241,7 +241,7 @@ const docTemplate = `{
         },
         "/api/v1/rbac/grouping/{name}/delete": {
             "delete": {
-                "description": "Delete all roles associated with a specified member",
+                "description": "Delete all roles associated with a specified member.",
                 "consumes": [
                     "application/json"
                 ],
@@ -251,12 +251,12 @@ const docTemplate = `{
                 "tags": [
                     "privilege"
                 ],
-                "summary": "Delete RBAC Grouping Policy (Member)",
+                "summary": "Delete RBAC Grouping Policy (By member)",
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "Member Name",
-                        "name": "name",
+                        "description": "Enter user mail",
+                        "name": "member",
                         "in": "path",
                         "required": true
                     }
@@ -295,9 +295,9 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/v1/rbac/member/{name}": {
+        "/api/v1/rbac/member/{member}": {
             "get": {
-                "description": "show all roles attached to this member",
+                "description": "Show all roles attached to this member.",
                 "consumes": [
                     "application/json"
                 ],
@@ -311,8 +311,8 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "Member Name",
-                        "name": "name",
+                        "description": "Enter user mail",
+                        "name": "member",
                         "in": "path",
                         "required": true
                     }
@@ -353,7 +353,7 @@ const docTemplate = `{
         },
         "/api/v1/rbac/members": {
             "get": {
-                "description": "show all members defined in the server",
+                "description": "Show all members defined in the server.",
                 "consumes": [
                     "application/json"
                 ],
@@ -400,7 +400,7 @@ const docTemplate = `{
         },
         "/api/v1/rbac/policies": {
             "get": {
-                "description": "show all policies defined in the server",
+                "description": "Show all policies defined in the server.",
                 "consumes": [
                     "application/json"
                 ],
@@ -447,7 +447,7 @@ const docTemplate = `{
         },
         "/api/v1/rbac/policy/add": {
             "post": {
-                "description": "new a role/policy",
+                "description": "Create a role/policy.",
                 "consumes": [
                     "application/json"
                 ],
@@ -514,7 +514,7 @@ const docTemplate = `{
         },
         "/api/v1/rbac/policy/delete": {
             "delete": {
-                "description": "delete a single policy",
+                "description": "Delete a single policy.",
                 "consumes": [
                     "application/json"
                 ],
@@ -581,7 +581,7 @@ const docTemplate = `{
         },
         "/api/v1/rbac/policy/{name}/delete": {
             "delete": {
-                "description": "delete a policy (role)",
+                "description": "This action will delete role and all member will also remove from the group.",
                 "consumes": [
                     "application/json"
                 ],
@@ -591,12 +591,12 @@ const docTemplate = `{
                 "tags": [
                     "privilege"
                 ],
-                "summary": "Delete RBAC Policy (Role)",
+                "summary": "Delete RBAC Policy (By role)",
                 "parameters": [
                     {
                         "type": "string",
                         "description": "Role Name",
-                        "name": "name",
+                        "name": "role",
                         "in": "path",
                         "required": true
                     }
@@ -637,7 +637,7 @@ const docTemplate = `{
         },
         "/api/v1/rbac/role/{name}": {
             "get": {
-                "description": "show all members with this role",
+                "description": "Show all members in this role.",
                 "consumes": [
                     "application/json"
                 ],
@@ -652,7 +652,7 @@ const docTemplate = `{
                     {
                         "type": "string",
                         "description": "Role Name",
-                        "name": "name",
+                        "name": "role",
                         "in": "path",
                         "required": true
                     }
@@ -693,7 +693,7 @@ const docTemplate = `{
         },
         "/api/v1/rbac/roles": {
             "get": {
-                "description": "show all roles defined in the server",
+                "description": "Show all roles defined in the server.",
                 "consumes": [
                     "application/json"
                 ],
@@ -1149,7 +1149,7 @@ const docTemplate = `{
         },
         "/api/v1/user/delete": {
             "delete": {
-                "description": "delete an existing user",
+                "description": "delete an existing account.",
                 "consumes": [
                     "multipart/form-data"
                 ],
@@ -1159,17 +1159,11 @@ const docTemplate = `{
                 "tags": [
                     "users"
                 ],
-                "summary": "Delete User",
+                "summary": "Delete Account",
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "User Name",
-                        "name": "username",
-                        "in": "formData"
-                    },
-                    {
-                        "type": "string",
-                        "description": "e-Mail",
+                        "description": "Mail",
                         "name": "mail",
                         "in": "formData"
                     }
@@ -1279,8 +1273,8 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "User Name",
-                        "name": "username",
+                        "description": "Enter mail or username",
+                        "name": "account",
                         "in": "formData"
                     },
                     {
@@ -1371,7 +1365,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/v1/user/mail-disable": {
+        "/api/v1/user/mail/disable": {
             "put": {
                 "description": "Disable Mail OTP feature",
                 "consumes": [
@@ -1381,7 +1375,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "users"
+                    "otp"
                 ],
                 "summary": "Mail OTP Disable",
                 "parameters": [
@@ -1426,7 +1420,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/v1/user/mail-enable": {
+        "/api/v1/user/mail/enable": {
             "put": {
                 "description": "Enable Mail OTP feature",
                 "consumes": [
@@ -1436,7 +1430,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "users"
+                    "otp"
                 ],
                 "summary": "Mail OTP Enable",
                 "parameters": [
@@ -1481,7 +1475,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/v1/user/mail-send": {
+        "/api/v1/user/mail/send": {
             "post": {
                 "description": "To send an OTP using email.",
                 "consumes": [
@@ -1491,7 +1485,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "users"
+                    "otp"
                 ],
                 "summary": "Mail OTP Send",
                 "parameters": [
@@ -1536,7 +1530,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/v1/user/mail-verify": {
+        "/api/v1/user/mail/verify": {
             "get": {
                 "description": "If a user has enabled Mail OTP, the API can be used during the login process to verify its validity.",
                 "consumes": [
@@ -1546,7 +1540,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "users"
+                    "otp"
                 ],
                 "summary": "Mail OTP Verify",
                 "parameters": [
@@ -1559,7 +1553,7 @@ const docTemplate = `{
                     {
                         "type": "string",
                         "description": "OTP Code",
-                        "name": "otpCode",
+                        "name": "otp_code",
                         "in": "formData"
                     }
                 ],
@@ -1936,6 +1930,109 @@ const docTemplate = `{
                         "type": "string",
                         "description": "Phone Number",
                         "name": "phone_number",
+                        "in": "formData"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "404": {
+                        "description": "Not found",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/user/update-personal-info": {
+            "put": {
+                "description": "Update Personal Information.",
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "users"
+                ],
+                "summary": "Update Personal Information",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Mail",
+                        "name": "mail",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "description": "User Name",
+                        "name": "username",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Last Name",
+                        "name": "last_name",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "description": "First Name",
+                        "name": "first_name",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Phone Number",
+                        "name": "phone_number",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Address",
+                        "name": "address",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Birthday",
+                        "name": "birthday",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Sex",
+                        "name": "sex",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Blood Type",
+                        "name": "blood_type",
                         "in": "formData"
                     }
                 ],

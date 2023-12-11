@@ -18,7 +18,7 @@ import (
 
 // @Summary Mail OTP Enable
 // @Description Enable Mail OTP feature
-// @Tags users
+// @Tags otp
 // @Accept multipart/form-data
 // @Produce application/json
 // @Param mail formData string false "Mail"
@@ -72,7 +72,7 @@ func MailOTPEnable(c *gin.Context) {
 
 // @Summary Mail OTP Disable
 // @Description Disable Mail OTP feature
-// @Tags users
+// @Tags otp
 // @Accept multipart/form-data
 // @Produce application/json
 // @Param mail formData string false "Mail"
@@ -127,7 +127,7 @@ func MailOTPDisable(c *gin.Context) {
 
 // @Summary Mail OTP Send
 // @Description To send an OTP using email.
-// @Tags users
+// @Tags otp
 // @Accept multipart/form-data
 // @Produce application/json
 // @Param mail formData string false "Mail"
@@ -199,11 +199,11 @@ func MailOTPSend(c *gin.Context) {
 
 // @Summary Mail OTP Verify
 // @Description If a user has enabled Mail OTP, the API can be used during the login process to verify its validity.
-// @Tags users
+// @Tags otp
 // @Accept multipart/form-data
 // @Produce application/json
 // @Param mail formData string false "Mail"
-// @Param otpCode formData string false "OTP Code"
+// @Param otp_code formData string false "OTP Code"
 // @Success 200 {string} string "Success"
 // @Failure 400 {string} string "Bad request"
 // @Failure 401 {string} string "Unauthorized"

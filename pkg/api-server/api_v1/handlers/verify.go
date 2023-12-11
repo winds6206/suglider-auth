@@ -14,10 +14,6 @@ import (
 	fmtv "suglider-auth/pkg/fmt_validator"
 )
 
-type passwordReset struct {
-	Password string `json:"password"`
-}
-
 // @Summary Verify Email Address
 // @Description verify email address for user
 // @Tags users

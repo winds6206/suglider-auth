@@ -16,14 +16,9 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type OTPData struct {
-	Mail    string `json:"mail" binding:"required"`
-	OTPCode string `json:"otp_code" binding:"required"`
-}
-
 func ValidateMailOTP() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		var request OTPData
+		var request otpData
 
 		// Check the parameter transfer from POST
 		err := c.ShouldBindJSON(&request)
@@ -94,7 +89,7 @@ func ValidateMailOTP() gin.HandlerFunc {
 
 func ValidateTOTP() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		var request OTPData
+		var request otpData
 
 		// Check the parameter trasnfer from POST
 		err := c.ShouldBindJSON(&request)

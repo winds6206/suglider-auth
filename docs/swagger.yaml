@@ -77,11 +77,11 @@ paths:
     delete:
       consumes:
       - application/json
-      description: Delete all roles associated with a specified member
+      description: Delete all roles associated with a specified member.
       parameters:
-      - description: Member Name
+      - description: Enter user mail
         in: path
-        name: name
+        name: member
         required: true
         type: string
       produces:
@@ -107,16 +107,16 @@ paths:
           description: Not found
           schema:
             type: string
-      summary: Delete RBAC Grouping Policy (Member)
+      summary: Delete RBAC Grouping Policy (By member)
       tags:
       - privilege
   /api/v1/rbac/grouping/add:
     post:
       consumes:
       - application/json
-      description: new a group (member-role) policy
+      description: Create a group (member-role) policy.
       parameters:
-      - description: Member
+      - description: Enter user mail
         in: formData
         name: member
         type: string
@@ -154,7 +154,7 @@ paths:
     delete:
       consumes:
       - application/json
-      description: delete a single policy (remove a role of member)
+      description: Delete a single policy (remove a role of member).
       parameters:
       - description: Member
         in: formData
@@ -190,15 +190,15 @@ paths:
       summary: Delete RBAC Single Grouping Policy (Remove A Role of Member)
       tags:
       - privilege
-  /api/v1/rbac/member/{name}:
+  /api/v1/rbac/member/{member}:
     get:
       consumes:
       - application/json
-      description: show all roles attached to this member
+      description: Show all roles attached to this member.
       parameters:
-      - description: Member Name
+      - description: Enter user mail
         in: path
-        name: name
+        name: member
         required: true
         type: string
       produces:
@@ -231,7 +231,7 @@ paths:
     get:
       consumes:
       - application/json
-      description: show all members defined in the server
+      description: Show all members defined in the server.
       produces:
       - application/json
       responses:
@@ -262,7 +262,7 @@ paths:
     get:
       consumes:
       - application/json
-      description: show all policies defined in the server
+      description: Show all policies defined in the server.
       produces:
       - application/json
       responses:
@@ -293,11 +293,12 @@ paths:
     delete:
       consumes:
       - application/json
-      description: delete a policy (role)
+      description: This action will delete role and all member will also remove from
+        the group.
       parameters:
       - description: Role Name
         in: path
-        name: name
+        name: role
         required: true
         type: string
       produces:
@@ -323,14 +324,14 @@ paths:
           description: Not found
           schema:
             type: string
-      summary: Delete RBAC Policy (Role)
+      summary: Delete RBAC Policy (By role)
       tags:
       - privilege
   /api/v1/rbac/policy/add:
     post:
       consumes:
       - application/json
-      description: new a role/policy
+      description: Create a role/policy.
       parameters:
       - description: Subject
         in: formData
@@ -374,7 +375,7 @@ paths:
     delete:
       consumes:
       - application/json
-      description: delete a single policy
+      description: Delete a single policy.
       parameters:
       - description: Subject
         in: formData
@@ -418,11 +419,11 @@ paths:
     get:
       consumes:
       - application/json
-      description: show all members with this role
+      description: Show all members in this role.
       parameters:
       - description: Role Name
         in: path
-        name: name
+        name: role
         required: true
         type: string
       produces:
@@ -455,7 +456,7 @@ paths:
     get:
       consumes:
       - application/json
-      description: show all roles defined in the server
+      description: Show all roles defined in the server.
       produces:
       - application/json
       responses:
@@ -756,13 +757,9 @@ paths:
     delete:
       consumes:
       - multipart/form-data
-      description: delete an existing user
+      description: delete an existing account.
       parameters:
-      - description: User Name
-        in: formData
-        name: username
-        type: string
-      - description: e-Mail
+      - description: Mail
         in: formData
         name: mail
         type: string
@@ -789,7 +786,7 @@ paths:
           description: Not found
           schema:
             type: string
-      summary: Delete User
+      summary: Delete Account
       tags:
       - users
   /api/v1/user/forgot-password:
@@ -834,9 +831,9 @@ paths:
       - multipart/form-data
       description: user login
       parameters:
-      - description: User Name
+      - description: Enter mail or username
         in: formData
-        name: username
+        name: account
         type: string
       - description: Password
         in: formData
@@ -899,7 +896,7 @@ paths:
       summary: User Logout
       tags:
       - users
-  /api/v1/user/mail-disable:
+  /api/v1/user/mail/disable:
     put:
       consumes:
       - multipart/form-data
@@ -934,8 +931,8 @@ paths:
             type: string
       summary: Mail OTP Disable
       tags:
-      - users
-  /api/v1/user/mail-enable:
+      - otp
+  /api/v1/user/mail/enable:
     put:
       consumes:
       - multipart/form-data
@@ -970,8 +967,8 @@ paths:
             type: string
       summary: Mail OTP Enable
       tags:
-      - users
-  /api/v1/user/mail-send:
+      - otp
+  /api/v1/user/mail/send:
     post:
       consumes:
       - multipart/form-data
@@ -1006,8 +1003,8 @@ paths:
             type: string
       summary: Mail OTP Send
       tags:
-      - users
-  /api/v1/user/mail-verify:
+      - otp
+  /api/v1/user/mail/verify:
     get:
       consumes:
       - multipart/form-data
@@ -1020,7 +1017,7 @@ paths:
         type: string
       - description: OTP Code
         in: formData
-        name: otpCode
+        name: otp_code
         type: string
       produces:
       - application/json
@@ -1047,7 +1044,7 @@ paths:
             type: string
       summary: Mail OTP Verify
       tags:
-      - users
+      - otp
   /api/v1/user/password-expire:
     get:
       consumes:
@@ -1294,6 +1291,74 @@ paths:
           schema:
             type: string
       summary: Sign Up User
+      tags:
+      - users
+  /api/v1/user/update-personal-info:
+    put:
+      consumes:
+      - multipart/form-data
+      description: Update Personal Information.
+      parameters:
+      - description: Mail
+        in: formData
+        name: mail
+        type: string
+      - description: User Name
+        in: formData
+        name: username
+        type: string
+      - description: Last Name
+        in: formData
+        name: last_name
+        type: string
+      - description: First Name
+        in: formData
+        name: first_name
+        type: string
+      - description: Phone Number
+        in: formData
+        name: phone_number
+        type: string
+      - description: Address
+        in: formData
+        name: address
+        type: string
+      - description: Birthday
+        in: formData
+        name: birthday
+        type: string
+      - description: Sex
+        in: formData
+        name: sex
+        type: string
+      - description: Blood Type
+        in: formData
+        name: blood_type
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            type: string
+        "400":
+          description: Bad request
+          schema:
+            type: string
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+        "403":
+          description: Forbidden
+          schema:
+            type: string
+        "404":
+          description: Not found
+          schema:
+            type: string
+      summary: Update Personal Information
       tags:
       - users
   /api/v1/user/verify-mail:
