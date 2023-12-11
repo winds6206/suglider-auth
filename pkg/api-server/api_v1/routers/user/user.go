@@ -19,7 +19,7 @@ func UserHandler(router *gin.RouterGroup) {
 	router.GET("/verify-mail/resend", handlers.ResendVerifyEmail)
 	router.GET("/forgot-password", handlers.ForgotPasswordEmail)
 	router.POST("/reset-password", handlers.RestUserPassword)
-	router.GET("/check-username", handlers.CheckUsername)
+	router.GET("/check-username", handlers.CheckUserName)
 	router.GET("/check-mail", handlers.CheckMail)
 	router.PATCH("/change-password", handlers.ChangePassword)
 	router.PATCH("/setup-password", handlers.SetUpPassword)

@@ -64,16 +64,26 @@ func UserDelete(userName, mail string) (result sql.Result, err error) {
 	return result, err
 }
 
-func UserDeleteByUUID(userID, userName, mail string) (result sql.Result, err error) {
+func UserDeleteByMail(mail string) (result sql.Result, err error) {
 	ctx, cancel := context.WithTimeout(context.Background(), dbTimeOut)
 	defer cancel()
 
-	// UNHEX(?) can convert user_id to binary(16)
 	sqlStr := "DELETE FROM suglider.user_info " +
-		"WHERE user_id=UNHEX(?) AND username=? AND mail=?"
-	result, err = DataBase.ExecContext(ctx, sqlStr, userID, userName, mail)
+		"WHERE mail=?"
+	result, err = DataBase.ExecContext(ctx, sqlStr, mail)
 	return result, err
 }
+
+// func UserDeleteByUUID(userID, userName, mail string) (result sql.Result, err error) {
+// 	ctx, cancel := context.WithTimeout(context.Background(), dbTimeOut)
+// 	defer cancel()
+
+// 	// UNHEX(?) can convert user_id to binary(16)
+// 	sqlStr := "DELETE FROM suglider.user_info " +
+// 		"WHERE user_id=UNHEX(?) AND username=? AND mail=?"
+// 	result, err = DataBase.ExecContext(ctx, sqlStr, userID, userName, mail)
+// 	return result, err
+// }
 
 func GetPasswordByUserName(userName string) (userInfo UserInfo, err error) {
 	ctx, cancel := context.WithTimeout(context.Background(), dbTimeOut)

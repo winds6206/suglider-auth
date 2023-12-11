@@ -19,57 +19,6 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type userSignUp struct {
-	Mail        string  `json:"mail" binding:"required"`
-	Password    string  `json:"password" binding:"required"`
-	UserName    *string `json:"username"`
-	FirstName   *string `json:"first_name"`
-	LastName    *string `json:"last_name"`
-	PhoneNumber *string `json:"phone_number"`
-}
-
-type userDelete struct {
-	User_id  string `json:"user_id"`
-	Username string `json:"username" binding:"required"`
-	Mail     string `json:"mail" binding:"required"`
-}
-
-type userLogin struct {
-	Account  string `json:"account" binding:"required"`
-	Password string `json:"password" binding:"required"`
-}
-
-type userNameOperate struct {
-	UserName string `json:"username" binding:"required"`
-}
-
-type mailOperate struct {
-	Mail string `json:"mail" binding:"required"`
-}
-
-type resetPassword struct {
-	Mail        string `json:"mail" binding:"required"`
-	OldPassword string `json:"old_password" binding:"required"`
-	NewPassword string `json:"new_password" binding:"required"`
-}
-
-type setUpPassword struct {
-	Mail     string `json:"mail" binding:"required"`
-	Password string `json:"password" binding:"required"`
-}
-
-type updatePersonalInfo struct {
-	Mail        string  `json:"mail" binding:"required"`
-	UserName    *string `json:"username"`
-	FirstName   *string `json:"first_name"`
-	LastName    *string `json:"last_name"`
-	PhoneNumber *string `json:"phone_number"`
-	Address     *string `json:"address"`
-	Birthday    *string `json:"birthday"`
-	Sex         *string `json:"sex"`
-	BloodType   *string `json:"blood_type"`
-}
-
 // @Summary Sign Up User
 // @Description registry new user
 // @Tags users
@@ -218,13 +167,12 @@ func UserSignUp(c *gin.Context) {
 
 }
 
-// @Summary Delete User
-// @Description delete an existing user
+// @Summary Delete Account
+// @Description delete an existing account.
 // @Tags users
 // @Accept multipart/form-data
 // @Produce application/json
-// @Param username formData string false "User Name"
-// @Param mail formData string false "e-Mail"
+// @Param mail formData string false "Mail"
 // @Success 200 {string} string "Success"
 // @Failure 400 {string} string "Bad request"
 // @Failure 401 {string} string "Unauthorized"
@@ -232,7 +180,7 @@ func UserSignUp(c *gin.Context) {
 // @Failure 404 {string} string "Not found"
 // @Router /api/v1/user/delete [delete]
 func UserDelete(c *gin.Context) {
-	var request userDelete
+	var request mailOperate
 
 	// Check the parameter trasnfer from POST
 	err := c.ShouldBindJSON(&request)
@@ -241,47 +189,23 @@ func UserDelete(c *gin.Context) {
 		return
 	}
 
-	if request.User_id == "" {
-		result, err := mariadb.UserDelete(request.Username, request.Mail)
+	result, err := mariadb.UserDeleteByMail(request.Mail)
+	// First, check if error or not
+	if err != nil {
+		errorMessage := fmt.Sprintf("Delete user_info data failed: %v", err)
+		slog.Error(errorMessage)
 
-		// First, check if error or not
-		if err != nil {
-			errorMessage := fmt.Sprintf("Delete user_info data failed: %v", err)
-			slog.Error(errorMessage)
+		c.JSON(http.StatusInternalServerError, utils.ErrorResponse(c, 1002, err))
+		return
+	}
 
-			c.JSON(http.StatusInternalServerError, utils.ErrorResponse(c, 1002, err))
-			return
-		}
+	// Second, get affected row
+	rowsAffected, _ := result.RowsAffected()
 
-		// Second, get affected row
-		rowsAffected, _ := result.RowsAffected()
-
-		if rowsAffected == 0 {
-			c.JSON(http.StatusNotFound, utils.ErrorResponse(c, 1003))
-		} else if rowsAffected > 0 {
-			c.JSON(http.StatusOK, utils.SuccessResponse(c, 200, nil))
-		}
-	} else {
-
-		result, err := mariadb.UserDeleteByUUID(request.User_id, request.Username, request.Mail)
-
-		// First, check if error or not
-		if err != nil {
-			errorMessage := fmt.Sprintf("Delete user_info data failed: %v", err)
-			slog.Error(errorMessage)
-
-			c.JSON(http.StatusInternalServerError, utils.ErrorResponse(c, 1002, err))
-			return
-		}
-
-		// Second, get affected row
-		rowsAffected, _ := result.RowsAffected()
-
-		if rowsAffected == 0 {
-			c.JSON(http.StatusNotFound, utils.ErrorResponse(c, 1003))
-		} else if rowsAffected > 0 {
-			c.JSON(http.StatusOK, utils.SuccessResponse(c, 200, nil))
-		}
+	if rowsAffected == 0 {
+		c.JSON(http.StatusNotFound, utils.ErrorResponse(c, 1003))
+	} else if rowsAffected > 0 {
+		c.JSON(http.StatusOK, utils.SuccessResponse(c, 200, nil))
 	}
 }
 
@@ -290,7 +214,7 @@ func UserDelete(c *gin.Context) {
 // @Tags users
 // @Accept multipart/form-data
 // @Produce application/json
-// @Param username formData string false "User Name"
+// @Param account formData string false "Enter mail or username"
 // @Param password formData string false "Password"
 // @Success 200 {string} string "Success"
 // @Failure 400 {string} string "Bad request"
@@ -309,7 +233,7 @@ func UserLogin(c *gin.Context) {
 		return
 	}
 
-	// Check  password can't post space or empty string
+	// Check password can't post space or empty string
 	if strings.TrimSpace(request.Password) == "" || request.Password == "" {
 		c.JSON(http.StatusForbidden, utils.ErrorResponse(c, 1061, err))
 		return
@@ -687,7 +611,7 @@ func PasswordExtension(c *gin.Context) {
 // @Failure 403 {string} string "Forbidden"
 // @Failure 404 {string} string "Not found"
 // @Router /api/v1/user/check-username [get]
-func CheckUsername(c *gin.Context) {
+func CheckUserName(c *gin.Context) {
 	var request userNameOperate
 
 	// Check the parameter trasnfer from POST
