@@ -38,6 +38,10 @@ type mailOperate struct {
 	Mail string `json:"mail" binding:"required"`
 }
 
+type phoneNumberOperate struct {
+	PhoneNumber string `json:"phone_number" binding:"required"`
+}
+
 type resetPassword struct {
 	Mail        string `json:"mail" binding:"required"`
 	OldPassword string `json:"old_password" binding:"required"`
@@ -65,10 +69,23 @@ type passwordReset struct {
 	Password string `json:"password"`
 }
 
+// type rdsValeData struct {
+// 	Mail           string `json:"mail"`
+// 	AccountPassed  bool   `json:"account_passed"`
+// 	TotpEnabled    bool   `json:"totp_enabled"`
+// 	MailOTPEnabled bool   `json:"mail_otp_enabled"`
+// 	SmsOTPEnabled  bool   `json:"sms_otp_enabled"`
+// }
+
 type rdsValeData struct {
-	Mail           string `json:"mail"`
-	AccountPassed  bool   `json:"account_passed"`
-	TotpEnabled    bool   `json:"totp_enabled"`
-	MailOTPEnabled bool   `json:"mail_otp_enabled"`
-	SmsOTPEnabled  bool   `json:"sms_otp_enabled"`
+	Mail           string   `json:"mail"`
+	AccountPassed  bool     `json:"account_passed"`
+	MailOTPEnabled bool     `json:"mail_otp_enabled"`
+	SmsOTPEnabled  bool     `json:"sms_otp_enabled"`
+	TotpEnabled    bool     `json:"totp_enabled"`
+	UserName       UserName `json:"username"`
+}
+type UserName struct {
+	String string `json:"String"`
+	Valid  bool   `json:"Valid"`
 }

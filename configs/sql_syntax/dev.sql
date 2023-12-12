@@ -8,7 +8,7 @@ CREATE TABLE IF NOT EXISTS suglider.user_info (
     password VARCHAR(256),
     last_name VARCHAR(10),
     first_name VARCHAR(10),
-    phone_number VARCHAR(10) DEFAULT NULL,
+    phone_number VARCHAR(15) DEFAULT NULL,
     mail VARCHAR(256) NOT NULL,
     mail_verified INT UNSIGNED NOT NULL DEFAULT 0,
     mail_otp_enabled BOOL DEFAULT false,

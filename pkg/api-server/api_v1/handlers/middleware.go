@@ -85,6 +85,7 @@ func ValidateMailOTP() gin.HandlerFunc {
 		}
 
 		c.Set("mail", request.Mail)
+		c.Set("userName", userTwoFactorAuthData.UserName)
 		c.Next()
 	}
 }
@@ -143,6 +144,7 @@ func ValidateTOTP() gin.HandlerFunc {
 		}
 
 		c.Set("mail", request.Mail)
+		c.Set("userName", totpData.UserName)
 		c.Next()
 	}
 }
@@ -209,6 +211,7 @@ func LoginStatusCheck() gin.HandlerFunc {
 			}
 			c.JSON(http.StatusOK, utils.SuccessResponse(c, 200, map[string]interface{}{
 				"mail":             data.Mail,
+				"username":         data.UserName,
 				"account_passed":   data.AccountPassed,
 				"totp_enabled":     data.TotpEnabled,
 				"mail_otp_enabled": data.MailOTPEnabled,

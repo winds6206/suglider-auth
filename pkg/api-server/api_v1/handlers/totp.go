@@ -124,11 +124,12 @@ func TotpVerify(c *gin.Context) {
 func TotpValidate(c *gin.Context) {
 
 	mail, isMailExists := c.Get("mail")
+	userName, isUserNameExists := c.Get("userName")
 	Result, isTOTPVerifyExists := c.Get("totp_verify")
 
-	if !isMailExists || !isTOTPVerifyExists {
-		slog.Error("mail and totp_verify are not exists.")
-		c.JSON(http.StatusInternalServerError, utils.ErrorResponse(c, 1052, nil))
+	if !isMailExists || !isTOTPVerifyExists || !isUserNameExists {
+		slog.Error("mail, totp_verify or username are not exists.")
+		c.JSON(http.StatusInternalServerError, utils.ErrorResponse(c, 1071, nil))
 		return
 	}
 
@@ -142,11 +143,13 @@ func TotpValidate(c *gin.Context) {
 	if verifyResult {
 		c.JSON(http.StatusOK, utils.SuccessResponse(c, 200, map[string]interface{}{
 			"mail":        mail,
+			"username":    userName,
 			"totp_verify": true,
 		}))
 	} else {
 		c.JSON(http.StatusUnauthorized, utils.ErrorResponse(c, 1047, map[string]interface{}{
 			"mail":        mail,
+			"username":    userName,
 			"totp_verify": false,
 		}))
 	}
