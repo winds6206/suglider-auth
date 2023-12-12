@@ -319,6 +319,17 @@ func GetUserInfo(mail string) (userInfo UserInfo, err error) {
 	return userInfo, err
 }
 
+func GetUserInfoByUserName(userName string) (userInfo UserInfo, err error) {
+	ctx, cancel := context.WithTimeout(context.Background(), dbTimeOut)
+	defer cancel()
+
+	sqlStr := "SELECT mail " +
+		"FROM suglider.user_info " +
+		"WHERE user_info.username=?"
+	err = DataBase.GetContext(ctx, &userInfo, sqlStr, userName)
+	return userInfo, err
+}
+
 func GetTwoFactorAuthByUserName(userName string) (userTwoFactorAuthInfo UserTwoFactorAuthInfo, err error) {
 	ctx, cancel := context.WithTimeout(context.Background(), dbTimeOut)
 	defer cancel()

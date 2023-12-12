@@ -27,7 +27,7 @@ type userSignUp struct {
 
 type userLogin struct {
 	Account  string `json:"account" binding:"required"`
-	Password string `json:"password" binding:"required"`
+	Password string `json:"password"`
 }
 
 type userNameOperate struct {
@@ -63,4 +63,12 @@ type updatePersonalInfo struct {
 
 type passwordReset struct {
 	Password string `json:"password"`
+}
+
+type rdsValeData struct {
+	Mail           string `json:"mail"`
+	AccountPassed  bool   `json:"account_passed"`
+	TotpEnabled    bool   `json:"totp_enabled"`
+	MailOTPEnabled bool   `json:"mail_otp_enabled"`
+	SmsOTPEnabled  bool   `json:"sms_otp_enabled"`
 }

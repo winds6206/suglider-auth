@@ -10,7 +10,7 @@ func UserHandler(router *gin.RouterGroup) {
 
 	router.POST("/sign-up", handlers.UserSignUp)
 	router.DELETE("/delete", handlers.UserDelete)
-	router.POST("/login", handlers.UserLogin)
+	router.POST("/login", handlers.LoginStatusCheck(), handlers.UserLogin)
 	router.POST("/logout", handlers.UserLogout)
 	router.GET("/password-expire", handlers.PasswordExpire)
 	router.PATCH("/password-extension", handlers.PasswordExtension)
