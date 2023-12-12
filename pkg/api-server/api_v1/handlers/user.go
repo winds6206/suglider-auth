@@ -940,13 +940,13 @@ func CheckPhoneNumber(c *gin.Context) {
 
 	if count == 1 {
 		c.JSON(http.StatusOK, utils.SuccessResponse(c, 200, map[string]interface{}{
-			"mail":  request.PhoneNumber,
-			"exist": true,
+			"phone_number": request.PhoneNumber,
+			"exist":        true,
 		}))
 	} else {
 		c.JSON(http.StatusOK, utils.SuccessResponse(c, 200, map[string]interface{}{
-			"mail":  request.PhoneNumber,
-			"exist": false,
+			"phone_number": request.PhoneNumber,
+			"exist":        false,
 		}))
 	}
 
