@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"database/sql"
+	"encoding/json"
 	"fmt"
 	"log/slog"
 	"net/http"
@@ -9,6 +10,7 @@ import (
 	"suglider-auth/internal/redis"
 	"suglider-auth/internal/utils"
 	"suglider-auth/pkg/encrypt"
+	fmtv "suglider-auth/pkg/fmt_validator"
 	"suglider-auth/pkg/jwt"
 	"suglider-auth/pkg/session"
 	"suglider-auth/pkg/totp"
@@ -142,6 +144,79 @@ func ValidateTOTP() gin.HandlerFunc {
 
 		c.Set("mail", request.Mail)
 		c.Next()
+	}
+}
+
+func LoginStatusCheck() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		var request userLogin
+		var account string
+		var data rdsValeData
+
+		// Check the parameter trasnfer from POST
+		err := c.ShouldBindJSON(&request)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, utils.ErrorResponse(c, 1001, err))
+			c.Abort()
+			return
+		}
+
+		account = request.Account
+
+		// Check whether user input data is mail format or not.
+		mailValid := fmtv.MailValidator(account)
+
+		if !mailValid {
+
+			userInfo, err := mariadb.GetUserInfoByUserName(account)
+			if err != nil {
+				if err == sql.ErrNoRows {
+					c.JSON(http.StatusBadRequest, utils.ErrorResponse(c, 1048, err))
+					c.Abort()
+					return
+				}
+				c.JSON(http.StatusInternalServerError, utils.ErrorResponse(c, 1002, err))
+				c.Abort()
+				return
+			}
+			account = userInfo.Mail
+		}
+
+		// Check whether login status exists in redis or not.
+		value, errCode, err := redis.Get("login_status:" + account)
+
+		switch errCode {
+		// Key not exists
+		case 1043:
+
+			c.Set("mail", account)
+			c.Set("password", request.Password)
+			c.Next()
+
+		case 1044:
+			errorMessage := fmt.Sprintf("Redis GET data failed: %v", err)
+			slog.Error(errorMessage)
+			c.JSON(http.StatusInternalServerError, utils.ErrorResponse(c, errCode, err))
+			c.Abort()
+			return
+		// Key exists
+		case 0:
+			err := json.Unmarshal([]byte(value), &data)
+			if err != nil {
+				c.JSON(http.StatusInternalServerError, utils.ErrorResponse(c, 1063, err))
+				c.Abort()
+				return
+			}
+			c.JSON(http.StatusOK, utils.SuccessResponse(c, 200, map[string]interface{}{
+				"mail":             data.Mail,
+				"account_passed":   data.AccountPassed,
+				"totp_enabled":     data.TotpEnabled,
+				"mail_otp_enabled": data.MailOTPEnabled,
+				"sms_otp_enabled":  data.SmsOTPEnabled,
+			}))
+			c.Abort()
+			return
+		}
 	}
 }
 

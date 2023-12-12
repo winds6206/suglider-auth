@@ -187,7 +187,14 @@ func MailOTPSend(c *gin.Context) {
 
 	redisKey := encrypt.HashWithSHA(request.Mail, "sha1")
 
-	redis.Set("mail_otp:"+redisKey, code, redisTTL)
+	err = redis.Set("mail_otp:"+redisKey, code, redisTTL)
+
+	if err != nil {
+		errorMessage := fmt.Sprintf("Redis SET data failed.: %v", err)
+		slog.Error(errorMessage)
+		c.JSON(http.StatusInternalServerError, utils.ErrorResponse(c, 1042, err))
+		return
+	}
 
 	errSendMailOTP := smtp.SendMailOTP(c, user, userInfo.Mail, code)
 	if errSendMailOTP != nil {
