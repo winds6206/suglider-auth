@@ -21,6 +21,7 @@ func UserHandler(router *gin.RouterGroup) {
 	router.POST("/reset-password", handlers.RestUserPassword)
 	router.GET("/check-username", handlers.CheckUserName)
 	router.GET("/check-mail", handlers.CheckMail)
+	router.GET("/check-phone-number", handlers.CheckPhoneNumber)
 	router.PATCH("/change-password", handlers.ChangePassword)
 	router.PATCH("/setup-password", handlers.SetUpPassword)
 	router.PUT("/update-personal-info", handlers.UpdatePersonalInfo)

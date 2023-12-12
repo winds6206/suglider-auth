@@ -717,6 +717,42 @@ paths:
       summary: Mail Check
       tags:
       - users
+  /api/v1/user/check-phone-number:
+    get:
+      consumes:
+      - multipart/form-data
+      description: Check whether the phone number exists or not
+      parameters:
+      - description: Phone Number
+        in: formData
+        name: phone_number
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            type: string
+        "400":
+          description: Bad request
+          schema:
+            type: string
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+        "403":
+          description: Forbidden
+          schema:
+            type: string
+        "404":
+          description: Not found
+          schema:
+            type: string
+      summary: Phone Number Check
+      tags:
+      - users
   /api/v1/user/check-username:
     get:
       consumes:

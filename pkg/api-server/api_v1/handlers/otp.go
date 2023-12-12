@@ -219,10 +219,11 @@ func MailOTPSend(c *gin.Context) {
 // @Router /api/v1/user/mail/verify [get]
 func MailOTPVerify(c *gin.Context) {
 	mail, isMailExists := c.Get("mail")
+	userName, isUserNameExists := c.Get("userName")
 	Result, isMailOTPVerifyExists := c.Get("mail_otp_verify")
 
-	if !isMailExists || !isMailOTPVerifyExists {
-		slog.Error("mail and mail_otp_verify are not exists.")
+	if !isMailExists || !isMailOTPVerifyExists || !isUserNameExists {
+		slog.Error("mail, mail_otp_verify or username are not exists.")
 		c.JSON(http.StatusInternalServerError, utils.ErrorResponse(c, 1052, nil))
 		return
 	}
@@ -237,11 +238,13 @@ func MailOTPVerify(c *gin.Context) {
 	if verifyResult {
 		c.JSON(http.StatusOK, utils.SuccessResponse(c, 200, map[string]interface{}{
 			"mail":            mail,
+			"username":        userName,
 			"mail_otp_verify": true,
 		}))
 	} else {
 		c.JSON(http.StatusUnauthorized, utils.ErrorResponse(c, 1047, map[string]interface{}{
 			"mail":            mail,
+			"username":        userName,
 			"mail_otp_verify": false,
 		}))
 	}

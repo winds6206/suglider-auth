@@ -98,7 +98,7 @@ func GetPasswordByMail(mail string) (userInfo UserInfo, err error) {
 	ctx, cancel := context.WithTimeout(context.Background(), dbTimeOut)
 	defer cancel()
 
-	err = DataBase.GetContext(ctx, &userInfo, "SELECT mail, password FROM suglider.user_info WHERE mail=?", mail)
+	err = DataBase.GetContext(ctx, &userInfo, "SELECT username, mail, password FROM suglider.user_info WHERE mail=?", mail)
 
 	return userInfo, err
 }
@@ -215,7 +215,7 @@ func TotpUserData(mail string) (totpUserInfo TotpUserInfo, err error) {
 	ctx, cancel := context.WithTimeout(context.Background(), dbTimeOut)
 	defer cancel()
 
-	sqlStr := "SELECT totp.user_id, totp.totp_enabled, totp_verified, totp.totp_secret, totp_url " +
+	sqlStr := "SELECT user_info.username, totp.user_id, totp.totp_enabled, totp_verified, totp.totp_secret, totp_url " +
 		"FROM suglider.user_info " +
 		"INNER JOIN suglider.totp ON user_info.user_id = totp.user_id " +
 		"WHERE user_info.mail=?"
@@ -397,4 +397,14 @@ func UpdatePersonalInfoByMail(mail string, userName, lastName, firstName, phoneN
 	}
 
 	return nil
+}
+
+func CheckPhoneNumberExists(phoneNumber string) (rowCount int, err error) {
+	var count int
+	ctx, cancel := context.WithTimeout(context.Background(), dbTimeOut)
+	defer cancel()
+
+	sqlStr := "SELECT COUNT(*) FROM suglider.user_info WHERE phone_number=?"
+	err = DataBase.GetContext(ctx, &count, sqlStr, phoneNumber)
+	return count, err
 }

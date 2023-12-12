@@ -12,11 +12,12 @@ type UserInfo struct {
 }
 
 type TotpUserInfo struct {
-	UserID       string `db:"user_id"`
-	TotpEnabled  bool   `db:"totp_enabled"`
-	TotpVerified bool   `db:"totp_verified"`
-	TotpSecret   string `db:"totp_secret"`
-	TotpURL      string `db:"totp_url"`
+	UserName     sql.NullString `db:"username"`
+	UserID       string         `db:"user_id"`
+	TotpEnabled  bool           `db:"totp_enabled"`
+	TotpVerified bool           `db:"totp_verified"`
+	TotpSecret   string         `db:"totp_secret"`
+	TotpURL      string         `db:"totp_url"`
 }
 
 type UserTwoFactorAuthInfo struct {
