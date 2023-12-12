@@ -367,22 +367,25 @@ func UserLogout(c *gin.Context) {
 	// Clear JWT
 	c.SetCookie("token", "", -1, "/", "localhost", false, true)
 
-	// Clear session
+	// Read session
 	sid, _, errCode, err := session.ReadSession(c)
 
 	switch errCode {
+	// Redis key does not exist
 	case 1043:
-		errorMessage := fmt.Sprintf("Redis key does not exist: %v", err)
-		slog.Error(errorMessage)
-		c.JSON(http.StatusInternalServerError, utils.ErrorResponse(c, errCode, err))
+		c.JSON(http.StatusOK, utils.SuccessResponse(c, 200, map[string]interface{}{
+			"msg": "Logout successful!",
+		}))
 		return
 
+	// Redis GET data failed
 	case 1044:
 		errorMessage := fmt.Sprintf("Redis GET data failed: %v", err)
 		slog.Error(errorMessage)
 		c.JSON(http.StatusInternalServerError, utils.ErrorResponse(c, errCode, err))
 		return
 
+	// The json data unmarshal failed
 	case 1063:
 		errorMessage := fmt.Sprintf("The json data unmarshal failed: %v", err)
 		slog.Error(errorMessage)
@@ -390,20 +393,7 @@ func UserLogout(c *gin.Context) {
 		return
 	}
 
-	// Check session exist or not
-	ok, err := session.CheckSession(c)
-	if err != nil {
-		errorMessage := fmt.Sprintf("Checking whether key exist or not happen something wrong: %v", err)
-		slog.Error(errorMessage)
-
-		c.JSON(http.StatusInternalServerError, utils.ErrorResponse(c, 1039, err))
-		return
-	}
-	if !ok {
-		slog.Info(fmt.Sprintf("session ID %s doesn't exsit in redis", sid))
-		return
-	}
-
+	// Clear session
 	err = session.DeleteSession(sid)
 	if err != nil {
 		errorMessage := fmt.Sprintf("Delete key(sid:%s) failed: %v", sid, err)
@@ -412,6 +402,11 @@ func UserLogout(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, utils.ErrorResponse(c, 1040, err))
 		return
 	}
+
+	c.JSON(http.StatusOK, utils.SuccessResponse(c, 200, map[string]interface{}{
+		"msg": "Logout successful!",
+	}))
+
 }
 
 // @Summary User Refresh JWT
