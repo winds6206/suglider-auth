@@ -126,13 +126,13 @@ func OAuthGoogleCallback(c *gin.Context) {
 		}
 
 		// These conditions indicate that user have enabled the 2FA feature.
-		if userTwoFactorAuthData.TotpEnabled.Valid &&
-			(userTwoFactorAuthData.TotpEnabled.Bool ||
-				userTwoFactorAuthData.SmsOTPEnabled ||
-				userTwoFactorAuthData.MailOTPEnabled) {
+		if userTwoFactorAuthData.TotpEnabled.Bool ||
+			userTwoFactorAuthData.SmsOTPEnabled ||
+			userTwoFactorAuthData.MailOTPEnabled {
 
 			c.JSON(http.StatusOK, utils.SuccessResponse(c, 200, map[string]interface{}{
 				"mail":             oAuthResponse.Email,
+				"username":         userTwoFactorAuthData.UserName,
 				"totp_enabled":     userTwoFactorAuthData.TotpEnabled.Bool,
 				"mail_otp_enabled": userTwoFactorAuthData.MailOTPEnabled,
 				"sms_otp_enabled":  userTwoFactorAuthData.SmsOTPEnabled,
