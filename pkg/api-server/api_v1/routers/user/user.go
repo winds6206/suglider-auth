@@ -25,4 +25,5 @@ func UserHandler(router *gin.RouterGroup) {
 	router.PATCH("/change-password", handlers.ChangePassword)
 	router.PATCH("/setup-password", handlers.SetUpPassword)
 	router.PUT("/update-personal-info", handlers.UpdatePersonalInfo)
+	router.GET("/check-auth-valid", handlers.CheckAuthValid)
 }

@@ -951,3 +951,55 @@ func CheckPhoneNumber(c *gin.Context) {
 	}
 
 }
+
+// @Summary Check Authentication Valid
+// @Description Check whether JWT and session are valid or not.
+// @Tags users
+// @Accept multipart/form-data
+// @Produce application/json
+// @Success 200 {string} string "Success"
+// @Failure 400 {string} string "Bad request"
+// @Failure 401 {string} string "Unauthorized"
+// @Failure 403 {string} string "Forbidden"
+// @Failure 404 {string} string "Not found"
+// @Router /api/v1/user/check-auth-valid [get]
+func CheckAuthValid(c *gin.Context) {
+
+	var jwtValid bool
+	jwtValid = true
+
+	// Check session valid(exist) or not
+	isExists, err := session.CheckSession(c)
+
+	if err != nil {
+		errorMessage := fmt.Sprintf("Checking whether key exist or not happen something wrong: %v", err)
+		slog.Error(errorMessage)
+		c.JSON(http.StatusInternalServerError, utils.ErrorResponse(c, 1039, err))
+		return
+	}
+
+	// Get client JWT
+	cookie, err := c.Cookie("token")
+
+	if err != nil {
+		errorMessage := fmt.Sprintf("Get cookie JWT key failed: %v", err)
+		slog.Error(errorMessage)
+		jwtValid = false
+	}
+
+	claims, errCode, errParseJWT := jwt.ParseJWT(cookie)
+
+	if errParseJWT != nil {
+		if errCode == 1015 || errCode == 1016 || errCode == 1017 {
+			jwtValid = false
+		}
+	} else if time.Now().Unix() > claims.ExpiresAt.Unix() {
+		jwtValid = false
+	}
+
+	c.JSON(http.StatusOK, utils.SuccessResponse(c, 200, map[string]interface{}{
+		"session_valid": isExists,
+		"jwt_valid":     jwtValid,
+	}))
+
+}
