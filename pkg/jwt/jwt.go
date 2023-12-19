@@ -67,7 +67,6 @@ func ParseJWT(token string) (*jwtData, int64, error) {
 		errorMessage := fmt.Sprintf("Parse JWT claim data failed: %v", err)
 		slog.Error(errorMessage)
 		errCode = 1016
-
 		return nil, errCode, err
 	}
 	if !tkn.Valid {

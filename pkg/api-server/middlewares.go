@@ -80,6 +80,7 @@ var apiWhileList = []string{
 	"/api/v1/oauth/google/login",
 	"/api/v1/oauth/google/sign-up",
 	"/api/v1/oauth/google/callback",
+	"/api/v1/user/check-auth-valid",
 }
 
 func checkAPIWhileList(c *gin.Context) bool {
@@ -171,7 +172,7 @@ func CheckUserJWT() gin.HandlerFunc {
 				return
 
 			case 1016:
-				c.JSON(http.StatusBadRequest, utils.ErrorResponse(c, errCode, err))
+				c.JSON(http.StatusInternalServerError, utils.ErrorResponse(c, errCode, err))
 				c.Abort()
 				return
 

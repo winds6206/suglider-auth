@@ -69,14 +69,6 @@ type passwordReset struct {
 	Password string `json:"password"`
 }
 
-// type rdsValeData struct {
-// 	Mail           string `json:"mail"`
-// 	AccountPassed  bool   `json:"account_passed"`
-// 	TotpEnabled    bool   `json:"totp_enabled"`
-// 	MailOTPEnabled bool   `json:"mail_otp_enabled"`
-// 	SmsOTPEnabled  bool   `json:"sms_otp_enabled"`
-// }
-
 type rdsValeData struct {
 	Mail           string   `json:"mail"`
 	AccountPassed  bool     `json:"account_passed"`
@@ -88,4 +80,10 @@ type rdsValeData struct {
 type UserName struct {
 	String string `json:"String"`
 	Valid  bool   `json:"Valid"`
+}
+
+type checkAuthValid struct {
+	Mail      string `json:"mail" binding:"required"`
+	SessionID string `json:"session_id" binding:"required"`
+	JWTToken  string `json:"jwt_token" binding:"required"`
 }

@@ -3,7 +3,6 @@ package session
 import (
 	"encoding/json"
 	"fmt"
-	"log/slog"
 	"suglider-auth/configs"
 	"suglider-auth/internal/redis"
 	"suglider-auth/pkg/encrypt"
@@ -63,8 +62,6 @@ func CheckSession(c *gin.Context) (bool, error) {
 	// Exists() function will return bool
 	isExists, err := redis.Exists(sessionKey)
 	if err != nil {
-		errorMessage := fmt.Sprintf("Checking whether key exist or not happen something wrong: %v", err)
-		slog.Error(errorMessage)
 		return false, err
 	}
 

@@ -681,6 +681,37 @@ paths:
       summary: Change Password
       tags:
       - users
+  /api/v1/user/check-auth-valid:
+    get:
+      consumes:
+      - multipart/form-data
+      description: Check whether JWT and session are valid or not.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            type: string
+        "400":
+          description: Bad request
+          schema:
+            type: string
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+        "403":
+          description: Forbidden
+          schema:
+            type: string
+        "404":
+          description: Not found
+          schema:
+            type: string
+      summary: Check Authentication Valid
+      tags:
+      - users
   /api/v1/user/check-mail:
     get:
       consumes:
