@@ -86,13 +86,14 @@ func (cec *CasbinEnforcerConfig) InitPolicies() error {
 		"/api/v1/user/check-username",
 		"/api/v1/user/check-mail",
 		"/api/v1/user/check-phone-number",
+		"/api/v1/user/check-auth-valid",
+		"/api/v1/user/check-login-status",
 		"/api/v1/totp/validate",
 		"/api/v1/otp/mail/verify",
 		"/api/v1/otp/mail/send",
 		"/api/v1/oauth/google/login",
 		"/api/v1/oauth/google/sign-up",
 		"/api/v1/oauth/google/callback",
-		"/api/v1/user/check-auth-valid",
 	}
 	for _, item := range anonymousPolicies {
 		if ok, err := cec.Enforcer.Enforcer.AddPolicy("anonymous", item, "GET"); !ok {

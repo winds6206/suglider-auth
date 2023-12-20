@@ -712,6 +712,42 @@ paths:
       summary: Check Authentication Valid
       tags:
       - users
+  /api/v1/user/check-login-status:
+    get:
+      consumes:
+      - multipart/form-data
+      description: Check user login status
+      parameters:
+      - description: Mail
+        in: formData
+        name: mail
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            type: string
+        "400":
+          description: Bad request
+          schema:
+            type: string
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+        "403":
+          description: Forbidden
+          schema:
+            type: string
+        "404":
+          description: Not found
+          schema:
+            type: string
+      summary: Check Login Status
+      tags:
+      - users
   /api/v1/user/check-mail:
     get:
       consumes:

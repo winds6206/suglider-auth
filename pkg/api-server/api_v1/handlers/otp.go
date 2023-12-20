@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"database/sql"
+	"encoding/json"
 	"fmt"
 	"log/slog"
 	"net/http"
@@ -218,9 +219,14 @@ func MailOTPSend(c *gin.Context) {
 // @Failure 404 {string} string "Not found"
 // @Router /api/v1/user/mail/verify [get]
 func MailOTPVerify(c *gin.Context) {
+	var data rdsValeData
+
 	mail, isMailExists := c.Get("mail")
 	userName, isUserNameExists := c.Get("userName")
 	Result, isMailOTPVerifyExists := c.Get("mail_otp_verify")
+
+	// Convert interface to string
+	strMail := fmt.Sprintf("%v", mail)
 
 	if !isMailExists || !isMailOTPVerifyExists || !isUserNameExists {
 		slog.Error("mail, mail_otp_verify or username are not exists.")
@@ -236,14 +242,63 @@ func MailOTPVerify(c *gin.Context) {
 	}
 
 	if verifyResult {
+		// Check whether login status exists in redis or not.
+		value, errCode, err := redis.Get("login_status:" + strMail)
+
+		switch errCode {
+		// Key not exists
+		case 1043:
+			errorMessage := fmt.Sprintf("Redis key does not exist: %v", err)
+			slog.Error(errorMessage)
+			c.JSON(http.StatusInternalServerError, utils.ErrorResponse(c, errCode, err))
+			return
+		case 1044:
+			errorMessage := fmt.Sprintf("Redis GET data failed: %v", err)
+			slog.Error(errorMessage)
+			c.JSON(http.StatusInternalServerError, utils.ErrorResponse(c, errCode, err))
+			return
+		// Key exists
+		case 0:
+			err := json.Unmarshal([]byte(value), &data)
+			if err != nil {
+				c.JSON(http.StatusInternalServerError, utils.ErrorResponse(c, 1063, err))
+				return
+			}
+
+			// Change status
+			data.MailOTPPassed = true
+
+			jsonData, err := json.Marshal(data)
+			if err != nil {
+				c.JSON(http.StatusInternalServerError, utils.ErrorResponse(c, 1063, err))
+				return
+			}
+
+			redisTTL, _, err := time_convert.ConvertTimeFormat("15m")
+			if err != nil {
+				c.JSON(http.StatusInternalServerError, utils.ErrorResponse(c, 1069, err))
+				return
+			}
+
+			// Set login_status into redis
+			err = redis.Set("login_status:"+strMail, string(jsonData), redisTTL)
+
+			if err != nil {
+				errorMessage := fmt.Sprintf("Redis SET data failed.: %v", err)
+				slog.Error(errorMessage)
+				c.JSON(http.StatusInternalServerError, utils.ErrorResponse(c, 1042, err))
+				return
+			}
+		}
+
 		c.JSON(http.StatusOK, utils.SuccessResponse(c, 200, map[string]interface{}{
-			"mail":            mail,
+			"mail":            strMail,
 			"username":        userName,
 			"mail_otp_verify": true,
 		}))
 	} else {
 		c.JSON(http.StatusUnauthorized, utils.ErrorResponse(c, 1047, map[string]interface{}{
-			"mail":            mail,
+			"mail":            strMail,
 			"username":        userName,
 			"mail_otp_verify": false,
 		}))
