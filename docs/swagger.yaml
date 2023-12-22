@@ -937,6 +937,11 @@ paths:
       consumes:
       - multipart/form-data
       description: user logout
+      parameters:
+      - description: Mail
+        in: formData
+        name: mail
+        type: string
       produces:
       - application/json
       responses:

@@ -356,6 +356,7 @@ func UserLogin(c *gin.Context) {
 // @Tags users
 // @Accept multipart/form-data
 // @Produce application/json
+// @Param mail formData string false "Mail"
 // @Success 200 {string} string "Success"
 // @Failure 400 {string} string "Bad request"
 // @Failure 401 {string} string "Unauthorized"
@@ -363,6 +364,25 @@ func UserLogin(c *gin.Context) {
 // @Failure 404 {string} string "Not found"
 // @Router /api/v1/user/logout [post]
 func UserLogout(c *gin.Context) {
+
+	var request mailOperate
+
+	// Check the parameter trasnfer from POST
+	err := c.ShouldBindJSON(&request)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, utils.ErrorResponse(c, 1001, err))
+		return
+	}
+
+	redisKey := "login_status:" + request.Mail
+
+	err = redis.Delete("login_status:" + request.Mail)
+	if err != nil {
+		errorMessage := fmt.Sprintf("Delete key(%s) failed: %v", redisKey, err)
+		slog.Error(errorMessage)
+		c.JSON(http.StatusInternalServerError, utils.ErrorResponse(c, 1234, err))
+		return
+	}
 
 	// Clear JWT
 	c.SetCookie("token", "", -1, "/", "localhost", false, true)
