@@ -72,6 +72,9 @@ type passwordReset struct {
 type rdsValeData struct {
 	Mail           string   `json:"mail"`
 	AccountPassed  bool     `json:"account_passed"`
+	MailOTPPassed  bool     `json:"mail_otp_passed"`
+	SmsOTPPassed   bool     `json:"sms_otp_passed"`
+	TotpPassed     bool     `json:"totp_passed"`
 	MailOTPEnabled bool     `json:"mail_otp_enabled"`
 	SmsOTPEnabled  bool     `json:"sms_otp_enabled"`
 	TotpEnabled    bool     `json:"totp_enabled"`

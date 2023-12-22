@@ -274,6 +274,9 @@ func UserLogin(c *gin.Context) {
 					Mail:           userInfo.Mail,
 					UserName:       *userNameData,
 					AccountPassed:  true,
+					MailOTPPassed:  false,
+					SmsOTPPassed:   false,
+					TotpPassed:     false,
 					TotpEnabled:    userTwoFactorAuthData.TotpEnabled.Bool,
 					MailOTPEnabled: userTwoFactorAuthData.MailOTPEnabled,
 					SmsOTPEnabled:  userTwoFactorAuthData.SmsOTPEnabled,
@@ -319,10 +322,52 @@ func UserLogin(c *gin.Context) {
 				if !okSetJWT {
 					return
 				}
+				// Store value into struct
+				userNameData := &UserName{
+					String: userInfo.Username.String,
+					Valid:  userInfo.Username.Valid,
+				}
+
+				rdsValue := &rdsValeData{
+					Mail:           userInfo.Mail,
+					UserName:       *userNameData,
+					AccountPassed:  true,
+					MailOTPPassed:  false,
+					SmsOTPPassed:   false,
+					TotpPassed:     false,
+					TotpEnabled:    userTwoFactorAuthData.TotpEnabled.Bool,
+					MailOTPEnabled: userTwoFactorAuthData.MailOTPEnabled,
+					SmsOTPEnabled:  userTwoFactorAuthData.SmsOTPEnabled,
+				}
+
+				jsonData, err := json.Marshal(rdsValue)
+				if err != nil {
+					c.JSON(http.StatusInternalServerError, utils.ErrorResponse(c, 1063, err))
+					return
+				}
+
+				redisTTL, _, err := time_convert.ConvertTimeFormat("15m")
+				if err != nil {
+					c.JSON(http.StatusInternalServerError, utils.ErrorResponse(c, 1069, err))
+					return
+				}
+
+				// Set login_status into redis
+				err = redis.Set("login_status:"+userInfo.Mail, string(jsonData), redisTTL)
+
+				if err != nil {
+					errorMessage := fmt.Sprintf("Redis SET data failed.: %v", err)
+					slog.Error(errorMessage)
+					c.JSON(http.StatusInternalServerError, utils.ErrorResponse(c, 1042, err))
+					return
+				}
 
 				c.JSON(http.StatusOK, utils.SuccessResponse(c, 200, map[string]interface{}{
-					"mail":     userInfo.Mail,
-					"username": userInfo.Username,
+					"mail":             userInfo.Mail,
+					"username":         userInfo.Username,
+					"totp_enabled":     userTwoFactorAuthData.TotpEnabled.Bool,
+					"mail_otp_enabled": userTwoFactorAuthData.MailOTPEnabled,
+					"sms_otp_enabled":  userTwoFactorAuthData.SmsOTPEnabled,
 				}))
 			}
 			// Password is not correct.
@@ -1001,5 +1046,67 @@ func CheckAuthValid(c *gin.Context) {
 		"session_valid": isExists,
 		"jwt_valid":     jwtValid,
 	}))
+
+}
+
+// @Summary Check Login Status
+// @Description Check user login status
+// @Tags users
+// @Accept multipart/form-data
+// @Produce application/json
+// @Param mail formData string false "Mail"
+// @Success 200 {string} string "Success"
+// @Failure 400 {string} string "Bad request"
+// @Failure 401 {string} string "Unauthorized"
+// @Failure 403 {string} string "Forbidden"
+// @Failure 404 {string} string "Not found"
+// @Router /api/v1/user/check-login-status [get]
+func CheckLoginStatus(c *gin.Context) {
+	var data rdsValeData
+	var request mailOperate
+
+	// Check the parameter trasnfer from POST
+	err := c.ShouldBindJSON(&request)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, utils.ErrorResponse(c, 1001, err))
+		return
+	}
+
+	// Check whether login status exists in redis or not.
+	value, errCode, err := redis.Get("login_status:" + request.Mail)
+
+	switch errCode {
+	// Key not exists
+	case 1043:
+		errorMessage := fmt.Sprintf("Redis key does not exist: %v", err)
+		slog.Error(errorMessage)
+		c.JSON(http.StatusInternalServerError, utils.ErrorResponse(c, errCode, err))
+		return
+	case 1044:
+		errorMessage := fmt.Sprintf("Redis GET data failed: %v", err)
+		slog.Error(errorMessage)
+		c.JSON(http.StatusInternalServerError, utils.ErrorResponse(c, errCode, err))
+		return
+	// Key exists
+	case 0:
+		err := json.Unmarshal([]byte(value), &data)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, utils.ErrorResponse(c, 1063, err))
+			return
+		}
+
+		c.JSON(http.StatusOK, utils.SuccessResponse(c, 200, map[string]interface{}{
+			"mail":             data.Mail,
+			"username":         data.UserName,
+			"account_passed":   data.AccountPassed,
+			"mail_otp_passed":  data.MailOTPPassed,
+			"sms_otp_passed":   data.SmsOTPPassed,
+			"totp_passed":      data.TotpPassed,
+			"totp_enabled":     data.TotpEnabled,
+			"mail_otp_enabled": data.MailOTPEnabled,
+			"sms_otp_enabled":  data.SmsOTPEnabled,
+		}))
+
+	}
 
 }
