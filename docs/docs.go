@@ -1488,6 +1488,14 @@ const docTemplate = `{
                     "users"
                 ],
                 "summary": "User Logout",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Mail",
+                        "name": "mail",
+                        "in": "formData"
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "Success",
