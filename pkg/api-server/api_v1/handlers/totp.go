@@ -49,13 +49,14 @@ func TotpGenerate(c *gin.Context) {
 	}
 
 	// Generate TOTP QRcode
-	totpInfo, imageData, errCode, err := totp.TotpGernate(request.Mail, userIDInfo.UserID)
+	// totpInfo, imageData, errCode, err := totp.TotpGernate(request.Mail, userIDInfo.UserID)
+	totpInfo, _, errCode, err := totp.TotpGernate(request.Mail, userIDInfo.UserID)
 	if errCode != 0 {
 		c.JSON(http.StatusInternalServerError, utils.ErrorResponse(c, errCode, err))
 	}
-	c.Header("Content-Type", "image/png")
+	// c.Header("Content-Type", "image/png")
 	c.JSON(http.StatusOK, utils.SuccessResponse(c, 200, totpInfo))
-	c.Data(http.StatusOK, "image/png", imageData)
+	// c.Data(http.StatusOK, "image/png", imageData)
 }
 
 // @Summary Verify TOTP
@@ -174,7 +175,7 @@ func TotpValidate(c *gin.Context) {
 			}
 
 			// Change status
-			data.MailOTPPassed = true
+			data.TotpPassed = true
 
 			jsonData, err := json.Marshal(data)
 			if err != nil {
