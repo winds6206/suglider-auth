@@ -28,7 +28,7 @@ import (
 // @Failure 401 {string} string "Unauthorized"
 // @Failure 403 {string} string "Forbidden"
 // @Failure 404 {string} string "Not found"
-// @Router /api/v1/user/mail/enable [put]
+// @Router /api/v1/otp/mail/enable [put]
 func MailOTPEnable(c *gin.Context) {
 	var request mailOperate
 
@@ -82,7 +82,7 @@ func MailOTPEnable(c *gin.Context) {
 // @Failure 401 {string} string "Unauthorized"
 // @Failure 403 {string} string "Forbidden"
 // @Failure 404 {string} string "Not found"
-// @Router /api/v1/user/mail/disable [put]
+// @Router /api/v1/otp/mail/disable [put]
 func MailOTPDisable(c *gin.Context) {
 	var request mailOperate
 
@@ -137,7 +137,7 @@ func MailOTPDisable(c *gin.Context) {
 // @Failure 401 {string} string "Unauthorized"
 // @Failure 403 {string} string "Forbidden"
 // @Failure 404 {string} string "Not found"
-// @Router /api/v1/user/mail/send [post]
+// @Router /api/v1/otp/mail/send [post]
 func MailOTPSend(c *gin.Context) {
 	var request mailOperate
 	var user string
@@ -217,7 +217,7 @@ func MailOTPSend(c *gin.Context) {
 // @Failure 401 {string} string "Unauthorized"
 // @Failure 403 {string} string "Forbidden"
 // @Failure 404 {string} string "Not found"
-// @Router /api/v1/user/mail/verify [get]
+// @Router /api/v1/otp/mail/verify [get]
 func MailOTPVerify(c *gin.Context) {
 	var data rdsValeData
 
