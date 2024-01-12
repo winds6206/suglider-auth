@@ -1,7 +1,7 @@
 {
     "_type": "export",
     "__export_format": 4,
-    "__export_date": "2023-12-04T06:16:12.888Z",
+    "__export_date": "2024-01-11T07:14:12.329Z",
     "__export_source": "insomnia.desktop.app:v0.2.3-a",
     "resources":
     [
@@ -65,7 +65,7 @@
         {
             "_id": "req_ca56700a5f4a47f080cc80688593a051",
             "parentId": "fld_3c44bf8d52564f7b99df687223172f31",
-            "modified": 1700115105490,
+            "modified": 1704957098161,
             "created": 1699953954442,
             "url": "{{ _.scheme }}://{{ _.domain }}:{{ _.port }}{{ _.path_prefix }}{{ _.subpath_prefix }}/sign-up",
             "name": "SignUp",
@@ -74,7 +74,7 @@
             "body":
             {
                 "mimeType": "application/json",
-                "text": "{\n\t\"username\": \"tony\",\n\t\"password\": \"Aa123456!\",\n\t\"comfirm_pwd\": \"Aa123456!\",\n\t\"mail\": \"winds6206@gmail.com\",\n\t\"address\": \"none\"\n}"
+                "text": "{\n\t\"mail\":     \"\",\n\t\"password\": \"\",\n\t\"usernmae\": \"\",\n\t\"phone_number\": \"+886972777999\"\n}"
             },
             "parameters":
             [],
@@ -127,7 +127,7 @@
         {
             "_id": "req_f761ed7277834b35bd7741fc0d3e03bd",
             "parentId": "fld_3c44bf8d52564f7b99df687223172f31",
-            "modified": 1700115108661,
+            "modified": 1704957090297,
             "created": 1699954041264,
             "url": "{{ _.scheme }}://{{ _.domain }}:{{ _.port }}{{ _.path_prefix }}{{ _.subpath_prefix }}/login",
             "name": "Login",
@@ -136,7 +136,7 @@
             "body":
             {
                 "mimeType": "application/json",
-                "text": "{\n\t\"username\": \"tony\",\n\t\"password\": \"Aa123456!\"\n}"
+                "text": "{\n\t\"account\": \"\",\n\t\"password\": \"\"\n}"
             },
             "parameters":
             [],
@@ -168,7 +168,7 @@
         {
             "_id": "req_ef34180ccabb471fb5c27ff682273ebf",
             "parentId": "fld_3c44bf8d52564f7b99df687223172f31",
-            "modified": 1699954146008,
+            "modified": 1704957106521,
             "created": 1699954114169,
             "url": "{{ _.scheme }}://{{ _.domain }}:{{ _.port }}{{ _.path_prefix }}{{ _.subpath_prefix }}/logout",
             "name": "Logout",
@@ -177,7 +177,7 @@
             "body":
             {
                 "mimeType": "application/json",
-                "text": "{\n\t\"username\": \"tony\"\n}"
+                "text": "{\n\t\"mail\": \"\"\n}"
             },
             "parameters":
             [],
@@ -207,207 +207,9 @@
             "_type": "request"
         },
         {
-            "_id": "req_3dea8ec82a8943fdab5976d2b5432a07",
-            "parentId": "fld_3c44bf8d52564f7b99df687223172f31",
-            "modified": 1699954269240,
-            "created": 1699954237666,
-            "url": "{{ _.scheme }}://{{ _.domain }}:{{ _.port }}{{ _.path_prefix }}{{ _.subpath_prefix }}/refresh",
-            "name": "Refresh JWT",
-            "description": "",
-            "method": "POST",
-            "body":
-            {},
-            "parameters":
-            [],
-            "headers":
-            [
-                {
-                    "name": "User-Agent",
-                    "value": "insomnium/0.2.3-a"
-                }
-            ],
-            "authentication":
-            {},
-            "metaSortKey": -1699953961107,
-            "isPrivate": false,
-            "settingStoreCookies": true,
-            "settingSendCookies": true,
-            "settingDisableRenderRequestBody": false,
-            "settingEncodeUrl": true,
-            "settingRebuildPath": true,
-            "settingFollowRedirects": "global",
-            "segmentParams":
-            [],
-            "_type": "request"
-        },
-        {
-            "_id": "req_6eb50698f08b4ce49460de9c41ae5c3a",
-            "parentId": "fld_3c44bf8d52564f7b99df687223172f31",
-            "modified": 1701670251044,
-            "created": 1701670201409,
-            "url": "{{ _.scheme }}://{{ _.domain }}:{{ _.port }}{{ _.path_prefix }}{{ _.subpath_prefix }}/mail-disable",
-            "name": "Mail OTP Disable",
-            "description": "",
-            "method": "POST",
-            "body":
-            {
-                "mimeType": "application/json",
-                "text": "{\n\t\"mail\": \"jill@nevermind.np\"\n}"
-            },
-            "parameters":
-            [],
-            "headers":
-            [
-                {
-                    "name": "Content-Type",
-                    "value": "application/json"
-                },
-                {
-                    "name": "User-Agent",
-                    "value": "insomnium/0.2.3-a"
-                }
-            ],
-            "authentication":
-            {},
-            "metaSortKey": -1699953950270,
-            "isPrivate": false,
-            "settingStoreCookies": true,
-            "settingSendCookies": true,
-            "settingDisableRenderRequestBody": false,
-            "settingEncodeUrl": true,
-            "settingRebuildPath": true,
-            "settingFollowRedirects": "global",
-            "segmentParams":
-            [],
-            "_type": "request"
-        },
-        {
-            "_id": "req_53d08ff73aa945a08102a9094c5269da",
-            "parentId": "fld_3c44bf8d52564f7b99df687223172f31",
-            "modified": 1701670275001,
-            "created": 1701670271240,
-            "url": "{{ _.scheme }}://{{ _.domain }}:{{ _.port }}{{ _.path_prefix }}{{ _.subpath_prefix }}/mail-enable",
-            "name": "Mail OTP Enable",
-            "description": "",
-            "method": "POST",
-            "body":
-            {
-                "mimeType": "application/json",
-                "text": "{\n\t\"mail\": \"jill@nevermind.np\"\n}"
-            },
-            "parameters":
-            [],
-            "headers":
-            [
-                {
-                    "name": "Content-Type",
-                    "value": "application/json"
-                },
-                {
-                    "name": "User-Agent",
-                    "value": "insomnium/0.2.3-a"
-                }
-            ],
-            "authentication":
-            {},
-            "metaSortKey": -1699953944851.5,
-            "isPrivate": false,
-            "settingStoreCookies": true,
-            "settingSendCookies": true,
-            "settingDisableRenderRequestBody": false,
-            "settingEncodeUrl": true,
-            "settingRebuildPath": true,
-            "settingFollowRedirects": "global",
-            "segmentParams":
-            [],
-            "_type": "request"
-        },
-        {
-            "_id": "req_f154a4e2e63545edbf4408434efa355c",
-            "parentId": "fld_3c44bf8d52564f7b99df687223172f31",
-            "modified": 1701670317053,
-            "created": 1701670310120,
-            "url": "{{ _.scheme }}://{{ _.domain }}:{{ _.port }}{{ _.path_prefix }}{{ _.subpath_prefix }}/mail-send",
-            "name": "Mail OTP Send",
-            "description": "",
-            "method": "POST",
-            "body":
-            {
-                "mimeType": "application/json",
-                "text": "{\n\t\"mail\": \"jill@nevermind.np\"\n}"
-            },
-            "parameters":
-            [],
-            "headers":
-            [
-                {
-                    "name": "Content-Type",
-                    "value": "application/json"
-                },
-                {
-                    "name": "User-Agent",
-                    "value": "insomnium/0.2.3-a"
-                }
-            ],
-            "authentication":
-            {},
-            "metaSortKey": -1699953942142.25,
-            "isPrivate": false,
-            "settingStoreCookies": true,
-            "settingSendCookies": true,
-            "settingDisableRenderRequestBody": false,
-            "settingEncodeUrl": true,
-            "settingRebuildPath": true,
-            "settingFollowRedirects": "global",
-            "segmentParams":
-            [],
-            "_type": "request"
-        },
-        {
-            "_id": "req_86a3dabf1de64bc38c1ae66f2b83bdf9",
-            "parentId": "fld_3c44bf8d52564f7b99df687223172f31",
-            "modified": 1701670370097,
-            "created": 1701670335514,
-            "url": "{{ _.scheme }}://{{ _.domain }}:{{ _.port }}{{ _.path_prefix }}{{ _.subpath_prefix }}/mail-verify",
-            "name": "Mail OTP Verify",
-            "description": "",
-            "method": "POST",
-            "body":
-            {
-                "mimeType": "application/json",
-                "text": "{\n\tmail: \"jill@nevermind.np\",\n\totp_code: \"\"\n}"
-            },
-            "parameters":
-            [],
-            "headers":
-            [
-                {
-                    "name": "Content-Type",
-                    "value": "application/json"
-                },
-                {
-                    "name": "User-Agent",
-                    "value": "insomnium/0.2.3-a"
-                }
-            ],
-            "authentication":
-            {},
-            "metaSortKey": -1699953940787.625,
-            "isPrivate": false,
-            "settingStoreCookies": true,
-            "settingSendCookies": true,
-            "settingDisableRenderRequestBody": false,
-            "settingEncodeUrl": true,
-            "settingRebuildPath": true,
-            "settingFollowRedirects": "global",
-            "segmentParams":
-            [],
-            "_type": "request"
-        },
-        {
             "_id": "req_3ff6e2968a374178a29b68fe7b968053",
             "parentId": "fld_3c44bf8d52564f7b99df687223172f31",
-            "modified": 1699954335268,
+            "modified": 1704957184100,
             "created": 1699954295659,
             "url": "{{ _.scheme }}://{{ _.domain }}:{{ _.port }}{{ _.path_prefix }}{{ _.subpath_prefix }}/verify-mail",
             "name": "Verify Email Address",
@@ -420,7 +222,7 @@
                 {
                     "id": "pair_4fe7755d88194e2699f6c1a567300aa7",
                     "name": "mail",
-                    "value": "winds6206%40gmail.com",
+                    "value": "",
                     "description": ""
                 },
                 {
@@ -460,7 +262,7 @@
         {
             "_id": "req_fd37fa1a2e2849caa22cf0379b08087c",
             "parentId": "fld_3c44bf8d52564f7b99df687223172f31",
-            "modified": 1700115120596,
+            "modified": 1704957110416,
             "created": 1699954357509,
             "url": "{{ _.scheme }}://{{ _.domain }}:{{ _.port }}{{ _.path_prefix }}{{ _.subpath_prefix }}/reset-password",
             "name": "Reset Password",
@@ -469,7 +271,7 @@
             "body":
             {
                 "mimeType": "application/json",
-                "text": "{\n\t\"password\": \"Bb123456!\"\n}"
+                "text": "{\n\t\"password\": \"\"\n}"
             },
             "parameters":
             [
@@ -518,9 +320,43 @@
             "_type": "request"
         },
         {
+            "_id": "req_3dea8ec82a8943fdab5976d2b5432a07",
+            "parentId": "fld_3c44bf8d52564f7b99df687223172f31",
+            "modified": 1703657625054,
+            "created": 1699954237666,
+            "url": "{{ _.scheme }}://{{ _.domain }}:{{ _.port }}{{ _.path_prefix }}{{ _.subpath_prefix }}/refresh",
+            "name": "Refresh JWT",
+            "description": "",
+            "method": "GET",
+            "body":
+            {},
+            "parameters":
+            [],
+            "headers":
+            [
+                {
+                    "name": "User-Agent",
+                    "value": "insomnium/0.2.3-a"
+                }
+            ],
+            "authentication":
+            {},
+            "metaSortKey": -1699953939295.5,
+            "isPrivate": false,
+            "settingStoreCookies": true,
+            "settingSendCookies": true,
+            "settingDisableRenderRequestBody": false,
+            "settingEncodeUrl": true,
+            "settingRebuildPath": true,
+            "settingFollowRedirects": "global",
+            "segmentParams":
+            [],
+            "_type": "request"
+        },
+        {
             "_id": "req_ea610eada78747a8ba5c7b2c4615bdd4",
             "parentId": "fld_3c44bf8d52564f7b99df687223172f31",
-            "modified": 1701670450767,
+            "modified": 1704957116448,
             "created": 1701670405122,
             "url": "{{ _.scheme }}://{{ _.domain }}:{{ _.port }}{{ _.path_prefix }}{{ _.subpath_prefix }}/password-expire",
             "name": "Chcek Password Expired",
@@ -529,7 +365,7 @@
             "body":
             {
                 "mimeType": "application/json",
-                "text": "{\n\t\"mail\": \"jill@nevermind.np\"\n}"
+                "text": "{\n\t\"mail\": \"\"\n}"
             },
             "parameters":
             [],
@@ -537,11 +373,13 @@
             [
                 {
                     "name": "Content-Type",
-                    "value": "application/json"
+                    "value": "application/json",
+                    "id": "pair_b52fc9ae3e524715b51b4c08bd85f096"
                 },
                 {
                     "name": "User-Agent",
-                    "value": "insomnium/0.2.3-a"
+                    "value": "insomnium/0.2.3-a",
+                    "id": "pair_91aa065d6e854e2fab50902a6489d17c"
                 }
             ],
             "authentication":
@@ -561,7 +399,7 @@
         {
             "_id": "req_86d55ec98222429b94fd8882be9ed1a6",
             "parentId": "fld_3c44bf8d52564f7b99df687223172f31",
-            "modified": 1699954472587,
+            "modified": 1704791758035,
             "created": 1699954427265,
             "url": "{{ _.scheme }}://{{ _.domain }}:{{ _.port }}{{ _.path_prefix }}{{ _.subpath_prefix }}/verify-mail/resend",
             "name": "ReSend Verify Mail",
@@ -574,13 +412,13 @@
                 {
                     "id": "pair_7e100d924e4149ba8b815aa0cd4bedf0",
                     "name": "username",
-                    "value": "tony",
+                    "value": "",
                     "description": ""
                 },
                 {
                     "id": "pair_4065c674911646d68c854a6794882d75",
                     "name": "mail",
-                    "value": "winds6206%40gmail.com",
+                    "value": "cruelcloud@msn.com",
                     "description": ""
                 }
             ],
@@ -649,7 +487,7 @@
         {
             "_id": "req_6c6b722db4504847bcebe8f3f6a998ea",
             "parentId": "fld_3c44bf8d52564f7b99df687223172f31",
-            "modified": 1700300547132,
+            "modified": 1704957120208,
             "created": 1700248434569,
             "url": "{{ _.scheme }}://{{ _.domain }}:{{ _.port }}{{ _.path_prefix }}{{ _.subpath_prefix }}/check-username",
             "name": "Check User Is Exist",
@@ -658,7 +496,7 @@
             "body":
             {
                 "mimeType": "application/json",
-                "text": "{\n\t\"username\": \"jill\"\n}"
+                "text": "{\n\t\"username\": \"\"\n}"
             },
             "parameters":
             [
@@ -673,11 +511,13 @@
             [
                 {
                     "name": "Content-Type",
-                    "value": "application/json"
+                    "value": "application/json",
+                    "id": "pair_4087b80d7c7e47e8873754813293e8df"
                 },
                 {
                     "name": "User-Agent",
-                    "value": "insomnium/0.2.3-a"
+                    "value": "insomnium/0.2.3-a",
+                    "id": "pair_fd0fcc5aaa604b19abb3b3520ceb7669"
                 }
             ],
             "authentication":
@@ -697,7 +537,7 @@
         {
             "_id": "req_05090147b2c24021800fdb8da2dd3083",
             "parentId": "fld_3c44bf8d52564f7b99df687223172f31",
-            "modified": 1700248599163,
+            "modified": 1704957125858,
             "created": 1700248565100,
             "url": "{{ _.scheme }}://{{ _.domain }}:{{ _.port }}{{ _.path_prefix }}{{ _.subpath_prefix }}/check-mail",
             "name": "Check Mail Address Is Exist",
@@ -706,7 +546,7 @@
             "body":
             {
                 "mimeType": "application/json",
-                "text": "{\n\t\"mail\": \"winds6206@gmail.com\"\n}"
+                "text": "{\n\t\"mail\": \"\"\n}"
             },
             "parameters":
             [
@@ -721,11 +561,13 @@
             [
                 {
                     "name": "Content-Type",
-                    "value": "application/json"
+                    "value": "application/json",
+                    "id": "pair_43cc1c9affc345b299865de964055e18"
                 },
                 {
                     "name": "User-Agent",
-                    "value": "insomnium/0.2.3-a"
+                    "value": "insomnium/0.2.3-a",
+                    "id": "pair_c085a4c8b9a446d496c7b2b581c9b671"
                 }
             ],
             "authentication":
@@ -743,9 +585,143 @@
             "_type": "request"
         },
         {
+            "_id": "req_a758c863bf8e429c9d3d250d316fd5b0",
+            "parentId": "fld_3c44bf8d52564f7b99df687223172f31",
+            "modified": 1704957138689,
+            "created": 1702370387333,
+            "url": "{{ _.scheme }}://{{ _.domain }}:{{ _.port }}{{ _.path_prefix }}{{ _.subpath_prefix }}/check-phone-number",
+            "name": "Check Phone Number Is Exist",
+            "description": "",
+            "method": "GET",
+            "body":
+            {
+                "mimeType": "application/json",
+                "text": "{\n\t\"phone_number\": \"+886972777888\"\n}"
+            },
+            "parameters":
+            [
+                {
+                    "id": "pair_4065c674911646d68c854a6794882d75",
+                    "name": "mail",
+                    "value": "",
+                    "description": ""
+                }
+            ],
+            "headers":
+            [
+                {
+                    "name": "Content-Type",
+                    "value": "application/json",
+                    "id": "pair_02c696cb163c41cbac5505fb1272f2f7"
+                },
+                {
+                    "name": "User-Agent",
+                    "value": "insomnium/0.2.3-a",
+                    "id": "pair_129e315dc3824c76a790f9ef02df9275"
+                }
+            ],
+            "authentication":
+            {},
+            "metaSortKey": -1699953920393.25,
+            "isPrivate": false,
+            "settingStoreCookies": true,
+            "settingSendCookies": true,
+            "settingDisableRenderRequestBody": false,
+            "settingEncodeUrl": true,
+            "settingRebuildPath": true,
+            "settingFollowRedirects": "global",
+            "segmentParams":
+            [],
+            "_type": "request"
+        },
+        {
+            "_id": "req_e188cc225bf0464ea0fc40fd484eaffc",
+            "parentId": "fld_3c44bf8d52564f7b99df687223172f31",
+            "modified": 1704957133068,
+            "created": 1703656428517,
+            "url": "{{ _.scheme }}://{{ _.domain }}:{{ _.port }}{{ _.path_prefix }}{{ _.subpath_prefix }}/check-login-status",
+            "name": "Check Login Status",
+            "description": "",
+            "method": "GET",
+            "body":
+            {
+                "mimeType": "application/json",
+                "text": "{\n\t\"mail\": \"\"\n}"
+            },
+            "parameters":
+            [],
+            "headers":
+            [
+                {
+                    "name": "Content-Type",
+                    "value": "application/json",
+                    "id": "pair_afb3791f57284e9d9b1c506b722cea4c"
+                },
+                {
+                    "name": "User-Agent",
+                    "value": "insomnium/0.2.3-a",
+                    "id": "pair_5e139ef48f1045f8b7e20131a8832e1e"
+                }
+            ],
+            "authentication":
+            {},
+            "metaSortKey": -1699953920368.25,
+            "isPrivate": false,
+            "settingStoreCookies": true,
+            "settingSendCookies": true,
+            "settingDisableRenderRequestBody": false,
+            "settingEncodeUrl": true,
+            "settingRebuildPath": true,
+            "settingFollowRedirects": "global",
+            "segmentParams":
+            [],
+            "_type": "request"
+        },
+        {
+            "_id": "req_d76637ccd099421ba3ea9efd6c3e627a",
+            "parentId": "fld_3c44bf8d52564f7b99df687223172f31",
+            "modified": 1704957142491,
+            "created": 1703657716610,
+            "url": "{{ _.scheme }}://{{ _.domain }}:{{ _.port }}{{ _.path_prefix }}{{ _.subpath_prefix }}/check-auth-valid",
+            "name": "Check Authentication Valid",
+            "description": "",
+            "method": "GET",
+            "body":
+            {},
+            "parameters":
+            [
+                {
+                    "id": "pair_4065c674911646d68c854a6794882d75",
+                    "name": "mail",
+                    "value": "",
+                    "description": ""
+                }
+            ],
+            "headers":
+            [
+                {
+                    "name": "User-Agent",
+                    "value": "insomnium/0.2.3-a"
+                }
+            ],
+            "authentication":
+            {},
+            "metaSortKey": -1699953920355.75,
+            "isPrivate": false,
+            "settingStoreCookies": true,
+            "settingSendCookies": true,
+            "settingDisableRenderRequestBody": false,
+            "settingEncodeUrl": true,
+            "settingRebuildPath": true,
+            "settingFollowRedirects": "global",
+            "segmentParams":
+            [],
+            "_type": "request"
+        },
+        {
             "_id": "req_1b164129990a4ce38c1c59d2433982ff",
             "parentId": "fld_3c44bf8d52564f7b99df687223172f31",
-            "modified": 1701670507702,
+            "modified": 1704957148263,
             "created": 1701670485625,
             "url": "{{ _.scheme }}://{{ _.domain }}:{{ _.port }}{{ _.path_prefix }}{{ _.subpath_prefix }}/password-extension",
             "name": "Password Extension",
@@ -754,7 +730,7 @@
             "body":
             {
                 "mimeType": "application/json",
-                "text": "{\n\t\"mail\": \"jill@nevermind.np\"\n}"
+                "text": "{\n\t\"mail\": \"\"\n}"
             },
             "parameters":
             [],
@@ -784,18 +760,141 @@
             "_type": "request"
         },
         {
+            "_id": "req_b6a1e485a101402fb902f351ebe434b0",
+            "parentId": "fld_3c44bf8d52564f7b99df687223172f31",
+            "modified": 1704957155609,
+            "created": 1703656652789,
+            "url": "{{ _.scheme }}://{{ _.domain }}:{{ _.port }}{{ _.path_prefix }}{{ _.subpath_prefix }}/change-password",
+            "name": "Change Password",
+            "description": "",
+            "method": "PATCH",
+            "body":
+            {
+                "mimeType": "application/json",
+                "text": "{\n\t\"mail\": \"\",\n\t\"old_password\": \"\",\n\t\"new_password\": \"\"\n}"
+            },
+            "parameters":
+            [],
+            "headers":
+            [
+                {
+                    "name": "Content-Type",
+                    "value": "application/json"
+                },
+                {
+                    "name": "User-Agent",
+                    "value": "insomnium/0.2.3-a"
+                }
+            ],
+            "authentication":
+            {},
+            "metaSortKey": -1699953920293.25,
+            "isPrivate": false,
+            "settingStoreCookies": true,
+            "settingSendCookies": true,
+            "settingDisableRenderRequestBody": false,
+            "settingEncodeUrl": true,
+            "settingRebuildPath": true,
+            "settingFollowRedirects": "global",
+            "segmentParams":
+            [],
+            "_type": "request"
+        },
+        {
+            "_id": "req_9df346ffff33442297e5e353cef99315",
+            "parentId": "fld_3c44bf8d52564f7b99df687223172f31",
+            "modified": 1704957161657,
+            "created": 1703657655471,
+            "url": "{{ _.scheme }}://{{ _.domain }}:{{ _.port }}{{ _.path_prefix }}{{ _.subpath_prefix }}/setup-password",
+            "name": "Set Password",
+            "description": "",
+            "method": "PATCH",
+            "body":
+            {
+                "mimeType": "application/json",
+                "text": "{\n\t\"mail\": \"\",\n\t\"password\": \"\"\n}"
+            },
+            "parameters":
+            [],
+            "headers":
+            [
+                {
+                    "name": "Content-Type",
+                    "value": "application/json"
+                },
+                {
+                    "name": "User-Agent",
+                    "value": "insomnium/0.2.3-a"
+                }
+            ],
+            "authentication":
+            {},
+            "metaSortKey": -1699953920280.75,
+            "isPrivate": false,
+            "settingStoreCookies": true,
+            "settingSendCookies": true,
+            "settingDisableRenderRequestBody": false,
+            "settingEncodeUrl": true,
+            "settingRebuildPath": true,
+            "settingFollowRedirects": "global",
+            "segmentParams":
+            [],
+            "_type": "request"
+        },
+        {
+            "_id": "req_613361e714d548ccb569cfc105c160c3",
+            "parentId": "fld_3c44bf8d52564f7b99df687223172f31",
+            "modified": 1704957169943,
+            "created": 1703657247190,
+            "url": "{{ _.scheme }}://{{ _.domain }}:{{ _.port }}{{ _.path_prefix }}{{ _.subpath_prefix }}/update-personal-info",
+            "name": "Update Personal Information",
+            "description": "",
+            "method": "PUT",
+            "body":
+            {
+                "mimeType": "application/json",
+                "text": "{\n\t\"mail\": \"\",\n\t\"username\": \"\",\n\t\"last_name\": \"\",\n\t\"first_name\": \"\",\n\t\"phone_number\": \"+886972777888\",\n\t\"address\": \"\",\n\t\"birthday\": \"\",\n\t\"sex\": \"\",\n\t\"blood_type\": \"\"\n}"
+            },
+            "parameters":
+            [],
+            "headers":
+            [
+                {
+                    "name": "Content-Type",
+                    "value": "application/json"
+                },
+                {
+                    "name": "User-Agent",
+                    "value": "insomnium/0.2.3-a"
+                }
+            ],
+            "authentication":
+            {},
+            "metaSortKey": -1699953920268.25,
+            "isPrivate": false,
+            "settingStoreCookies": true,
+            "settingSendCookies": true,
+            "settingDisableRenderRequestBody": false,
+            "settingEncodeUrl": true,
+            "settingRebuildPath": true,
+            "settingFollowRedirects": "global",
+            "segmentParams":
+            [],
+            "_type": "request"
+        },
+        {
             "_id": "req_887ff18a9310441e9e9b15cfe00c07b1",
             "parentId": "fld_3c44bf8d52564f7b99df687223172f31",
-            "modified": 1701670511034,
+            "modified": 1704957174585,
             "created": 1699954174547,
             "url": "{{ _.scheme }}://{{ _.domain }}:{{ _.port }}{{ _.path_prefix }}{{ _.subpath_prefix }}/delete",
-            "name": "Delete User",
+            "name": "Delete Account",
             "description": "",
             "method": "DELETE",
             "body":
             {
                 "mimeType": "application/json",
-                "text": "{\n\t\"username\": \"jill\",\n\t\"mail\": \"jill@nevermind.np\"\n}"
+                "text": "{\n\t\"mail\": \"\"\n}"
             },
             "parameters":
             [],
@@ -825,18 +924,82 @@
             "_type": "request"
         },
         {
-            "_id": "req_07dbd30d5a8c48a79afae0cc2b62c1e2",
-            "parentId": "fld_ef90a3bdd794413a873986ba13c91ff1",
-            "modified": 1701670090808,
-            "created": 1699954634490,
-            "url": "{{ _.scheme }}://{{ _.domain }}:{{ _.port }}{{ _.path_prefix }}{{ _.subpath_prefix }}/totp/generate",
-            "name": "Enable TOTP",
+            "_id": "req_86a3dabf1de64bc38c1ae66f2b83bdf9",
+            "parentId": "fld_16dbbe7c358d45829c7068d487a8a3e5",
+            "modified": 1704957192796,
+            "created": 1701670335514,
+            "url": "{{ _.scheme }}://{{ _.domain }}:{{ _.port }}{{ _.path_prefix }}{{ _.subpath_prefix }}/mail/verify",
+            "name": "Mail OTP Verify",
+            "description": "",
+            "method": "GET",
+            "body":
+            {
+                "mimeType": "application/json",
+                "text": "{\n\t\"mail\": \"\",\n\t\"otp_code\": \"\"\n}"
+            },
+            "parameters":
+            [],
+            "headers":
+            [
+                {
+                    "name": "Content-Type",
+                    "value": "application/json",
+                    "id": "pair_f9f7d7475b2a4f00b7719be6a591620b"
+                },
+                {
+                    "name": "User-Agent",
+                    "value": "insomnium/0.2.3-a",
+                    "id": "pair_959994e0c60a4784abf0d5ceecd98758"
+                }
+            ],
+            "authentication":
+            {},
+            "metaSortKey": -1703656843516,
+            "isPrivate": false,
+            "settingStoreCookies": true,
+            "settingSendCookies": true,
+            "settingDisableRenderRequestBody": false,
+            "settingEncodeUrl": true,
+            "settingRebuildPath": true,
+            "settingFollowRedirects": "global",
+            "segmentParams":
+            [],
+            "_type": "request"
+        },
+        {
+            "_id": "fld_16dbbe7c358d45829c7068d487a8a3e5",
+            "parentId": "wrk_24c79459e84148f4ad6036f0c304c411",
+            "modified": 1704348808437,
+            "created": 1703656815906,
+            "name": "otp",
+            "description": "",
+            "environment":
+            {
+                "subpath_prefix": "/otp"
+            },
+            "environmentPropertyOrder":
+            {
+                "&":
+                [
+                    "subpath_prefix"
+                ]
+            },
+            "metaSortKey": -1699953934428.875,
+            "_type": "request_group"
+        },
+        {
+            "_id": "req_f154a4e2e63545edbf4408434efa355c",
+            "parentId": "fld_16dbbe7c358d45829c7068d487a8a3e5",
+            "modified": 1704957196034,
+            "created": 1701670310120,
+            "url": "{{ _.scheme }}://{{ _.domain }}:{{ _.port }}{{ _.path_prefix }}{{ _.subpath_prefix }}/mail/send",
+            "name": "Mail OTP Send",
             "description": "",
             "method": "POST",
             "body":
             {
                 "mimeType": "application/json",
-                "text": "{\n\tmail: \"jill@nevermind.np\"\n}"
+                "text": "{\n\t\"mail\": \"\"\n}"
             },
             "parameters":
             [],
@@ -849,6 +1012,131 @@
                 {
                     "name": "User-Agent",
                     "value": "insomnium/0.2.3-a"
+                }
+            ],
+            "authentication":
+            {},
+            "metaSortKey": -1703656843416,
+            "isPrivate": false,
+            "settingStoreCookies": true,
+            "settingSendCookies": true,
+            "settingDisableRenderRequestBody": false,
+            "settingEncodeUrl": true,
+            "settingRebuildPath": true,
+            "settingFollowRedirects": "global",
+            "segmentParams":
+            [],
+            "_type": "request"
+        },
+        {
+            "_id": "req_53d08ff73aa945a08102a9094c5269da",
+            "parentId": "fld_16dbbe7c358d45829c7068d487a8a3e5",
+            "modified": 1704957199045,
+            "created": 1701670271240,
+            "url": "{{ _.scheme }}://{{ _.domain }}:{{ _.port }}{{ _.path_prefix }}{{ _.subpath_prefix }}/mail/enable",
+            "name": "Mail OTP Enable",
+            "description": "",
+            "method": "PUT",
+            "body":
+            {
+                "mimeType": "application/json",
+                "text": "{\n\t\"mail\": \"\"\n}"
+            },
+            "parameters":
+            [],
+            "headers":
+            [
+                {
+                    "name": "Content-Type",
+                    "value": "application/json"
+                },
+                {
+                    "name": "User-Agent",
+                    "value": "insomnium/0.2.3-a"
+                }
+            ],
+            "authentication":
+            {},
+            "metaSortKey": -1703656843316,
+            "isPrivate": false,
+            "settingStoreCookies": true,
+            "settingSendCookies": true,
+            "settingDisableRenderRequestBody": false,
+            "settingEncodeUrl": true,
+            "settingRebuildPath": true,
+            "settingFollowRedirects": "global",
+            "segmentParams":
+            [],
+            "_type": "request"
+        },
+        {
+            "_id": "req_6eb50698f08b4ce49460de9c41ae5c3a",
+            "parentId": "fld_16dbbe7c358d45829c7068d487a8a3e5",
+            "modified": 1704957201857,
+            "created": 1701670201409,
+            "url": "{{ _.scheme }}://{{ _.domain }}:{{ _.port }}{{ _.path_prefix }}{{ _.subpath_prefix }}/mail/disable",
+            "name": "Mail OTP Disable",
+            "description": "",
+            "method": "PUT",
+            "body":
+            {
+                "mimeType": "application/json",
+                "text": "{\n\t\"mail\": \"\"\n}"
+            },
+            "parameters":
+            [],
+            "headers":
+            [
+                {
+                    "name": "Content-Type",
+                    "value": "application/json"
+                },
+                {
+                    "name": "User-Agent",
+                    "value": "insomnium/0.2.3-a"
+                }
+            ],
+            "authentication":
+            {},
+            "metaSortKey": -1703656843216,
+            "isPrivate": false,
+            "settingStoreCookies": true,
+            "settingSendCookies": true,
+            "settingDisableRenderRequestBody": false,
+            "settingEncodeUrl": true,
+            "settingRebuildPath": true,
+            "settingFollowRedirects": "global",
+            "segmentParams":
+            [],
+            "_type": "request"
+        },
+        {
+            "_id": "req_07dbd30d5a8c48a79afae0cc2b62c1e2",
+            "parentId": "fld_ef90a3bdd794413a873986ba13c91ff1",
+            "modified": 1704957205930,
+            "created": 1699954634490,
+            "url": "{{ _.scheme }}://{{ _.domain }}:{{ _.port }}{{ _.path_prefix }}{{ _.subpath_prefix }}/generate",
+            "name": "Enable TOTP",
+            "description": "",
+            "method": "POST",
+            "body":
+            {
+                "mimeType": "application/json",
+                "text": "{\n\t\"mail\": \"\"\n}"
+            },
+            "parameters":
+            [],
+            "headers":
+            [
+                {
+                    "name": "Content-Type",
+                    "value": "application/json",
+                    "id": "pair_25cedb7347d94120985bd8c933c41640"
+                },
+                {
+                    "name": "User-Agent",
+                    "value": "insomnium/0.2.3-a",
+                    "id": "pair_623aadbf93624649bac1a57742e39267"
                 }
             ],
             "authentication":
@@ -868,7 +1156,7 @@
         {
             "_id": "fld_ef90a3bdd794413a873986ba13c91ff1",
             "parentId": "wrk_24c79459e84148f4ad6036f0c304c411",
-            "modified": 1699954610089,
+            "modified": 1703657864712,
             "created": 1699954536936,
             "name": "totp",
             "description": "",
@@ -883,22 +1171,22 @@
                     "subpath_prefix"
                 ]
             },
-            "metaSortKey": -1699953934425.75,
+            "metaSortKey": -1699953934428.0938,
             "_type": "request_group"
         },
         {
             "_id": "req_6618b4a80f1a4f39a0a2cc4c0e79127b",
             "parentId": "fld_ef90a3bdd794413a873986ba13c91ff1",
-            "modified": 1701670100398,
+            "modified": 1704957208755,
             "created": 1699954683136,
-            "url": "{{ _.scheme }}://{{ _.domain }}:{{ _.port }}{{ _.path_prefix }}{{ _.subpath_prefix }}/totp/disable",
+            "url": "{{ _.scheme }}://{{ _.domain }}:{{ _.port }}{{ _.path_prefix }}{{ _.subpath_prefix }}/disable",
             "name": "Disable TOTP",
             "description": "",
-            "method": "POST",
+            "method": "PUT",
             "body":
             {
                 "mimeType": "application/json",
-                "text": "{\n\tmail: \"jill@nevermind.np\"\n}"
+                "text": "{\n\t\"mail\": \"\"\n}"
             },
             "parameters":
             [],
@@ -930,16 +1218,16 @@
         {
             "_id": "req_a0b8c9ddaa764a23b3693bb91db82286",
             "parentId": "fld_ef90a3bdd794413a873986ba13c91ff1",
-            "modified": 1701670133849,
+            "modified": 1704957212270,
             "created": 1699954714528,
-            "url": "{{ _.scheme }}://{{ _.domain }}:{{ _.port }}{{ _.path_prefix }}{{ _.subpath_prefix }}/totp/verify",
+            "url": "{{ _.scheme }}://{{ _.domain }}:{{ _.port }}{{ _.path_prefix }}{{ _.subpath_prefix }}/verify",
             "name": "Verify TOTP",
             "description": "",
-            "method": "POST",
+            "method": "PATCH",
             "body":
             {
                 "mimeType": "application/json",
-                "text": "{\n\tmail: \"jill@nevermind.np\",\n\totp_code: \"\"\n}"
+                "text": "{\n\t\"mail\": \"\",\n\t\"otp_code\": \"\"\n}"
             },
             "parameters":
             [],
@@ -971,16 +1259,16 @@
         {
             "_id": "req_a275002be5fa4a59b0c197e39325ba0c",
             "parentId": "fld_ef90a3bdd794413a873986ba13c91ff1",
-            "modified": 1701670149600,
+            "modified": 1704957215656,
             "created": 1699954744534,
-            "url": "{{ _.scheme }}://{{ _.domain }}:{{ _.port }}{{ _.path_prefix }}{{ _.subpath_prefix }}/totp/validate",
+            "url": "{{ _.scheme }}://{{ _.domain }}:{{ _.port }}{{ _.path_prefix }}{{ _.subpath_prefix }}/validate",
             "name": "TOTP Validate",
             "description": "",
             "method": "POST",
             "body":
             {
                 "mimeType": "application/json",
-                "text": "{\n\tmail: \"jill@nevermind.np\",\n\totp_code: \"\"\n}"
+                "text": "{\n\t\"mail\": \"\",\n\t\"otp_code\": \"\"\n}"
             },
             "parameters":
             [],
@@ -998,6 +1286,95 @@
             "authentication":
             {},
             "metaSortKey": -1699954045542.375,
+            "isPrivate": false,
+            "settingStoreCookies": true,
+            "settingSendCookies": true,
+            "settingDisableRenderRequestBody": false,
+            "settingEncodeUrl": true,
+            "settingRebuildPath": true,
+            "settingFollowRedirects": "global",
+            "segmentParams":
+            [],
+            "_type": "request"
+        },
+        {
+            "_id": "req_3af42e784343433f855395008cb0b8b6",
+            "parentId": "fld_a7f007cfc9da498b949283dcc17c742e",
+            "modified": 1703657940283,
+            "created": 1703657916487,
+            "url": "{{ _.scheme }}://{{ _.domain }}:{{ _.port }}{{ _.path_prefix }}{{ _.subpath_prefix }}/google/login",
+            "name": "Google OAuth2 Login",
+            "description": "",
+            "method": "GET",
+            "body":
+            {},
+            "parameters":
+            [],
+            "headers":
+            [
+                {
+                    "name": "User-Agent",
+                    "value": "insomnium/0.2.3-a"
+                }
+            ],
+            "authentication":
+            {},
+            "metaSortKey": -1703657922248,
+            "isPrivate": false,
+            "settingStoreCookies": true,
+            "settingSendCookies": true,
+            "settingDisableRenderRequestBody": false,
+            "settingEncodeUrl": true,
+            "settingRebuildPath": true,
+            "settingFollowRedirects": "global",
+            "segmentParams":
+            [],
+            "_type": "request"
+        },
+        {
+            "_id": "fld_a7f007cfc9da498b949283dcc17c742e",
+            "parentId": "wrk_24c79459e84148f4ad6036f0c304c411",
+            "modified": 1703657875367,
+            "created": 1703657810064,
+            "name": "oauth2",
+            "description": "",
+            "environment":
+            {
+                "subpath_prefix": "/oauth"
+            },
+            "environmentPropertyOrder":
+            {
+                "&":
+                [
+                    "subpath_prefix"
+                ]
+            },
+            "metaSortKey": -1699953934427.3125,
+            "_type": "request_group"
+        },
+        {
+            "_id": "req_442697e13bcb4670bd10055d92569f98",
+            "parentId": "fld_a7f007cfc9da498b949283dcc17c742e",
+            "modified": 1703657967025,
+            "created": 1703657956453,
+            "url": "{{ _.scheme }}://{{ _.domain }}:{{ _.port }}{{ _.path_prefix }}{{ _.subpath_prefix }}/google/sign-up",
+            "name": "Google OAuth2 SignUp",
+            "description": "",
+            "method": "GET",
+            "body":
+            {},
+            "parameters":
+            [],
+            "headers":
+            [
+                {
+                    "name": "User-Agent",
+                    "value": "insomnium/0.2.3-a"
+                }
+            ],
+            "authentication":
+            {},
+            "metaSortKey": -1703657382882,
             "isPrivate": false,
             "settingStoreCookies": true,
             "settingSendCookies": true,
@@ -1481,23 +1858,32 @@
         {
             "_id": "jar_7957d37d99ba4c2f9d79056b204b912f",
             "parentId": "wrk_24c79459e84148f4ad6036f0c304c411",
-            "modified": 1699955767893,
+            "modified": 1704438697378,
             "created": 1699953783738,
             "name": "Default Jar",
             "cookies":
             [
                 {
+                    "key": "token",
+                    "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJtYWlsIjoiY3J1ZWxjbG91ZEBtc24uY29tIiwiZXhwIjoxNzA0NDM5ODk3fQ.euWaa8RU7l_d1yMNQgOL8zhlvq6nUow8huFYYWPn4jA",
+                    "expires": "2038-01-19T03:14:07.000Z",
+                    "domain": "127.0.0.1",
+                    "path": "/",
+                    "creation": "2024-01-05T06:26:29.429Z",
+                    "id": "10598510135864347"
+                },
+                {
                     "key": "session-key",
-                    "value": "MTY5OTk1NTc2N3xEWDhFQVFMX2dBQUJFQUVRQUFBOV80QUFBUVp6ZEhKcGJtY01CUUFEYzJsa0JuTjBjbWx1Wnd3aUFDQmpOamc0T0Roak5qUTVPR0UwT0RrMVlUVmtZVGcyTXpjNE1EQm1ORFE1WXc9PXzTCqeo5rHYa1eIBF8RiXbyMtt-IvmsTCzltB16ni87fA==",
-                    "expires": "2023-11-14T11:56:07.000Z",
+                    "value": "MTcwNDQzODY5N3xEWDhFQVFMX2dBQUJFQUVRQUFBOV80QUFBUVp6ZEhKcGJtY01CUUFEYzJsa0JuTjBjbWx1Wnd3aUFDQXlaV05sWm1KaU1qVmlNRGMwTldZMFlqVXpZVE0xTm1VMFptVmlZV1JoWXc9PXzkeE8q51c_n8y4YVV2MfHXWitvqMGluzaXvRlkVzFWFg==",
+                    "expires": "2024-01-05T09:11:37.000Z",
                     "maxAge": 7200,
                     "domain": "127.0.0.1",
                     "path": "/",
                     "httpOnly": true,
                     "hostOnly": true,
-                    "creation": "2023-11-14T09:56:07.892Z",
-                    "lastAccessed": "2023-11-14T09:56:07.892Z",
-                    "id": "6281642314191123"
+                    "creation": "2024-01-05T06:26:29.433Z",
+                    "lastAccessed": "2024-01-05T07:11:37.378Z",
+                    "id": "34146844662003994"
                 }
             ],
             "_type": "cookie_jar"

@@ -43,6 +43,22 @@ Command `make docker` can build docker images
 make docker VERSION=1.0.0
 ```
 
+## Update API Document
+
+### Update swagger doc files
+
+Install the swaggo cmd binary first:
+
+```bash
+go install github.com/swaggo/swag/cmd/swag@latest
+```
+
+And run the following command to update swagger files by comments with swagger specific format in the golang codes:
+
+```bash
+swag init
+```
+
 ## Test
 
 ### Unit Test
