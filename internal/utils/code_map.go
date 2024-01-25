@@ -80,6 +80,8 @@ func ResponseStatusCode() {
 		1069: "TTL string convert to duration failed",
 		1070: "Check whether the phone number exists or not failed.",
 		1071: "mail, totp_verify or username are not exists.",
+		1072: "It's either that the mail doesn't exist or token.",
+		1073: "The token and mail not matched with info from google oauth2.",
 		1101: "Fail to parse POST form data.",
 		1102: "Fail to bind POST form data.",
 		1103: "Fail to parse path parameters.",
