@@ -114,6 +114,67 @@
                 }
             }
         },
+        "/api/v1/oauth/google/verify": {
+            "post": {
+                "description": "Verify Google OAuth2 authentication from frontend",
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "oauth2"
+                ],
+                "summary": "Google OAuth2 Verification",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Mail",
+                        "name": "mail",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Token",
+                        "name": "token",
+                        "in": "formData"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "404": {
+                        "description": "Not found",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
         "/api/v1/otp/mail/disable": {
             "put": {
                 "description": "Disable Mail OTP feature",

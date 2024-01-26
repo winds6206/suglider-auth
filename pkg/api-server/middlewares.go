@@ -43,7 +43,8 @@ func userPrivilege(csbn *rbac.CasbinEnforcerConfig) gin.HandlerFunc {
 			"/api/v1/otp/mail/send",
 			"/api/v1/oauth/google/login",
 			"/api/v1/oauth/google/sign-up",
-			"/api/v1/oauth/google/callback":
+			"/api/v1/oauth/google/callback",
+			"/api/v1/oauth/google/verify":
 			sub = "anonymous"
 		default:
 		}
@@ -84,6 +85,7 @@ var apiWhileList = []string{
 	"/api/v1/oauth/google/login",
 	"/api/v1/oauth/google/sign-up",
 	"/api/v1/oauth/google/callback",
+	"/api/v1/oauth/google/verify",
 }
 
 func checkAPIWhileList(c *gin.Context) bool {

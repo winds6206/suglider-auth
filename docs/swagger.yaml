@@ -73,6 +73,46 @@ paths:
       summary: Google OAuth2 Sign Up
       tags:
       - oauth2
+  /api/v1/oauth/google/verify:
+    post:
+      consumes:
+      - multipart/form-data
+      description: Verify Google OAuth2 authentication from frontend
+      parameters:
+      - description: Mail
+        in: formData
+        name: mail
+        type: string
+      - description: Token
+        in: formData
+        name: token
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            type: string
+        "400":
+          description: Bad request
+          schema:
+            type: string
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+        "403":
+          description: Forbidden
+          schema:
+            type: string
+        "404":
+          description: Not found
+          schema:
+            type: string
+      summary: Google OAuth2 Verification
+      tags:
+      - oauth2
   /api/v1/otp/mail/disable:
     put:
       consumes:

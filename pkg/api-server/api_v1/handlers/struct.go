@@ -16,6 +16,11 @@ type oAuthResponse struct {
 	Locale     string `json:"locale"`
 }
 
+type googleOauth2Verification struct {
+	Mail        string `json:"mail"`
+	AccessToken string `json:"token"`
+}
+
 type userSignUp struct {
 	Mail        string  `json:"mail" binding:"required"`
 	Password    string  `json:"password" binding:"required"`
